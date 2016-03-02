@@ -1,0 +1,24 @@
+_startup: CODE, 429 0 72
+___awdiv: CODE, 320 0 69
+_ISR: CODE, 1356 0 7
+_lcdclear: CODE, 15 0 6
+_ReadAmnt: CODE, 1144 0 117
+___awmod: CODE, 234 0 61
+_main: CODE, 699 0 419
+_lcdcmd: CODE, 570 0 22
+_DisplayKerosene: CODE, 21 0 32
+_lcdport: CODE, 389 0 26
+_uart_init: CODE, 1319 0 16
+_enable: CODE, 415 0 14
+_lcddata: CODE, 295 0 25
+___lbdiv: CODE, 620 0 27
+_paramter: CODE, 1118 0 26
+_DisplayRise: CODE, 53 0 32
+_DisplayAmnt: CODE, 117 0 117
+_DisplaySugar: CODE, 85 0 32
+___wmul: CODE, 1285 0 28
+_eeprom_read: CODE, 1261 0 24
+___lbmod: CODE, 647 0 28
+_lcdstring: CODE, 592 0 28
+_lcd_init: CODE, 501 0 69
+Total: 1297
