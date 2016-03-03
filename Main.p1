@@ -888,8 +888,18 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _digit `Cuc -> 0 `x e ]
 "34 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _card_store `uc -> 15 `i e ]
+"34 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _sms `uc -> 20 `i e ]
+"34 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _RiseArray `uc -> 5 `i e ]
+"34 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _SugarArray `uc -> 4 `i e ]
+"34 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _KeroseneArray `uc -> 4 `i e ]
 "35 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _rfid_flag `b 1 e ]
+"35 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _sms_indication `b 1 e ]
 "36 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _User1 `uc -> 0 `x e ]
 "37 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
@@ -901,6 +911,8 @@ Version 3.2 HI-TECH Software Intermediate Code
 [p mainexit ]
 "44 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\include\string.h
 [v _strcmp `(i 0 ef2`*Cuc`*Cuc ]
+"43 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\include\string.h
+[v _memcmp `(i 0 ef3`*Cv`*Cv`ui ]
 [; ;pic16f887.h: 19: volatile unsigned char INDF @ 0x000;
 [; ;pic16f887.h: 20: volatile unsigned char TMR0 @ 0x001;
 [; ;pic16f887.h: 21: volatile unsigned char PCL @ 0x002;
@@ -2157,400 +2169,408 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;UART.C: 2: {
 [e :U _receive ]
 [f ]
-[; ;UART.C: 3: while(!RCIF);
+[; ;UART.C: 3: if(OERR){CREN=0;CREN=1;}
 "3
-[e $U 78  ]
-[e :U 79 ]
+[e $ ! _OERR 78  ]
+{
+[e = _CREN -> -> 0 `i `b ]
+[e = _CREN -> -> 1 `i `b ]
+}
 [e :U 78 ]
-[e $ ! _RCIF 79  ]
-[e :U 80 ]
-[; ;UART.C: 4: return(RCREG);
+[; ;UART.C: 4: while(!RCIF);
 "4
+[e $U 79  ]
+[e :U 80 ]
+[e :U 79 ]
+[e $ ! _RCIF 80  ]
+[e :U 81 ]
+[; ;UART.C: 5: return(RCREG);
+"5
 [e ) _RCREG ]
 [e $UE 77  ]
-[; ;UART.C: 5: }
-"5
+[; ;UART.C: 6: }
+"6
 [e :UE 77 ]
 }
-"7
+"8
 [v _transmit `(v 1 ef1`uc ]
 {
-[; ;UART.C: 6: void transmit(unsigned char data)
-[; ;UART.C: 7: {
+[; ;UART.C: 7: void transmit(unsigned char data)
+[; ;UART.C: 8: {
 [e :U _transmit ]
 [v _data `uc 1 r1 ]
 [f ]
-[; ;UART.C: 8: while(!TXIF);
-"8
-[e $U 82  ]
-[e :U 83 ]
-[e :U 82 ]
-[e $ ! _TXIF 83  ]
-[e :U 84 ]
-[; ;UART.C: 9: TXREG =data;
+[; ;UART.C: 9: while(!TXIF);
 "9
-[e = _TXREG _data ]
-[; ;UART.C: 10: }
+[e $U 83  ]
+[e :U 84 ]
+[e :U 83 ]
+[e $ ! _TXIF 84  ]
+[e :U 85 ]
+[; ;UART.C: 10: TXREG =data;
 "10
-[e :UE 81 ]
+[e = _TXREG _data ]
+[; ;UART.C: 11: }
+"11
+[e :UE 82 ]
 }
-"12
+"13
 [v _UARTinit `(v 1 ef ]
 {
-[; ;UART.C: 11: void UARTinit()
-[; ;UART.C: 12: {
+[; ;UART.C: 12: void UARTinit()
+[; ;UART.C: 13: {
 [e :U _UARTinit ]
 [f ]
-[; ;UART.C: 13: TXSTA = 0x24;
-"13
-[e = _TXSTA -> -> 36 `i `uc ]
-[; ;UART.C: 14: RCSTA = 0x90;
+[; ;UART.C: 14: TXSTA = 0x24;
 "14
-[e = _RCSTA -> -> 144 `i `uc ]
-[; ;UART.C: 15: SPBRG = 129;
+[e = _TXSTA -> -> 36 `i `uc ]
+[; ;UART.C: 15: RCSTA = 0x90;
 "15
-[e = _SPBRG -> -> 129 `i `uc ]
-[; ;UART.C: 16: INTCON = 0xC0;
+[e = _RCSTA -> -> 144 `i `uc ]
+[; ;UART.C: 16: SPBRG = 129;
 "16
-[e = _INTCON -> -> 192 `i `uc ]
-[; ;UART.C: 17: RCREG = 0;
+[e = _SPBRG -> -> 129 `i `uc ]
+[; ;UART.C: 17: INTCON = 0xC0;
 "17
-[e = _RCREG -> -> 0 `i `uc ]
-[; ;UART.C: 18: }
+[e = _INTCON -> -> 192 `i `uc ]
+[; ;UART.C: 18: RCREG = 0;
 "18
-[e :UE 85 ]
+[e = _RCREG -> -> 0 `i `uc ]
+[; ;UART.C: 19: }
+"19
+[e :UE 86 ]
 }
-"21
+"22
 [v _usartstring `(v 1 ef1`*Cuc ]
 {
-[; ;UART.C: 20: void usartstring(const unsigned char *st)
-[; ;UART.C: 21: {
+[; ;UART.C: 21: void usartstring(const unsigned char *st)
+[; ;UART.C: 22: {
 [e :U _usartstring ]
 [v _st `*Cuc 1 r1 ]
 [f ]
-[; ;UART.C: 22: while(*st)
-"22
-[e $U 87  ]
-[e :U 88 ]
-[; ;UART.C: 23: transmit(*st++);
+[; ;UART.C: 23: while(*st)
 "23
-[e ( _transmit (1 *U ++ _st * -> -> 1 `i `x -> -> # *U _st `i `x ]
-[e :U 87 ]
-"22
-[e $ != -> *U _st `i -> -> -> 0 `i `Cuc `i 88  ]
+[e $U 88  ]
 [e :U 89 ]
-[; ;UART.C: 24: }
+[; ;UART.C: 24: transmit(*st++);
 "24
-[e :UE 86 ]
+[e ( _transmit (1 *U ++ _st * -> -> 1 `i `x -> -> # *U _st `i `x ]
+[e :U 88 ]
+"23
+[e $ != -> *U _st `i -> -> -> 0 `i `Cuc `i 89  ]
+[e :U 90 ]
+[; ;UART.C: 25: }
+"25
+[e :UE 87 ]
 }
-"28
+"29
 [v _gsm_init `(v 1 ef ]
 {
-[; ;UART.C: 27: void gsm_init()
-[; ;UART.C: 28: {
+[; ;UART.C: 28: void gsm_init()
+[; ;UART.C: 29: {
 [e :U _gsm_init ]
 [f ]
-"29
-[v _d `uc 1 a ]
-[; ;UART.C: 29: unsigned char d;
-[; ;UART.C: 30: lcdcmd(0X80);
 "30
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;UART.C: 31: lcdstring("GSM INITIALIZING");
+[v _d `uc 1 a ]
+[; ;UART.C: 30: unsigned char d;
+[; ;UART.C: 31: lcdcmd(0X80);
 "31
-[e ( _lcdstring (1 :s 1C ]
-[; ;UART.C: 32: lcdcmd(0XC0);
-"32
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;UART.C: 33: lcdstring("PLS WAIT........");
-"33
-[e ( _lcdstring (1 :s 2C ]
-[; ;UART.C: 34: DelayS(5);
-"34
-[e ( _DelayS (1 -> -> 5 `i `uc ]
-[; ;UART.C: 35: lcdcmd(0x01);
-"35
-[e ( _lcdcmd (1 -> -> 1 `i `uc ]
-[; ;UART.C: 37: usartstring("AT\r");
-"37
-[e ( _usartstring (1 :s 3C ]
-[; ;UART.C: 38: transmit(0x0D);
-"38
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 39: while((d=receive())!='K');
-"39
-[e $U 91  ]
-[e :U 92 ]
-[e :U 91 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 92  ]
-[e :U 93 ]
-[; ;UART.C: 41: usartstring("AT+CPIN?\r");
-"41
-[e ( _usartstring (1 :s 4C ]
-[; ;UART.C: 42: transmit(0x0D);
-"42
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 43: while((d=receive())!='K');
-"43
-[e $U 94  ]
-[e :U 95 ]
-[e :U 94 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 95  ]
-[e :U 96 ]
-[; ;UART.C: 45: usartstring("AT+CSDH=1\r");
-"45
-[e ( _usartstring (1 :s 5C ]
-[; ;UART.C: 46: transmit(0x0D);
-"46
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 47: while((d=receive())!='K');
-"47
-[e $U 97  ]
-[e :U 98 ]
-[e :U 97 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 98  ]
-[e :U 99 ]
-[; ;UART.C: 49: usartstring("AT+CMGF=1\r");
-"49
-[e ( _usartstring (1 :s 6C ]
-[; ;UART.C: 50: transmit(0x0D);
-"50
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 51: while((d=receive())!='K');
-"51
-[e $U 100  ]
-[e :U 101 ]
-[e :U 100 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 101  ]
-[e :U 102 ]
-[; ;UART.C: 53: usartstring("AT+CNMI=2,2,0,0,0\r");
-"53
-[e ( _usartstring (1 :s 7C ]
-[; ;UART.C: 54: transmit(0x0D);
-"54
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 55: while((d=receive())!='K');
-"55
-[e $U 103  ]
-[e :U 104 ]
-[e :U 103 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 104  ]
-[e :U 105 ]
-[; ;UART.C: 56: lcdcmd(0x80);
-"56
 [e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;UART.C: 57: lcdstring("GSM READY");
-"57
-[e ( _lcdstring (1 :s 8C ]
-[; ;UART.C: 58: DelayS(10);
-"58
-[e ( _DelayS (1 -> -> 10 `i `uc ]
-[; ;UART.C: 59: lcdcmd(0x01);
-"59
+[; ;UART.C: 32: lcdstring("GSM INITIALIZING");
+"32
+[e ( _lcdstring (1 :s 1C ]
+[; ;UART.C: 33: lcdcmd(0XC0);
+"33
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;UART.C: 34: lcdstring("PLS WAIT........");
+"34
+[e ( _lcdstring (1 :s 2C ]
+[; ;UART.C: 35: DelayS(5);
+"35
+[e ( _DelayS (1 -> -> 5 `i `uc ]
+[; ;UART.C: 36: lcdcmd(0x01);
+"36
 [e ( _lcdcmd (1 -> -> 1 `i `uc ]
-[; ;UART.C: 60: }
+[; ;UART.C: 38: usartstring("AT\r");
+"38
+[e ( _usartstring (1 :s 3C ]
+[; ;UART.C: 39: transmit(0x0D);
+"39
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 40: while((d=receive())!='K');
+"40
+[e $U 92  ]
+[e :U 93 ]
+[e :U 92 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 93  ]
+[e :U 94 ]
+[; ;UART.C: 42: usartstring("AT+CPIN?\r");
+"42
+[e ( _usartstring (1 :s 4C ]
+[; ;UART.C: 43: transmit(0x0D);
+"43
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 44: while((d=receive())!='K');
+"44
+[e $U 95  ]
+[e :U 96 ]
+[e :U 95 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 96  ]
+[e :U 97 ]
+[; ;UART.C: 46: usartstring("AT+CSDH=1\r");
+"46
+[e ( _usartstring (1 :s 5C ]
+[; ;UART.C: 47: transmit(0x0D);
+"47
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 48: while((d=receive())!='K');
+"48
+[e $U 98  ]
+[e :U 99 ]
+[e :U 98 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 99  ]
+[e :U 100 ]
+[; ;UART.C: 50: usartstring("AT+CMGF=1\r");
+"50
+[e ( _usartstring (1 :s 6C ]
+[; ;UART.C: 51: transmit(0x0D);
+"51
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 52: while((d=receive())!='K');
+"52
+[e $U 101  ]
+[e :U 102 ]
+[e :U 101 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 102  ]
+[e :U 103 ]
+[; ;UART.C: 54: usartstring("AT+CNMI=2,2,0,0,0\r");
+"54
+[e ( _usartstring (1 :s 7C ]
+[; ;UART.C: 55: transmit(0x0D);
+"55
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 56: while((d=receive())!='K');
+"56
+[e $U 104  ]
+[e :U 105 ]
+[e :U 104 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 105  ]
+[e :U 106 ]
+[; ;UART.C: 57: lcdcmd(0x80);
+"57
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;UART.C: 58: lcdstring("GSM READY");
+"58
+[e ( _lcdstring (1 :s 8C ]
+[; ;UART.C: 59: DelayS(10);
+"59
+[e ( _DelayS (1 -> -> 10 `i `uc ]
+[; ;UART.C: 60: lcdcmd(0x01);
 "60
-[e :UE 90 ]
+[e ( _lcdcmd (1 -> -> 1 `i `uc ]
+[; ;UART.C: 61: }
+"61
+[e :UE 91 ]
 }
-"63
+"64
 [v _send_moister_message2 `(v 1 ef ]
 {
-[; ;UART.C: 62: void send_moister_message2()
-[; ;UART.C: 63: {
+[; ;UART.C: 63: void send_moister_message2()
+[; ;UART.C: 64: {
 [e :U _send_moister_message2 ]
 [f ]
-"64
-[v _d `uc 1 a ]
-[; ;UART.C: 64: unsigned char d;
-[; ;UART.C: 65: usartstring("AT+CMGS=\"+919790080510\"");
 "65
-[e ( _usartstring (1 :s 9C ]
-[; ;UART.C: 66: transmit(0x0D);
+[v _d `uc 1 a ]
+[; ;UART.C: 65: unsigned char d;
+[; ;UART.C: 66: usartstring("AT+CMGS=\"+919790080510\"");
 "66
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 67: while((d=receive())!='>');
+[e ( _usartstring (1 :s 9C ]
+[; ;UART.C: 67: transmit(0x0D);
 "67
-[e $U 107  ]
-[e :U 108 ]
-[e :U 107 ]
-[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 108  ]
-[e :U 109 ]
-[; ;UART.C: 68: usartstring("moister level low moter ON");
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 68: while((d=receive())!='>');
 "68
-[e ( _usartstring (1 :s 10C ]
-[; ;UART.C: 69: transmit(0x1A);
-"69
-[e ( _transmit (1 -> -> 26 `i `uc ]
-[; ;UART.C: 70: while((d=receive())!='K');
-"70
-[e $U 110  ]
-[e :U 111 ]
+[e $U 108  ]
+[e :U 109 ]
+[e :U 108 ]
+[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 109  ]
 [e :U 110 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 111  ]
-[e :U 112 ]
-[; ;UART.C: 71: }
+[; ;UART.C: 69: usartstring("moister level low moter ON");
+"69
+[e ( _usartstring (1 :s 10C ]
+[; ;UART.C: 70: transmit(0x1A);
+"70
+[e ( _transmit (1 -> -> 26 `i `uc ]
+[; ;UART.C: 71: while((d=receive())!='K');
 "71
-[e :UE 106 ]
+[e $U 111  ]
+[e :U 112 ]
+[e :U 111 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 112  ]
+[e :U 113 ]
+[; ;UART.C: 72: }
+"72
+[e :UE 107 ]
 }
-"73
+"74
 [v _send_moister_message1 `(v 1 ef ]
 {
-[; ;UART.C: 72: void send_moister_message1()
-[; ;UART.C: 73: {
+[; ;UART.C: 73: void send_moister_message1()
+[; ;UART.C: 74: {
 [e :U _send_moister_message1 ]
 [f ]
-"74
-[v _d `uc 1 a ]
-[; ;UART.C: 74: unsigned char d;
-[; ;UART.C: 75: usartstring("AT+CMGS=\"+919790080510\"");
 "75
-[e ( _usartstring (1 :s 11C ]
-[; ;UART.C: 76: transmit(0x0D);
+[v _d `uc 1 a ]
+[; ;UART.C: 75: unsigned char d;
+[; ;UART.C: 76: usartstring("AT+CMGS=\"+919790080510\"");
 "76
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 77: while((d=receive())!='>');
+[e ( _usartstring (1 :s 11C ]
+[; ;UART.C: 77: transmit(0x0D);
 "77
-[e $U 114  ]
-[e :U 115 ]
-[e :U 114 ]
-[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 115  ]
-[e :U 116 ]
-[; ;UART.C: 78: usartstring("moister level high moter OFF");
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 78: while((d=receive())!='>');
 "78
-[e ( _usartstring (1 :s 12C ]
-[; ;UART.C: 79: transmit(0x1A);
-"79
-[e ( _transmit (1 -> -> 26 `i `uc ]
-[; ;UART.C: 80: while((d=receive())!='K');
-"80
-[e $U 117  ]
-[e :U 118 ]
+[e $U 115  ]
+[e :U 116 ]
+[e :U 115 ]
+[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 116  ]
 [e :U 117 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 118  ]
-[e :U 119 ]
-[; ;UART.C: 81: }
+[; ;UART.C: 79: usartstring("moister level high moter OFF");
+"79
+[e ( _usartstring (1 :s 12C ]
+[; ;UART.C: 80: transmit(0x1A);
+"80
+[e ( _transmit (1 -> -> 26 `i `uc ]
+[; ;UART.C: 81: while((d=receive())!='K');
 "81
-[e :UE 113 ]
+[e $U 118  ]
+[e :U 119 ]
+[e :U 118 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 119  ]
+[e :U 120 ]
+[; ;UART.C: 82: }
+"82
+[e :UE 114 ]
 }
-"83
+"84
 [v _send_stage1_message `(v 1 ef ]
 {
-[; ;UART.C: 82: void send_stage1_message()
-[; ;UART.C: 83: {
+[; ;UART.C: 83: void send_stage1_message()
+[; ;UART.C: 84: {
 [e :U _send_stage1_message ]
 [f ]
-"84
-[v _d `uc 1 a ]
-[; ;UART.C: 84: unsigned char d;
-[; ;UART.C: 85: usartstring("AT+CMGS=\"+919790080510\"");
 "85
-[e ( _usartstring (1 :s 13C ]
-[; ;UART.C: 86: transmit(0x0D);
+[v _d `uc 1 a ]
+[; ;UART.C: 85: unsigned char d;
+[; ;UART.C: 86: usartstring("AT+CMGS=\"+919790080510\"");
 "86
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 87: while((d=receive())!='>');
+[e ( _usartstring (1 :s 13C ]
+[; ;UART.C: 87: transmit(0x0D);
 "87
-[e $U 121  ]
-[e :U 122 ]
-[e :U 121 ]
-[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 122  ]
-[e :U 123 ]
-[; ;UART.C: 88: usartstring("Crop crossed stage1");
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 88: while((d=receive())!='>');
 "88
-[e ( _usartstring (1 :s 14C ]
-[; ;UART.C: 89: transmit(0x1A);
-"89
-[e ( _transmit (1 -> -> 26 `i `uc ]
-[; ;UART.C: 90: while((d=receive())!='K');
-"90
-[e $U 124  ]
-[e :U 125 ]
+[e $U 122  ]
+[e :U 123 ]
+[e :U 122 ]
+[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 123  ]
 [e :U 124 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 125  ]
-[e :U 126 ]
-[; ;UART.C: 91: }
+[; ;UART.C: 89: usartstring("Crop crossed stage1");
+"89
+[e ( _usartstring (1 :s 14C ]
+[; ;UART.C: 90: transmit(0x1A);
+"90
+[e ( _transmit (1 -> -> 26 `i `uc ]
+[; ;UART.C: 91: while((d=receive())!='K');
 "91
-[e :UE 120 ]
+[e $U 125  ]
+[e :U 126 ]
+[e :U 125 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 126  ]
+[e :U 127 ]
+[; ;UART.C: 92: }
+"92
+[e :UE 121 ]
 }
-"93
+"94
 [v _send_stage2_message `(v 1 ef ]
 {
-[; ;UART.C: 92: void send_stage2_message()
-[; ;UART.C: 93: {
+[; ;UART.C: 93: void send_stage2_message()
+[; ;UART.C: 94: {
 [e :U _send_stage2_message ]
 [f ]
-"94
-[v _d `uc 1 a ]
-[; ;UART.C: 94: unsigned char d;
-[; ;UART.C: 95: usartstring("AT+CMGS=\"+919790080510\"");
 "95
-[e ( _usartstring (1 :s 15C ]
-[; ;UART.C: 96: transmit(0x0D);
+[v _d `uc 1 a ]
+[; ;UART.C: 95: unsigned char d;
+[; ;UART.C: 96: usartstring("AT+CMGS=\"+919790080510\"");
 "96
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 97: while((d=receive())!='>');
+[e ( _usartstring (1 :s 15C ]
+[; ;UART.C: 97: transmit(0x0D);
 "97
-[e $U 128  ]
-[e :U 129 ]
-[e :U 128 ]
-[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 129  ]
-[e :U 130 ]
-[; ;UART.C: 98: usartstring("Crop crossed stage2");
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 98: while((d=receive())!='>');
 "98
-[e ( _usartstring (1 :s 16C ]
-[; ;UART.C: 99: transmit(0x1A);
-"99
-[e ( _transmit (1 -> -> 26 `i `uc ]
-[; ;UART.C: 100: while((d=receive())!='K');
-"100
-[e $U 131  ]
-[e :U 132 ]
+[e $U 129  ]
+[e :U 130 ]
+[e :U 129 ]
+[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 130  ]
 [e :U 131 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 132  ]
-[e :U 133 ]
-[; ;UART.C: 101: }
+[; ;UART.C: 99: usartstring("Crop crossed stage2");
+"99
+[e ( _usartstring (1 :s 16C ]
+[; ;UART.C: 100: transmit(0x1A);
+"100
+[e ( _transmit (1 -> -> 26 `i `uc ]
+[; ;UART.C: 101: while((d=receive())!='K');
 "101
-[e :UE 127 ]
+[e $U 132  ]
+[e :U 133 ]
+[e :U 132 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 133  ]
+[e :U 134 ]
+[; ;UART.C: 102: }
+"102
+[e :UE 128 ]
 }
-"103
+"104
 [v _send_stage3_message `(v 1 ef ]
 {
-[; ;UART.C: 102: void send_stage3_message()
-[; ;UART.C: 103: {
+[; ;UART.C: 103: void send_stage3_message()
+[; ;UART.C: 104: {
 [e :U _send_stage3_message ]
 [f ]
-"104
-[v _d `uc 1 a ]
-[; ;UART.C: 104: unsigned char d;
-[; ;UART.C: 105: usartstring("AT+CMGS=\"+919790080510\"");
 "105
-[e ( _usartstring (1 :s 17C ]
-[; ;UART.C: 106: transmit(0x0D);
+[v _d `uc 1 a ]
+[; ;UART.C: 105: unsigned char d;
+[; ;UART.C: 106: usartstring("AT+CMGS=\"+919790080510\"");
 "106
-[e ( _transmit (1 -> -> 13 `i `uc ]
-[; ;UART.C: 107: while((d=receive())!='>');
+[e ( _usartstring (1 :s 17C ]
+[; ;UART.C: 107: transmit(0x0D);
 "107
-[e $U 135  ]
-[e :U 136 ]
-[e :U 135 ]
-[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 136  ]
-[e :U 137 ]
-[; ;UART.C: 108: usartstring("Crop crossed stage3");
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;UART.C: 108: while((d=receive())!='>');
 "108
-[e ( _usartstring (1 :s 18C ]
-[; ;UART.C: 109: transmit(0x1A);
-"109
-[e ( _transmit (1 -> -> 26 `i `uc ]
-[; ;UART.C: 110: while((d=receive())!='K');
-"110
-[e $U 138  ]
-[e :U 139 ]
+[e $U 136  ]
+[e :U 137 ]
+[e :U 136 ]
+[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 137  ]
 [e :U 138 ]
-[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 139  ]
-[e :U 140 ]
-[; ;UART.C: 111: }
+[; ;UART.C: 109: usartstring("Crop crossed stage3");
+"109
+[e ( _usartstring (1 :s 18C ]
+[; ;UART.C: 110: transmit(0x1A);
+"110
+[e ( _transmit (1 -> -> 26 `i `uc ]
+[; ;UART.C: 111: while((d=receive())!='K');
 "111
-[e :UE 134 ]
+[e $U 139  ]
+[e :U 140 ]
+[e :U 139 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 140  ]
+[e :U 141 ]
+[; ;UART.C: 112: }
+"112
+[e :UE 135 ]
 }
 "12 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [; ;Main.c: 12: asm("\tpsect config,class=CONFIG,delta=2"); asm("\tdw ""0x3FFA & 0x3FF7 & 0x3FEF & 0x3CFF & 0x3FFF & 0x2FFF");
@@ -2650,12 +2670,15 @@ Version 3.2 HI-TECH Software Intermediate Code
 ..
 ]
 [; ;Main.c: 33: const char digit[]={"0123456789"};
-[; ;Main.c: 34: unsigned char card_store[15];
+[; ;Main.c: 34: unsigned char card_store[15],sms[20],RiseArray[5],SugarArray[4],KeroseneArray[4];
 "35
 [i _rfid_flag
 -> 0 `i
 ]
-[; ;Main.c: 35: bit rfid_flag=0;
+[i _sms_indication
+-> 0 `i
+]
+[; ;Main.c: 35: bit rfid_flag=0,sms_indication=0;
 "36
 [i _User1
 :U ..
@@ -2729,693 +2752,902 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 42: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "255" "," "200" "," "200" "," "0" "," "0" "," "0");
 [; 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
 [; 	db	10,0,255,200,200,0,0,0 ;#
-"47
-[v F1068 `(v 1 tf ]
-[v _ISR `IF1068 1 e ]
+"46
+[v _gsm_read_line2 `(v 1 ef1`*uc ]
 {
-[; ;Main.c: 46: void interrupt ISR(void)
-[; ;Main.c: 47: {
+[; ;Main.c: 45: void gsm_read_line2(char *buffer)
+[; ;Main.c: 46: {
+[e :U _gsm_read_line2 ]
+[v _buffer `*uc 1 r1 ]
+[f ]
+"47
+[v _rec_data `uc 1 a ]
+[; ;Main.c: 47: unsigned char rec_data=0,flag=0;
+[e = _rec_data -> -> 0 `i `uc ]
+[v _flag `uc 1 a ]
+[e = _flag -> -> 0 `i `uc ]
+[; ;Main.c: 49: do
+"49
+[e :U 145 ]
+[; ;Main.c: 50: {
+"50
+{
+[; ;Main.c: 51: rec_data = receive();
+"51
+[e = _rec_data ( _receive ..  ]
+[; ;Main.c: 52: if(rec_data=='#'){flag=1;rec_data = receive(); }
+"52
+[e $ ! == -> _rec_data `ui -> 35 `ui 146  ]
+{
+[e = _flag -> -> 1 `i `uc ]
+[e = _rec_data ( _receive ..  ]
+}
+[e :U 146 ]
+[; ;Main.c: 53: if(flag)
+"53
+[e $ ! != -> _flag `i -> -> -> 0 `i `uc `i 147  ]
+[; ;Main.c: 54: {
+"54
+{
+[; ;Main.c: 55: *buffer++ = rec_data;
+"55
+[e = *U ++ _buffer * -> -> 1 `i `x -> -> # *U _buffer `i `x _rec_data ]
+"56
+}
+[e :U 147 ]
+"57
+}
+[; ;Main.c: 56: }
+[; ;Main.c: 57: }while (rec_data != '\n');
+[e $ != -> _rec_data `ui -> 10 `ui 145  ]
+[e :U 144 ]
+[; ;Main.c: 58: *buffer='\0';
+"58
+[e = *U _buffer -> -> 0 `ui `uc ]
+[; ;Main.c: 59: }
+"59
+[e :UE 142 ]
+}
+"63
+[v F1077 `(v 1 tf ]
+[v _ISR `IF1077 1 e ]
+{
+[; ;Main.c: 62: void interrupt ISR(void)
+[; ;Main.c: 63: {
 [e :U _ISR ]
 [f ]
-[; ;Main.c: 48: }
-"48
-[e :UE 141 ]
+[; ;Main.c: 64: if (RCIF==1)
+"64
+[e $ ! == -> _RCIF `i -> 1 `i 149  ]
+[; ;Main.c: 65: {
+"65
+{
+[; ;Main.c: 66: gsm_read_line2(sms);
+"66
+[e ( _gsm_read_line2 (1 &U _sms ]
+"67
 }
-"51
+[e :U 149 ]
+[; ;Main.c: 67: }
+[; ;Main.c: 68: }
+"68
+[e :UE 148 ]
+}
+"71
 [v _RFID_read `(v 1 ef ]
 {
-[; ;Main.c: 50: void RFID_read()
-[; ;Main.c: 51: {
+[; ;Main.c: 70: void RFID_read()
+[; ;Main.c: 71: {
 [e :U _RFID_read ]
 [f ]
-[; ;Main.c: 52: if(!rfid_flag)
-"52
-[e $ ! ! _rfid_flag 143  ]
-[; ;Main.c: 53: {
-"53
+[; ;Main.c: 72: if(!rfid_flag)
+"72
+[e $ ! ! _rfid_flag 151  ]
+[; ;Main.c: 73: {
+"73
 {
-[; ;Main.c: 54: for(int i=0;i<12;i++)
-"54
+[; ;Main.c: 74: for(int i=0;i<12;i++)
+"74
 {
 [v _i `i 1 a ]
 [e = _i -> 0 `i ]
-[e $ < _i -> 12 `i 144  ]
-[e $U 145  ]
-"55
-[e :U 144 ]
-[; ;Main.c: 55: {card_store[i]=softreceive();}
+[e $ < _i -> 12 `i 152  ]
+[e $U 153  ]
+"75
+[e :U 152 ]
+[; ;Main.c: 75: {card_store[i]=softreceive();}
 {
 [e = *U + &U _card_store * -> -> _i `ui `ux -> -> # *U &U _card_store `ui `ux ( _softreceive ..  ]
 }
-"54
+"74
 [e ++ _i -> 1 `i ]
-[e $ < _i -> 12 `i 144  ]
-[e :U 145 ]
-"55
+[e $ < _i -> 12 `i 152  ]
+[e :U 153 ]
+"75
 }
-[; ;Main.c: 56: rfid_flag=1;
-"56
+[; ;Main.c: 76: rfid_flag=1;
+"76
 [e = _rfid_flag -> -> 1 `i `b ]
-"57
+"77
 }
-[e :U 143 ]
-[; ;Main.c: 57: }
-[; ;Main.c: 58: }
-"58
-[e :UE 142 ]
+[e :U 151 ]
+[; ;Main.c: 77: }
+[; ;Main.c: 78: }
+"78
+[e :UE 150 ]
 }
-"60
+"80
 [v _DisplayAmnt `(v 1 ef2`uc`i ]
 {
-[; ;Main.c: 59: void DisplayAmnt(unsigned char Location, int Amnt)
-[; ;Main.c: 60: {
+[; ;Main.c: 79: void DisplayAmnt(unsigned char Location, int Amnt)
+[; ;Main.c: 80: {
 [e :U _DisplayAmnt ]
 [v _Location `uc 1 r1 ]
 [v _Amnt `i 1 r2 ]
 [f ]
-[; ;Main.c: 61: lcdcmd(Location);
-"61
+[; ;Main.c: 81: lcdcmd(Location);
+"81
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 62: lcddata(digit[Amnt/1000]);
-"62
+[; ;Main.c: 82: lcddata(digit[Amnt/1000]);
+"82
 [e ( _lcddata (1 *U + &U _digit * -> -> / _Amnt -> 1000 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 63: lcddata(digit[Amnt%1000/100]);
-"63
+[; ;Main.c: 83: lcddata(digit[Amnt%1000/100]);
+"83
 [e ( _lcddata (1 *U + &U _digit * -> -> / % _Amnt -> 1000 `i -> 100 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 64: lcddata(digit[Amnt%1000%100/10]);
-"64
+[; ;Main.c: 84: lcddata(digit[Amnt%1000%100/10]);
+"84
 [e ( _lcddata (1 *U + &U _digit * -> -> / % % _Amnt -> 1000 `i -> 100 `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 65: lcddata(digit[Amnt%1000%100%10]);
-"65
+[; ;Main.c: 85: lcddata(digit[Amnt%1000%100%10]);
+"85
 [e ( _lcddata (1 *U + &U _digit * -> -> % % % _Amnt -> 1000 `i -> 100 `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 66: }
-"66
-[e :UE 147 ]
+[; ;Main.c: 86: }
+"86
+[e :UE 155 ]
 }
-"69
+"89
 [v _ReadAmnt `(v 1 ef ]
 {
-[; ;Main.c: 68: void ReadAmnt()
-[; ;Main.c: 69: {
+[; ;Main.c: 88: void ReadAmnt()
+[; ;Main.c: 89: {
 [e :U _ReadAmnt ]
 [f ]
-[; ;Main.c: 70: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
-"70
+[; ;Main.c: 90: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
+"90
 [e = _User1amt + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i ]
-[; ;Main.c: 71: User2amt=(eeprom_read(8)*100)+eeprom_read(15);
-"71
+[; ;Main.c: 91: User2amt=(eeprom_read(8)*100)+eeprom_read(15);
+"91
 [e = _User2amt + * -> ( _eeprom_read (1 -> -> 8 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 15 `i `uc `i ]
-[; ;Main.c: 72: User3amt=(eeprom_read(16)*100)+eeprom_read(23);
-"72
+[; ;Main.c: 92: User3amt=(eeprom_read(16)*100)+eeprom_read(23);
+"92
 [e = _User3amt + * -> ( _eeprom_read (1 -> -> 16 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 23 `i `uc `i ]
-[; ;Main.c: 73: User1Rise = eeprom_read(2);
-"73
+[; ;Main.c: 93: User1Rise = eeprom_read(2);
+"93
 [e = _User1Rise ( _eeprom_read (1 -> -> 2 `i `uc ]
-[; ;Main.c: 74: User2Rise = eeprom_read(10);
-"74
+[; ;Main.c: 94: User2Rise = eeprom_read(10);
+"94
 [e = _User2Rise ( _eeprom_read (1 -> -> 10 `i `uc ]
-[; ;Main.c: 75: User3Rise = eeprom_read(18);
-"75
+[; ;Main.c: 95: User3Rise = eeprom_read(18);
+"95
 [e = _User3Rise ( _eeprom_read (1 -> -> 18 `i `uc ]
-[; ;Main.c: 76: User1Kerosene = eeprom_read(4);
-"76
+[; ;Main.c: 96: User1Kerosene = eeprom_read(4);
+"96
 [e = _User1Kerosene ( _eeprom_read (1 -> -> 4 `i `uc ]
-[; ;Main.c: 77: User2Kerosene = eeprom_read(12);
-"77
+[; ;Main.c: 97: User2Kerosene = eeprom_read(12);
+"97
 [e = _User2Kerosene ( _eeprom_read (1 -> -> 12 `i `uc ]
-[; ;Main.c: 78: User3Kerosene = eeprom_read(20);
-"78
+[; ;Main.c: 98: User3Kerosene = eeprom_read(20);
+"98
 [e = _User3Kerosene ( _eeprom_read (1 -> -> 20 `i `uc ]
-[; ;Main.c: 79: User1Sugar = eeprom_read(3);
-"79
+[; ;Main.c: 99: User1Sugar = eeprom_read(3);
+"99
 [e = _User1Sugar ( _eeprom_read (1 -> -> 3 `i `uc ]
-[; ;Main.c: 80: User2Sugar = eeprom_read(11);
-"80
+[; ;Main.c: 100: User2Sugar = eeprom_read(11);
+"100
 [e = _User2Sugar ( _eeprom_read (1 -> -> 11 `i `uc ]
-[; ;Main.c: 81: User3Sugar = eeprom_read(19);
-"81
+[; ;Main.c: 101: User3Sugar = eeprom_read(19);
+"101
 [e = _User3Sugar ( _eeprom_read (1 -> -> 19 `i `uc ]
-[; ;Main.c: 82: }
-"82
-[e :UE 148 ]
+[; ;Main.c: 102: }
+"102
+[e :UE 156 ]
 }
-"85
+"105
 [v _ReadStock `(v 1 ef ]
 {
-[; ;Main.c: 84: void ReadStock()
-[; ;Main.c: 85: {
+[; ;Main.c: 104: void ReadStock()
+[; ;Main.c: 105: {
 [e :U _ReadStock ]
 [f ]
-[; ;Main.c: 86: RiseStock=(eeprom_read(24)*100)+eeprom_read(25);
-"86
+[; ;Main.c: 106: RiseStock=(eeprom_read(24)*100)+eeprom_read(25);
+"106
 [e = _RiseStock -> + * -> ( _eeprom_read (1 -> -> 24 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 25 `i `uc `i `ui ]
-[; ;Main.c: 87: SugarStock=eeprom_read(26);
-"87
+[; ;Main.c: 107: SugarStock=eeprom_read(26);
+"107
 [e = _SugarStock -> ( _eeprom_read (1 -> -> 26 `i `uc `ui ]
-[; ;Main.c: 88: KeroseneStock=eeprom_read(27);
-"88
+[; ;Main.c: 108: KeroseneStock=eeprom_read(27);
+"108
 [e = _KeroseneStock -> ( _eeprom_read (1 -> -> 27 `i `uc `ui ]
-[; ;Main.c: 89: }
-"89
-[e :UE 149 ]
+[; ;Main.c: 109: }
+"109
+[e :UE 157 ]
 }
-"92
+"112
 [v _DisplayStock `(v 1 ef ]
 {
-[; ;Main.c: 91: void DisplayStock()
-[; ;Main.c: 92: {
+[; ;Main.c: 111: void DisplayStock()
+[; ;Main.c: 112: {
 [e :U _DisplayStock ]
 [f ]
-[; ;Main.c: 93: lcdcmd(0x80);
-"93
+[; ;Main.c: 113: lcdcmd(0x80);
+"113
 [e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 94: lcdstring("    STOCK DETAILS   ");
-"94
+[; ;Main.c: 114: lcdstring("    STOCK DETAILS   ");
+"114
 [e ( _lcdstring (1 :s 19C ]
-[; ;Main.c: 95: lcdcmd(0xC0);
-"95
+[; ;Main.c: 115: lcdcmd(0xC0);
+"115
 [e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 96: lcdstring("RISE:      Kg       ");
-"96
+[; ;Main.c: 116: lcdstring("RISE:      Kg       ");
+"116
 [e ( _lcdstring (1 :s 20C ]
-[; ;Main.c: 97: DisplayAmnt(0XC5,RiseStock);
-"97
+[; ;Main.c: 117: DisplayAmnt(0XC5,RiseStock);
+"117
 [e ( _DisplayAmnt (2 , -> -> 197 `i `uc -> _RiseStock `i ]
-[; ;Main.c: 98: lcdcmd(0x94);
-"98
+[; ;Main.c: 118: lcdcmd(0x94);
+"118
 [e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 99: lcdstring("SUGAR:    Kg         ");
-"99
+[; ;Main.c: 119: lcdstring("SUGAR:    Kg         ");
+"119
 [e ( _lcdstring (1 :s 21C ]
-[; ;Main.c: 100: DisplayAmnt(0x9A,SugarStock);
-"100
+[; ;Main.c: 120: DisplayAmnt(0x9A,SugarStock);
+"120
 [e ( _DisplayAmnt (2 , -> -> 154 `i `uc -> _SugarStock `i ]
-[; ;Main.c: 101: lcdcmd(0xD4);
-"101
+[; ;Main.c: 121: lcdcmd(0xD4);
+"121
 [e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 102: lcdstring("KEROSENE:     Lts    ");
-"102
+[; ;Main.c: 122: lcdstring("KEROSENE:     Lts    ");
+"122
 [e ( _lcdstring (1 :s 22C ]
-[; ;Main.c: 103: DisplayAmnt(0XDD,KeroseneStock);
-"103
+[; ;Main.c: 123: DisplayAmnt(0XDD,KeroseneStock);
+"123
 [e ( _DisplayAmnt (2 , -> -> 221 `i `uc -> _KeroseneStock `i ]
-[; ;Main.c: 104: }
-"104
-[e :UE 150 ]
+[; ;Main.c: 124: }
+"124
+[e :UE 158 ]
 }
-"106
+"126
 [v _DisplaySugar `(v 1 ef2`uc`uc ]
 {
-[; ;Main.c: 105: void DisplaySugar(unsigned char Location, unsigned char Sugar)
-[; ;Main.c: 106: {
+[; ;Main.c: 125: void DisplaySugar(unsigned char Location, unsigned char Sugar)
+[; ;Main.c: 126: {
 [e :U _DisplaySugar ]
 [v _Location `uc 1 r1 ]
 [v _Sugar `uc 1 r2 ]
 [f ]
-[; ;Main.c: 107: lcdcmd(Location);
-"107
+[; ;Main.c: 127: lcdcmd(Location);
+"127
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 108: lcddata(digit[Sugar/10]);
-"108
+[; ;Main.c: 128: lcddata(digit[Sugar/10]);
+"128
 [e ( _lcddata (1 *U + &U _digit * -> -> / -> _Sugar `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 109: lcddata(digit[Sugar%10]);
-"109
+[; ;Main.c: 129: lcddata(digit[Sugar%10]);
+"129
 [e ( _lcddata (1 *U + &U _digit * -> -> % -> _Sugar `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 110: }
-"110
-[e :UE 151 ]
+[; ;Main.c: 130: }
+"130
+[e :UE 159 ]
 }
-"112
+"132
 [v _DisplayRise `(v 1 ef2`uc`uc ]
 {
-[; ;Main.c: 111: void DisplayRise(unsigned char Location, unsigned char Rise)
-[; ;Main.c: 112: {
+[; ;Main.c: 131: void DisplayRise(unsigned char Location, unsigned char Rise)
+[; ;Main.c: 132: {
 [e :U _DisplayRise ]
 [v _Location `uc 1 r1 ]
 [v _Rise `uc 1 r2 ]
 [f ]
-[; ;Main.c: 113: lcdcmd(Location);
-"113
+[; ;Main.c: 133: lcdcmd(Location);
+"133
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 114: lcddata(digit[Rise/10]);
-"114
+[; ;Main.c: 134: lcddata(digit[Rise/10]);
+"134
 [e ( _lcddata (1 *U + &U _digit * -> -> / -> _Rise `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 115: lcddata(digit[Rise%10]);
-"115
+[; ;Main.c: 135: lcddata(digit[Rise%10]);
+"135
 [e ( _lcddata (1 *U + &U _digit * -> -> % -> _Rise `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 116: }
-"116
-[e :UE 152 ]
+[; ;Main.c: 136: }
+"136
+[e :UE 160 ]
 }
-"118
+"138
 [v _DisplayKerosene `(v 1 ef2`uc`uc ]
 {
-[; ;Main.c: 117: void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
-[; ;Main.c: 118: {
+[; ;Main.c: 137: void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
+[; ;Main.c: 138: {
 [e :U _DisplayKerosene ]
 [v _Location `uc 1 r1 ]
 [v _Kerosene `uc 1 r2 ]
 [f ]
-[; ;Main.c: 119: lcdcmd(Location);
-"119
+[; ;Main.c: 139: lcdcmd(Location);
+"139
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 120: lcddata(digit[Kerosene/10]);
-"120
+[; ;Main.c: 140: lcddata(digit[Kerosene/10]);
+"140
 [e ( _lcddata (1 *U + &U _digit * -> -> / -> _Kerosene `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 121: lcddata(digit[Kerosene%10]);
-"121
+[; ;Main.c: 141: lcddata(digit[Kerosene%10]);
+"141
 [e ( _lcddata (1 *U + &U _digit * -> -> % -> _Kerosene `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 122: }
-"122
-[e :UE 153 ]
+[; ;Main.c: 142: }
+"142
+[e :UE 161 ]
 }
-"125
+"145
 [v _uart_init `(v 1 ef ]
 {
-[; ;Main.c: 124: void uart_init()
-[; ;Main.c: 125: {
+[; ;Main.c: 144: void uart_init()
+[; ;Main.c: 145: {
 [e :U _uart_init ]
 [f ]
-[; ;Main.c: 126: PORTC=0xFF;
-"126
-[e = _PORTC -> -> 255 `i `uc ]
-[; ;Main.c: 127: TRISC=0x80;
-"127
-[e = _TRISC -> -> 128 `i `uc ]
-[; ;Main.c: 128: TXSTA=0X24;
-"128
-[e = _TXSTA -> -> 36 `i `uc ]
-[; ;Main.c: 129: RCSTA=0X90;
-"129
-[e = _RCSTA -> -> 144 `i `uc ]
-[; ;Main.c: 130: SPBRG=129;
-"130
-[e = _SPBRG -> -> 129 `i `uc ]
-[; ;Main.c: 131: RCREG=0;
-"131
-[e = _RCREG -> -> 0 `i `uc ]
-[; ;Main.c: 132: }
-"132
-[e :UE 154 ]
-}
-"134
-[v _paramter `(v 1 ef ]
-{
-[; ;Main.c: 133: void paramter()
-[; ;Main.c: 134: {
-[e :U _paramter ]
-[f ]
-[; ;Main.c: 135: c1=(eeprom_read(0)*100)+eeprom_read(1);
-"135
-[e = _c1 -> + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i `ui ]
-[; ;Main.c: 136: c2=(eeprom_read(2)*100)+eeprom_read(3);
-"136
-[e = _c2 -> + * -> ( _eeprom_read (1 -> -> 2 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 3 `i `uc `i `ui ]
-[; ;Main.c: 137: }
-"137
-[e :UE 155 ]
-}
-"139
-[v _startup `(v 1 ef ]
-{
-[; ;Main.c: 138: void startup()
-[; ;Main.c: 139: {
-[e :U _startup ]
-[f ]
-[; ;Main.c: 140: lcdcmd(0x80);
-"140
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 141: lcdstring("AUTOMATIC RATION ");
-"141
-[e ( _lcdstring (1 :s 23C ]
-[; ;Main.c: 142: lcdcmd(0xC0);
-"142
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 143: lcdstring("   CARD SYSTEM   ");
-"143
-[e ( _lcdstring (1 :s 24C ]
-[; ;Main.c: 144: _delay((unsigned long)((1000)*(20000000/4000.0)));
-"144
-[e ( __delay (1 -> * -> -> 1000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
-[; ;Main.c: 145: lcdcmd(0x01);
-"145
-[e ( _lcdcmd (1 -> -> 1 `i `uc ]
-[; ;Main.c: 146: _delay((unsigned long)((500)*(20000000/4000.0)));
+[; ;Main.c: 146: PORTC=0xFF;
 "146
-[e ( __delay (1 -> * -> -> 500 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
-[; ;Main.c: 147: lcdcmd(0x80);
+[e = _PORTC -> -> 255 `i `uc ]
+[; ;Main.c: 147: TRISC=0x80;
 "147
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 148: lcdstring("PLEASE TAP YOUR  ");
+[e = _TRISC -> -> 128 `i `uc ]
+[; ;Main.c: 148: TXSTA=0X24;
 "148
-[e ( _lcdstring (1 :s 25C ]
-[; ;Main.c: 149: lcdcmd(0xC0);
+[e = _TXSTA -> -> 36 `i `uc ]
+[; ;Main.c: 149: RCSTA=0X90;
 "149
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 150: lcdstring("SMART CARD       ");
+[e = _RCSTA -> -> 144 `i `uc ]
+[; ;Main.c: 150: SPBRG=129;
 "150
-[e ( _lcdstring (1 :s 26C ]
-[; ;Main.c: 151: _delay((unsigned long)((1000)*(20000000/4000.0)));
+[e = _SPBRG -> -> 129 `i `uc ]
+[; ;Main.c: 151: RCREG=0;
 "151
-[e ( __delay (1 -> * -> -> 1000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[e = _RCREG -> -> 0 `i `uc ]
 [; ;Main.c: 152: }
 "152
-[e :UE 156 ]
+[e :UE 162 ]
 }
+"154
+[v _paramter `(v 1 ef ]
+{
+[; ;Main.c: 153: void paramter()
+[; ;Main.c: 154: {
+[e :U _paramter ]
+[f ]
+[; ;Main.c: 155: c1=(eeprom_read(0)*100)+eeprom_read(1);
 "155
+[e = _c1 -> + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i `ui ]
+[; ;Main.c: 156: c2=(eeprom_read(2)*100)+eeprom_read(3);
+"156
+[e = _c2 -> + * -> ( _eeprom_read (1 -> -> 2 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 3 `i `uc `i `ui ]
+[; ;Main.c: 157: }
+"157
+[e :UE 163 ]
+}
+"159
+[v _startup `(v 1 ef ]
+{
+[; ;Main.c: 158: void startup()
+[; ;Main.c: 159: {
+[e :U _startup ]
+[f ]
+[; ;Main.c: 160: lcdcmd(0x80);
+"160
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 161: lcdstring("AUTOMATIC RATION ");
+"161
+[e ( _lcdstring (1 :s 23C ]
+[; ;Main.c: 162: lcdcmd(0xC0);
+"162
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 163: lcdstring("   CARD SYSTEM   ");
+"163
+[e ( _lcdstring (1 :s 24C ]
+[; ;Main.c: 164: _delay((unsigned long)((1000)*(20000000/4000.0)));
+"164
+[e ( __delay (1 -> * -> -> 1000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 165: lcdcmd(0x01);
+"165
+[e ( _lcdcmd (1 -> -> 1 `i `uc ]
+[; ;Main.c: 166: _delay((unsigned long)((500)*(20000000/4000.0)));
+"166
+[e ( __delay (1 -> * -> -> 500 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 167: lcdcmd(0x80);
+"167
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 168: lcdstring("PLEASE TAP YOUR  ");
+"168
+[e ( _lcdstring (1 :s 25C ]
+[; ;Main.c: 169: lcdcmd(0xC0);
+"169
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 170: lcdstring("SMART CARD       ");
+"170
+[e ( _lcdstring (1 :s 26C ]
+[; ;Main.c: 171: _delay((unsigned long)((1000)*(20000000/4000.0)));
+"171
+[e ( __delay (1 -> * -> -> 1000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 172: }
+"172
+[e :UE 164 ]
+}
+"175
+[v _LoadStockToArray `(v 1 ef ]
+{
+[; ;Main.c: 174: void LoadStockToArray()
+[; ;Main.c: 175: {
+[e :U _LoadStockToArray ]
+[f ]
+[; ;Main.c: 176: RiseArray[0] = digit[RiseStock/1000];
+"176
+[e = *U + &U _RiseArray * -> -> -> 0 `i `ui `ux -> -> # *U &U _RiseArray `ui `ux *U + &U _digit * -> / _RiseStock -> -> 1000 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 177: RiseArray[1] = digit[RiseStock%1000/100];
+"177
+[e = *U + &U _RiseArray * -> -> -> 1 `i `ui `ux -> -> # *U &U _RiseArray `ui `ux *U + &U _digit * -> / % _RiseStock -> -> 1000 `i `ui -> -> 100 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 178: RiseArray[2] = digit[RiseStock%1000%100/10];
+"178
+[e = *U + &U _RiseArray * -> -> -> 2 `i `ui `ux -> -> # *U &U _RiseArray `ui `ux *U + &U _digit * -> / % % _RiseStock -> -> 1000 `i `ui -> -> 100 `i `ui -> -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 179: RiseArray[3] = digit[RiseStock%1000%100%10];
+"179
+[e = *U + &U _RiseArray * -> -> -> 3 `i `ui `ux -> -> # *U &U _RiseArray `ui `ux *U + &U _digit * -> % % % _RiseStock -> -> 1000 `i `ui -> -> 100 `i `ui -> -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 180: SugarArray[0] = digit[SugarStock/100];
+"180
+[e = *U + &U _SugarArray * -> -> -> 0 `i `ui `ux -> -> # *U &U _SugarArray `ui `ux *U + &U _digit * -> / _SugarStock -> -> 100 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 181: SugarArray[1] = digit[SugarStock/10];
+"181
+[e = *U + &U _SugarArray * -> -> -> 1 `i `ui `ux -> -> # *U &U _SugarArray `ui `ux *U + &U _digit * -> / _SugarStock -> -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 182: SugarArray[2] = digit[SugarStock%10];
+"182
+[e = *U + &U _SugarArray * -> -> -> 2 `i `ui `ux -> -> # *U &U _SugarArray `ui `ux *U + &U _digit * -> % _SugarStock -> -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 183: KeroseneArray[0] = digit[KeroseneStock/100];
+"183
+[e = *U + &U _KeroseneArray * -> -> -> 0 `i `ui `ux -> -> # *U &U _KeroseneArray `ui `ux *U + &U _digit * -> / _KeroseneStock -> -> 100 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 184: KeroseneArray[1] = digit[KeroseneStock/10];
+"184
+[e = *U + &U _KeroseneArray * -> -> -> 1 `i `ui `ux -> -> # *U &U _KeroseneArray `ui `ux *U + &U _digit * -> / _KeroseneStock -> -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 185: KeroseneArray[2] = digit[KeroseneStock%10];
+"185
+[e = *U + &U _KeroseneArray * -> -> -> 2 `i `ui `ux -> -> # *U &U _KeroseneArray `ui `ux *U + &U _digit * -> % _KeroseneStock -> -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
+[; ;Main.c: 186: }
+"186
+[e :UE 165 ]
+}
+"189
+[v _SendRiseStock `(v 1 ef ]
+{
+[; ;Main.c: 188: void SendRiseStock()
+[; ;Main.c: 189: {
+[e :U _SendRiseStock ]
+[f ]
+"190
+[v _d `uc 1 a ]
+[; ;Main.c: 190: unsigned char d;
+[; ;Main.c: 191: PIE1=0X00;
+"191
+[e = _PIE1 -> -> 0 `i `uc ]
+[; ;Main.c: 192: usartstring("AT+CMGS=\"+919790080510\"");
+"192
+[e ( _usartstring (1 :s 27C ]
+[; ;Main.c: 193: transmit(0x0D);
+"193
+[e ( _transmit (1 -> -> 13 `i `uc ]
+[; ;Main.c: 194: while((d=receive())!='>');
+"194
+[e $U 167  ]
+[e :U 168 ]
+[e :U 167 ]
+[e $ != -> = _d ( _receive ..  `ui -> 62 `ui 168  ]
+[e :U 169 ]
+[; ;Main.c: 195: usartstring("Rise Stock:");
+"195
+[e ( _usartstring (1 :s 28C ]
+[; ;Main.c: 196: usartstring(RiseArray);
+"196
+[e ( _usartstring (1 -> &U _RiseArray `*Cuc ]
+[; ;Main.c: 197: usartstring(" Kgs");
+"197
+[e ( _usartstring (1 :s 29C ]
+[; ;Main.c: 198: transmit(0x1A);
+"198
+[e ( _transmit (1 -> -> 26 `i `uc ]
+[; ;Main.c: 199: while((d=receive())!='K');
+"199
+[e $U 170  ]
+[e :U 171 ]
+[e :U 170 ]
+[e $ != -> = _d ( _receive ..  `ui -> 75 `ui 171  ]
+[e :U 172 ]
+[; ;Main.c: 200: PIE1=0X20;
+"200
+[e = _PIE1 -> -> 32 `i `uc ]
+[; ;Main.c: 201: }
+"201
+[e :UE 166 ]
+}
+"204
 [v _main `(v 1 ef ]
 {
-[; ;Main.c: 154: void main()
-[; ;Main.c: 155: {
+[; ;Main.c: 203: void main()
+[; ;Main.c: 204: {
 [e :U _main ]
 [f ]
-[; ;Main.c: 156: ANSEL=0x00;
-"156
-[e = _ANSEL -> -> 0 `i `uc ]
-[; ;Main.c: 157: ANSELH=0x00;
-"157
-[e = _ANSELH -> -> 0 `i `uc ]
-[; ;Main.c: 158: TRISD=0X01;
-"158
-[e = _TRISD -> -> 1 `i `uc ]
-[; ;Main.c: 159: PORTD=0X00;
-"159
-[e = _PORTD -> -> 0 `i `uc ]
-[; ;Main.c: 160: TRISC=0X0F;
-"160
-[e = _TRISC -> -> 15 `i `uc ]
-[; ;Main.c: 161: PORTC=0X00;
-"161
-[e = _PORTC -> -> 0 `i `uc ]
-[; ;Main.c: 162: uart_init();
-"162
-[e ( _uart_init ..  ]
-[; ;Main.c: 163: lcd_init();
-"163
-[e ( _lcd_init ..  ]
-[; ;Main.c: 164: paramter();
-"164
-[e ( _paramter ..  ]
-[; ;Main.c: 165: SoftWareUart_Init();
-"165
-[e ( _SoftWareUart_Init ..  ]
-[; ;Main.c: 166: startup();
-"166
-[e ( _startup ..  ]
-[; ;Main.c: 169: while(1)
-"169
-[e :U 159 ]
-[; ;Main.c: 170: {
-"170
-{
-[; ;Main.c: 171: if(!RC0)
-"171
-[e $ ! ! _RC0 161  ]
-[; ;Main.c: 172: {
-"172
-{
-[; ;Main.c: 173: lcdstring("PLEASE TAP YOUR  ");
-"173
-[e ( _lcdstring (1 :s 27C ]
-[; ;Main.c: 174: lcdcmd(0xC0);
-"174
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 175: lcdstring("SMART CARD       ");
-"175
-[e ( _lcdstring (1 :s 28C ]
-[; ;Main.c: 176: _delay((unsigned long)((200)*(20000000/4000.0)));
-"176
-[e ( __delay (1 -> * -> -> 200 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
-[; ;Main.c: 177: rfid_flag=0;
-"177
-[e = _rfid_flag -> -> 0 `i `b ]
-"178
-}
-[e :U 161 ]
-[; ;Main.c: 178: }
-[; ;Main.c: 179: RFID_read();
-"179
-[e ( _RFID_read ..  ]
-[; ;Main.c: 182: if(strcmp(card_store,User1)==0)
-"182
-[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User1 `*Cuc -> 0 `i 162  ]
-[; ;Main.c: 183: {
-"183
-{
-[; ;Main.c: 184: User=1;
-"184
-[e = _User -> -> 1 `i `ui ]
-[; ;Main.c: 185: card_store[0]=0;
-"185
-[e = *U + &U _card_store * -> -> -> 0 `i `ui `ux -> -> # *U &U _card_store `ui `ux -> -> 0 `i `uc ]
-"186
-}
-[; ;Main.c: 186: }
-[e $U 163  ]
-"187
-[e :U 162 ]
-[; ;Main.c: 187: else if(strcmp(card_store,User2)==0)
-[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User2 `*Cuc -> 0 `i 164  ]
-[; ;Main.c: 188: {
-"188
-{
-[; ;Main.c: 189: User=2;
-"189
-[e = _User -> -> 2 `i `ui ]
-[; ;Main.c: 190: card_store[0]=0;
-"190
-[e = *U + &U _card_store * -> -> -> 0 `i `ui `ux -> -> # *U &U _card_store `ui `ux -> -> 0 `i `uc ]
-"191
-}
-[; ;Main.c: 191: }
-[e $U 165  ]
-"192
-[e :U 164 ]
-[; ;Main.c: 192: else if(strcmp(card_store,User3)==0)
-[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User3 `*Cuc -> 0 `i 166  ]
-[; ;Main.c: 193: {
-"193
-{
-[; ;Main.c: 194: User=3;
-"194
-[e = _User -> -> 3 `i `ui ]
-[; ;Main.c: 195: card_store[0]=0;
-"195
-[e = *U + &U _card_store * -> -> -> 0 `i `ui `ux -> -> # *U &U _card_store `ui `ux -> -> 0 `i `uc ]
-"196
-}
-[e :U 166 ]
-"198
-[e :U 165 ]
-[e :U 163 ]
-[; ;Main.c: 196: }
-[; ;Main.c: 198: switch(User)
-[e $U 168  ]
-[; ;Main.c: 199: {
-"199
-{
-[; ;Main.c: 200: case 1:
-"200
-[e :U 169 ]
-[; ;Main.c: 201: {
-"201
-{
-[; ;Main.c: 202: ReadAmnt();
-"202
-[e ( _ReadAmnt ..  ]
-[; ;Main.c: 203: lcdcmd(0x80);
-"203
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 204: lcdstring("USER1 AMOUNT:       ");
-"204
-[e ( _lcdstring (1 :s 29C ]
-[; ;Main.c: 205: DisplayAmnt(0X8D,User1amt);
+[; ;Main.c: 205: ANSEL=0x00;
 "205
-[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User1amt ]
-[; ;Main.c: 206: lcdcmd(0xC0);
+[e = _ANSEL -> -> 0 `i `uc ]
+[; ;Main.c: 206: ANSELH=0x00;
 "206
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 207: lcdstring("RISE:   Kg          ");
+[e = _ANSELH -> -> 0 `i `uc ]
+[; ;Main.c: 207: TRISD=0X01;
 "207
-[e ( _lcdstring (1 :s 30C ]
-[; ;Main.c: 208: DisplayRise(0XC5,User1Rise);
+[e = _TRISD -> -> 1 `i `uc ]
+[; ;Main.c: 208: PORTD=0X00;
 "208
-[e ( _DisplayRise (2 , -> -> 197 `i `uc _User1Rise ]
-[; ;Main.c: 209: lcdcmd(0x94);
+[e = _PORTD -> -> 0 `i `uc ]
+[; ;Main.c: 209: TRISC=0X8F;
 "209
-[e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 210: lcdstring("SUGAR:   Kg         ");
+[e = _TRISC -> -> 143 `i `uc ]
+[; ;Main.c: 210: PORTC=0X00;
 "210
-[e ( _lcdstring (1 :s 31C ]
-[; ;Main.c: 211: DisplaySugar(0x9A,User1Sugar);
+[e = _PORTC -> -> 0 `i `uc ]
+[; ;Main.c: 211: INTCON=0xC0;
 "211
-[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User1Sugar ]
-[; ;Main.c: 212: lcdcmd(0xD4);
+[e = _INTCON -> -> 192 `i `uc ]
+[; ;Main.c: 212: uart_init();
 "212
-[e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 213: lcdstring("KEROSENE:   Lts     ");
+[e ( _uart_init ..  ]
+[; ;Main.c: 213: lcd_init();
 "213
-[e ( _lcdstring (1 :s 32C ]
-[; ;Main.c: 214: DisplayKerosene(0XDD,User1Kerosene);
+[e ( _lcd_init ..  ]
+[; ;Main.c: 214: paramter();
 "214
-[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User1Kerosene ]
-[; ;Main.c: 215: User=0;
+[e ( _paramter ..  ]
+[; ;Main.c: 215: SoftWareUart_Init();
 "215
-[e = _User -> -> 0 `i `ui ]
-[; ;Main.c: 216: break;
+[e ( _SoftWareUart_Init ..  ]
+[; ;Main.c: 216: startup();
 "216
-[e $U 167  ]
+[e ( _startup ..  ]
+[; ;Main.c: 217: gsm_init();
 "217
-}
-[; ;Main.c: 217: }
-[; ;Main.c: 218: case 2:
+[e ( _gsm_init ..  ]
+[; ;Main.c: 218: PIE1=0x20;
 "218
-[e :U 170 ]
-[; ;Main.c: 219: {
-"219
-{
-[; ;Main.c: 220: ReadAmnt();
+[e = _PIE1 -> -> 32 `i `uc ]
+[; ;Main.c: 220: while(1)
 "220
-[e ( _ReadAmnt ..  ]
-[; ;Main.c: 221: lcdcmd(0x80);
+[e :U 175 ]
+[; ;Main.c: 221: {
 "221
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 222: lcdstring("USER2 AMOUNT:       ");
-"222
-[e ( _lcdstring (1 :s 33C ]
-[; ;Main.c: 223: DisplayAmnt(0X8D,User2amt);
+{
+[; ;Main.c: 223: if(!RC0)
 "223
-[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User2amt ]
-[; ;Main.c: 224: lcdcmd(0xC0);
+[e $ ! ! _RC0 177  ]
+[; ;Main.c: 224: {
 "224
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 225: lcdstring("RISE:   Kg          ");
+{
+[; ;Main.c: 225: lcdstring("PLEASE TAP YOUR  ");
 "225
-[e ( _lcdstring (1 :s 34C ]
-[; ;Main.c: 226: DisplayRise(0XC5,User2Rise);
+[e ( _lcdstring (1 :s 30C ]
+[; ;Main.c: 226: lcdcmd(0xC0);
 "226
-[e ( _DisplayRise (2 , -> -> 197 `i `uc _User2Rise ]
-[; ;Main.c: 227: lcdcmd(0x94);
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 227: lcdstring("SMART CARD       ");
 "227
-[e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 228: lcdstring("SUGAR:   Kg         ");
+[e ( _lcdstring (1 :s 31C ]
+[; ;Main.c: 228: _delay((unsigned long)((200)*(20000000/4000.0)));
 "228
-[e ( _lcdstring (1 :s 35C ]
-[; ;Main.c: 229: DisplaySugar(0x9A,User2Sugar);
+[e ( __delay (1 -> * -> -> 200 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 229: rfid_flag=0;
 "229
-[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User2Sugar ]
-[; ;Main.c: 230: lcdcmd(0xD4);
+[e = _rfid_flag -> -> 0 `i `b ]
 "230
-[e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 231: lcdstring("KEROSENE:   Lts     ");
-"231
-[e ( _lcdstring (1 :s 36C ]
-[; ;Main.c: 232: DisplayKerosene(0XDD,User2Kerosene);
-"232
-[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User2Kerosene ]
-[; ;Main.c: 233: User=0;
-"233
-[e = _User -> -> 0 `i `ui ]
-[; ;Main.c: 234: break;
-"234
-[e $U 167  ]
-"235
 }
-[; ;Main.c: 235: }
-[; ;Main.c: 236: case 3:
+[e :U 177 ]
+[; ;Main.c: 230: }
+[; ;Main.c: 231: RFID_read();
+"231
+[e ( _RFID_read ..  ]
+[; ;Main.c: 232: lcdcmd(0xD4);
+"232
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 233: lcdstring(sms);
+"233
+[e ( _lcdstring (1 -> &U _sms `*Cuc ]
+[; ;Main.c: 236: if(strcmp(card_store,User1)==0)
 "236
-[e :U 171 ]
+[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User1 `*Cuc -> 0 `i 178  ]
 [; ;Main.c: 237: {
 "237
 {
-[; ;Main.c: 238: ReadAmnt();
+[; ;Main.c: 238: User=1;
 "238
-[e ( _ReadAmnt ..  ]
-[; ;Main.c: 239: lcdcmd(0x80);
+[e = _User -> -> 1 `i `ui ]
+[; ;Main.c: 239: card_store[0]=0;
 "239
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 240: lcdstring("USER3 AMOUNT:       ");
+[e = *U + &U _card_store * -> -> -> 0 `i `ui `ux -> -> # *U &U _card_store `ui `ux -> -> 0 `i `uc ]
 "240
-[e ( _lcdstring (1 :s 37C ]
-[; ;Main.c: 241: DisplayAmnt(0X8D,User3amt);
+}
+[; ;Main.c: 240: }
+[e $U 179  ]
 "241
-[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User3amt ]
-[; ;Main.c: 242: lcdcmd(0xC0);
+[e :U 178 ]
+[; ;Main.c: 241: else if(strcmp(card_store,User2)==0)
+[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User2 `*Cuc -> 0 `i 180  ]
+[; ;Main.c: 242: {
 "242
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 243: lcdstring("RISE:   Kg          ");
+{
+[; ;Main.c: 243: User=2;
 "243
-[e ( _lcdstring (1 :s 38C ]
-[; ;Main.c: 244: DisplayRise(0XC5,User3Rise);
+[e = _User -> -> 2 `i `ui ]
+[; ;Main.c: 244: card_store[0]=0;
 "244
-[e ( _DisplayRise (2 , -> -> 197 `i `uc _User3Rise ]
-[; ;Main.c: 245: lcdcmd(0x94);
+[e = *U + &U _card_store * -> -> -> 0 `i `ui `ux -> -> # *U &U _card_store `ui `ux -> -> 0 `i `uc ]
 "245
-[e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 246: lcdstring("SUGAR:   Kg         ");
+}
+[; ;Main.c: 245: }
+[e $U 181  ]
 "246
-[e ( _lcdstring (1 :s 39C ]
-[; ;Main.c: 247: DisplaySugar(0x9A,User3Sugar);
+[e :U 180 ]
+[; ;Main.c: 246: else if(strcmp(card_store,User3)==0)
+[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User3 `*Cuc -> 0 `i 182  ]
+[; ;Main.c: 247: {
 "247
-[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User3Sugar ]
-[; ;Main.c: 248: lcdcmd(0xD4);
+{
+[; ;Main.c: 248: User=3;
 "248
-[e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 249: lcdstring("KEROSENE:   Lts     ");
+[e = _User -> -> 3 `i `ui ]
+[; ;Main.c: 249: card_store[0]=0;
 "249
-[e ( _lcdstring (1 :s 40C ]
-[; ;Main.c: 250: DisplayKerosene(0XDD,User3Kerosene);
+[e = *U + &U _card_store * -> -> -> 0 `i `ui `ux -> -> # *U &U _card_store `ui `ux -> -> 0 `i `uc ]
 "250
-[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User3Kerosene ]
-[; ;Main.c: 251: User=0;
-"251
-[e = _User -> -> 0 `i `ui ]
-[; ;Main.c: 252: break;
+}
+[e :U 182 ]
 "252
-[e $U 167  ]
+[e :U 181 ]
+[e :U 179 ]
+[; ;Main.c: 250: }
+[; ;Main.c: 252: switch(User)
+[e $U 184  ]
+[; ;Main.c: 253: {
 "253
-}
+{
+[; ;Main.c: 254: case 1:
+"254
+[e :U 185 ]
+[; ;Main.c: 255: {
+"255
+{
+[; ;Main.c: 256: ReadAmnt();
+"256
+[e ( _ReadAmnt ..  ]
+[; ;Main.c: 257: lcdcmd(0x80);
+"257
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 258: lcdstring("USER1 AMOUNT:       ");
+"258
+[e ( _lcdstring (1 :s 32C ]
+[; ;Main.c: 259: DisplayAmnt(0X8D,User1amt);
+"259
+[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User1amt ]
+[; ;Main.c: 260: lcdcmd(0xC0);
+"260
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 261: lcdstring("RISE:   Kg          ");
+"261
+[e ( _lcdstring (1 :s 33C ]
+[; ;Main.c: 262: DisplayRise(0XC5,User1Rise);
+"262
+[e ( _DisplayRise (2 , -> -> 197 `i `uc _User1Rise ]
+[; ;Main.c: 263: lcdcmd(0x94);
+"263
+[e ( _lcdcmd (1 -> -> 148 `i `uc ]
+[; ;Main.c: 264: lcdstring("SUGAR:   Kg         ");
+"264
+[e ( _lcdstring (1 :s 34C ]
+[; ;Main.c: 265: DisplaySugar(0x9A,User1Sugar);
+"265
+[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User1Sugar ]
+[; ;Main.c: 266: lcdcmd(0xD4);
+"266
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 267: lcdstring("KEROSENE:   Lts     ");
 "267
-}
-[; ;Main.c: 253: }
-[; ;Main.c: 267: }
-[e $U 167  ]
-"198
-[e :U 168 ]
-[e [\ _User , $ -> -> 1 `i `ui 169
- , $ -> -> 2 `i `ui 170
- , $ -> -> 3 `i `ui 171
- 167 ]
-"267
-[e :U 167 ]
-[; ;Main.c: 268: ReadStock();
+[e ( _lcdstring (1 :s 35C ]
+[; ;Main.c: 268: DisplayKerosene(0XDD,User1Kerosene);
 "268
-[e ( _ReadStock ..  ]
-[; ;Main.c: 269: if(RC1)
+[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User1Kerosene ]
+[; ;Main.c: 269: User=0;
 "269
-[e $ ! _RC1 172  ]
-[; ;Main.c: 270: DisplayStock();
+[e = _User -> -> 0 `i `ui ]
+[; ;Main.c: 270: break;
 "270
-[e ( _DisplayStock ..  ]
-[e :U 172 ]
-[; ;Main.c: 271: _delay((unsigned long)((500)*(20000000/4000.0)));
+[e $U 183  ]
 "271
-[e ( __delay (1 -> * -> -> 500 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+}
+[; ;Main.c: 271: }
+[; ;Main.c: 272: case 2:
 "272
-}
-[e :U 158 ]
-"169
-[e $U 159  ]
-[e :U 160 ]
-[; ;Main.c: 272: }
-[; ;Main.c: 273: }
+[e :U 186 ]
+[; ;Main.c: 273: {
 "273
-[e :UE 157 ]
+{
+[; ;Main.c: 274: ReadAmnt();
+"274
+[e ( _ReadAmnt ..  ]
+[; ;Main.c: 275: lcdcmd(0x80);
+"275
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 276: lcdstring("USER2 AMOUNT:       ");
+"276
+[e ( _lcdstring (1 :s 36C ]
+[; ;Main.c: 277: DisplayAmnt(0X8D,User2amt);
+"277
+[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User2amt ]
+[; ;Main.c: 278: lcdcmd(0xC0);
+"278
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 279: lcdstring("RISE:   Kg          ");
+"279
+[e ( _lcdstring (1 :s 37C ]
+[; ;Main.c: 280: DisplayRise(0XC5,User2Rise);
+"280
+[e ( _DisplayRise (2 , -> -> 197 `i `uc _User2Rise ]
+[; ;Main.c: 281: lcdcmd(0x94);
+"281
+[e ( _lcdcmd (1 -> -> 148 `i `uc ]
+[; ;Main.c: 282: lcdstring("SUGAR:   Kg         ");
+"282
+[e ( _lcdstring (1 :s 38C ]
+[; ;Main.c: 283: DisplaySugar(0x9A,User2Sugar);
+"283
+[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User2Sugar ]
+[; ;Main.c: 284: lcdcmd(0xD4);
+"284
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 285: lcdstring("KEROSENE:   Lts     ");
+"285
+[e ( _lcdstring (1 :s 39C ]
+[; ;Main.c: 286: DisplayKerosene(0XDD,User2Kerosene);
+"286
+[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User2Kerosene ]
+[; ;Main.c: 287: User=0;
+"287
+[e = _User -> -> 0 `i `ui ]
+[; ;Main.c: 288: break;
+"288
+[e $U 183  ]
+"289
 }
+[; ;Main.c: 289: }
+[; ;Main.c: 290: case 3:
+"290
+[e :U 187 ]
+[; ;Main.c: 291: {
+"291
+{
+[; ;Main.c: 292: ReadAmnt();
+"292
+[e ( _ReadAmnt ..  ]
+[; ;Main.c: 293: lcdcmd(0x80);
+"293
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 294: lcdstring("USER3 AMOUNT:       ");
+"294
+[e ( _lcdstring (1 :s 40C ]
+[; ;Main.c: 295: DisplayAmnt(0X8D,User3amt);
+"295
+[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User3amt ]
+[; ;Main.c: 296: lcdcmd(0xC0);
+"296
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 297: lcdstring("RISE:   Kg          ");
+"297
+[e ( _lcdstring (1 :s 41C ]
+[; ;Main.c: 298: DisplayRise(0XC5,User3Rise);
+"298
+[e ( _DisplayRise (2 , -> -> 197 `i `uc _User3Rise ]
+[; ;Main.c: 299: lcdcmd(0x94);
+"299
+[e ( _lcdcmd (1 -> -> 148 `i `uc ]
+[; ;Main.c: 300: lcdstring("SUGAR:   Kg         ");
+"300
+[e ( _lcdstring (1 :s 42C ]
+[; ;Main.c: 301: DisplaySugar(0x9A,User3Sugar);
+"301
+[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User3Sugar ]
+[; ;Main.c: 302: lcdcmd(0xD4);
+"302
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 303: lcdstring("KEROSENE:   Lts     ");
+"303
+[e ( _lcdstring (1 :s 43C ]
+[; ;Main.c: 304: DisplayKerosene(0XDD,User3Kerosene);
+"304
+[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User3Kerosene ]
+[; ;Main.c: 305: User=0;
+"305
+[e = _User -> -> 0 `i `ui ]
+[; ;Main.c: 306: break;
+"306
+[e $U 183  ]
+"307
+}
+"308
+}
+[; ;Main.c: 307: }
+[; ;Main.c: 308: }
+[e $U 183  ]
+"252
+[e :U 184 ]
+[e [\ _User , $ -> -> 1 `i `ui 185
+ , $ -> -> 2 `i `ui 186
+ , $ -> -> 3 `i `ui 187
+ 183 ]
+"308
+[e :U 183 ]
+[; ;Main.c: 309: ReadStock();
+"309
+[e ( _ReadStock ..  ]
+[; ;Main.c: 310: LoadStockToArray();
+"310
+[e ( _LoadStockToArray ..  ]
+[; ;Main.c: 311: if(RC1)
+"311
+[e $ ! _RC1 188  ]
+[; ;Main.c: 312: DisplayStock();
+"312
+[e ( _DisplayStock ..  ]
+[e :U 188 ]
+[; ;Main.c: 313: _delay((unsigned long)((500)*(20000000/4000.0)));
+"313
+[e ( __delay (1 -> * -> -> 500 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 315: if((memcmp("STOCK",&sms,5)==0))
+"315
+[e $ ! == ( _memcmp (3 , , -> :s 44C `*Cv -> &U _sms `*Cv -> -> 5 `i `ui -> 0 `i 189  ]
+[; ;Main.c: 316: {
+"316
+{
+[; ;Main.c: 317: if(!sms_indication)
+"317
+[e $ ! ! _sms_indication 190  ]
+[; ;Main.c: 318: {
+"318
+{
+[; ;Main.c: 319: SendRiseStock();
+"319
+[e ( _SendRiseStock ..  ]
+[; ;Main.c: 320: sms_indication=1;
+"320
+[e = _sms_indication -> -> 1 `i `b ]
+"321
+}
+[e :U 190 ]
+"322
+}
+[e :U 189 ]
+"324
+}
+[e :U 174 ]
+"220
+[e $U 175  ]
+[e :U 176 ]
+[; ;Main.c: 321: }
+[; ;Main.c: 322: }
+[; ;Main.c: 324: }
+[; ;Main.c: 325: }
+"325
+[e :UE 173 ]
+}
+[a 29C 32 75 103 115 0 ]
 [a 8C 71 83 77 32 82 69 65 68 89 0 ]
 [a 10C 109 111 105 115 116 101 114 32 108 101 118 101 108 32 108 111 119 32 109 111 116 101 114 32 79 78 0 ]
+[a 44C 83 84 79 67 75 0 ]
 [a 1C 71 83 77 32 73 78 73 84 73 65 76 73 90 73 78 71 0 ]
 [a 12C 109 111 105 115 116 101 114 32 108 101 118 101 108 32 104 105 103 104 32 109 111 116 101 114 32 79 70 70 0 ]
+[a 28C 82 105 115 101 32 83 116 111 99 107 58 0 ]
 [a 18C 67 114 111 112 32 99 114 111 115 115 101 100 32 115 116 97 103 101 51 0 ]
 [a 16C 67 114 111 112 32 99 114 111 115 115 101 100 32 115 116 97 103 101 50 0 ]
 [a 14C 67 114 111 112 32 99 114 111 115 115 101 100 32 115 116 97 103 101 49 0 ]
@@ -3425,28 +3657,29 @@ Version 3.2 HI-TECH Software Intermediate Code
 [a 13C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 15C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 17C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
+[a 27C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 23C 65 85 84 79 77 65 84 73 67 32 82 65 84 73 79 78 32 0 ]
 [a 25C 80 76 69 65 83 69 32 84 65 80 32 89 79 85 82 32 32 0 ]
-[a 27C 80 76 69 65 83 69 32 84 65 80 32 89 79 85 82 32 32 0 ]
+[a 30C 80 76 69 65 83 69 32 84 65 80 32 89 79 85 82 32 32 0 ]
 [a 19C 32 32 32 32 83 84 79 67 75 32 68 69 84 65 73 76 83 32 32 32 0 ]
 [a 24C 32 32 32 67 65 82 68 32 83 89 83 84 69 77 32 32 32 0 ]
 [a 22C 75 69 82 79 83 69 78 69 58 32 32 32 32 32 76 116 115 32 32 32 32 0 ]
-[a 32C 75 69 82 79 83 69 78 69 58 32 32 32 76 116 115 32 32 32 32 32 0 ]
-[a 36C 75 69 82 79 83 69 78 69 58 32 32 32 76 116 115 32 32 32 32 32 0 ]
-[a 40C 75 69 82 79 83 69 78 69 58 32 32 32 76 116 115 32 32 32 32 32 0 ]
+[a 35C 75 69 82 79 83 69 78 69 58 32 32 32 76 116 115 32 32 32 32 32 0 ]
+[a 39C 75 69 82 79 83 69 78 69 58 32 32 32 76 116 115 32 32 32 32 32 0 ]
+[a 43C 75 69 82 79 83 69 78 69 58 32 32 32 76 116 115 32 32 32 32 32 0 ]
 [a 20C 82 73 83 69 58 32 32 32 32 32 32 75 103 32 32 32 32 32 32 32 0 ]
 [a 26C 83 77 65 82 84 32 67 65 82 68 32 32 32 32 32 32 32 0 ]
-[a 28C 83 77 65 82 84 32 67 65 82 68 32 32 32 32 32 32 32 0 ]
-[a 37C 85 83 69 82 51 32 65 77 79 85 78 84 58 32 32 32 32 32 32 32 0 ]
-[a 33C 85 83 69 82 50 32 65 77 79 85 78 84 58 32 32 32 32 32 32 32 0 ]
-[a 29C 85 83 69 82 49 32 65 77 79 85 78 84 58 32 32 32 32 32 32 32 0 ]
-[a 31C 83 85 71 65 82 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
-[a 35C 83 85 71 65 82 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
-[a 39C 83 85 71 65 82 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
+[a 31C 83 77 65 82 84 32 67 65 82 68 32 32 32 32 32 32 32 0 ]
+[a 40C 85 83 69 82 51 32 65 77 79 85 78 84 58 32 32 32 32 32 32 32 0 ]
+[a 36C 85 83 69 82 50 32 65 77 79 85 78 84 58 32 32 32 32 32 32 32 0 ]
+[a 32C 85 83 69 82 49 32 65 77 79 85 78 84 58 32 32 32 32 32 32 32 0 ]
+[a 34C 83 85 71 65 82 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
+[a 38C 83 85 71 65 82 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
+[a 42C 83 85 71 65 82 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
 [a 21C 83 85 71 65 82 58 32 32 32 32 75 103 32 32 32 32 32 32 32 32 32 0 ]
-[a 30C 82 73 83 69 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 32 0 ]
-[a 34C 82 73 83 69 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 32 0 ]
-[a 38C 82 73 83 69 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 32 0 ]
+[a 33C 82 73 83 69 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 32 0 ]
+[a 37C 82 73 83 69 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 32 0 ]
+[a 41C 82 73 83 69 58 32 32 32 75 103 32 32 32 32 32 32 32 32 32 32 0 ]
 [a 3C 65 84 13 0 ]
 [a 4C 65 84 43 67 80 73 78 63 13 0 ]
 [a 5C 65 84 43 67 83 68 72 61 49 13 0 ]

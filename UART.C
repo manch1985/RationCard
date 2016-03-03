@@ -1,7 +1,8 @@
 unsigned char receive()
-{	
-while(!RCIF);
-return(RCREG);	
+{
+if(OERR){CREN=0;CREN=1;}
+	while(!RCIF);
+	return(RCREG);
 }
 void transmit(unsigned char data)
 {

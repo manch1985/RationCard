@@ -31,8 +31,8 @@ unsigned char User1Rise=0,
 			  
 int User1amt=0,User2amt=0,User3amt=0;
 const char digit[]={"0123456789"};
-unsigned char card_store[15];
-bit rfid_flag=0;
+unsigned char card_store[15],sms[20],RiseArray[5],SugarArray[4],KeroseneArray[4];
+bit rfid_flag=0,sms_indication=0;
 unsigned char User1[]={"1C0082CE6939"};
 unsigned char User2[]={"1B003C5BFC80"};
 unsigned char User3[]={"1B003C5BFC81"};
@@ -42,9 +42,29 @@ __EEPROM_DATA(10,0,20,4,5,0,0,0);
 __EEPROM_DATA(10,0,255,200,200,0,0,0);
 
 
+void gsm_read_line2(char *buffer)
+{
+	unsigned char rec_data=0,flag=0;
+	// Read the data until Line Feed character is received.
+	do 
+	{
+		rec_data = receive();
+		if(rec_data=='#'){flag=1;rec_data = receive(); }
+		if(flag)
+		{
+			*buffer++ = rec_data;
+		}
+	}while (rec_data != '\n');	
+	*buffer='\0';
+}	
+
 
 void interrupt ISR(void)
-{
+{	
+	if (RCIF==1)
+	{
+		gsm_read_line2(sms);
+	}	
 }
 
 void RFID_read()
@@ -123,12 +143,12 @@ void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
 
 void uart_init()
 {
-PORTC=0xFF;
-TRISC=0x80;
-TXSTA=0X24;			
-RCSTA=0X90;			
-SPBRG=129;		
-RCREG=0;
+	PORTC=0xFF;
+	TRISC=0x80;
+	TXSTA=0X24;			
+	RCSTA=0X90;			
+	SPBRG=129;		
+	RCREG=0;
 }
 void paramter()
 {
@@ -151,23 +171,55 @@ void startup()
 	__delay_ms(1000);
 }
 
+void LoadStockToArray()
+{
+	RiseArray[0] = digit[RiseStock/1000];
+	RiseArray[1] = digit[RiseStock%1000/100];
+	RiseArray[2] = digit[RiseStock%1000%100/10];
+	RiseArray[3] = digit[RiseStock%1000%100%10];
+	SugarArray[0] = digit[SugarStock/100];
+	SugarArray[1] = digit[SugarStock/10];
+	SugarArray[2] = digit[SugarStock%10];
+	KeroseneArray[0] = digit[KeroseneStock/100];
+	KeroseneArray[1] = digit[KeroseneStock/10];
+	KeroseneArray[2] = digit[KeroseneStock%10];
+}
+
+void SendRiseStock()
+{
+	unsigned char d;
+	PIE1=0X00;
+	usartstring("AT+CMGS=\"+919790080510\"");
+	transmit(0x0D);
+	while((d=receive())!='>');
+	usartstring("Rise Stock:");//message
+	usartstring(RiseArray);
+	usartstring(" Kgs");
+	transmit(0x1A);
+	while((d=receive())!='K');
+	PIE1=0X20;
+}
+
 void main()
 {
 	ANSEL=0x00;
 	ANSELH=0x00;
 	TRISD=0X01;
 	PORTD=0X00;
-	TRISC=0X0F;
+	TRISC=0X8F;
 	PORTC=0X00;
+	INTCON=0xC0;
 	uart_init();
 	lcd_init();
 	paramter();
 	SoftWareUart_Init();
 	startup();
-//	gsm_init();
+	gsm_init();
+	PIE1=0x20;
 //	lcdclear();
 while(1)
 {
+	
 	if(!RC0)
 	{	
 		lcdstring("PLEASE TAP YOUR  ");
@@ -177,6 +229,8 @@ while(1)
 		rfid_flag=0;
 	}
 	RFID_read();
+	lcdcmd(0xD4);	
+	lcdstring(sms);
 //	lcdcmd(0xD4);
 //	lcdstring(card_store);
 	if(strcmp(card_store,User1)==0)
@@ -251,24 +305,22 @@ while(1)
 			User=0;
 			break;
 		}
-/*		default:
-		{
-			
-			lcdcmd(0x80);	
-			lcdstring("USER NOT AUTHENTICAT");
-			lcdcmd(0xC0);	
-			lcdstring(" PLEASE CHECK YOUR  ");
-			lcdcmd(0x94);	
-			lcdstring("       CARD         ");
-			lcdcmd(0xD4);	
-			lcdstring("                    ");
-
-		} */
 	}
 	ReadStock();
+	LoadStockToArray();
 	if(RC1)
 	DisplayStock();
-	__delay_ms(500);
+		__delay_ms(500);
+	
+	if((memcmp("STOCK",&sms,5)==0))
+	{
+		if(!sms_indication)
+		{
+			SendRiseStock();
+			sms_indication=1;
+		}
+	}
+
 }
 }
 /*RD3=1;
@@ -326,4 +378,38 @@ __delay_ms(1000);
 }
 }
 }
-*/	
+*/
+/*		default:
+		{
+			
+			lcdcmd(0x80);	
+			lcdstring("USER NOT AUTHENTICAT");
+			lcdcmd(0xC0);	
+			lcdstring(" PLEASE CHECK YOUR  ");
+			lcdcmd(0x94);	
+			lcdstring("       CARD         ");
+			lcdcmd(0xD4);	
+			lcdstring("                    ");
+
+final_message_user1[0]=a[user1_rate/10000];
+final_message_user1[1]=a[user1_rate%10000/1000];
+final_message_user1[2]='.';
+final_message_user1[3]=a[user1_rate%10000%1000/100];
+final_message_user1[4]=a[user1_rate%10000%1000%100/10];
+final_message_user1[5]=a[user1_rate%10000%1000%100%10];
+final_message_user1[6]='\r';
+final_message_user1[7]=a[user1_pulse/1000];
+final_message_user1[8]=a[user1_pulse%1000/100];
+final_message_user1[9]=a[user1_pulse%1000%100/10];
+final_message_user1[10]=a[user1_pulse%1000%100%10];
+final_message_user1[11]='\r';
+final_message_user1[12]=a[user1_unit/1000];
+final_message_user1[13]='.';
+final_message_user1[14]=a[user1_unit%1000/100];
+final_message_user1[15]=a[user1_unit%1000%100/10];
+final_message_user1[16]=a[user1_unit%1000%100%10];
+final_message_user1[17]='\r';
+
+
+		} */
+	

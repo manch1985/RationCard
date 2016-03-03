@@ -2,8 +2,8 @@
 [d version 1.1 ]
 [d edition pro ]
 [d chip 16F887 ]
-"47 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v F1068 `(v  1 t 0 ]
+"63 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v F1077 `(v  1 t 0 ]
 "5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\abdiv.c
 [v ___abdiv `(c  1 e 1 0 ]
 "5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\abmod.c
@@ -72,6 +72,8 @@
 [v ___lwmod `(ui  1 e 2 0 ]
 "29 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lwtoft.c
 [v ___lwtoft `(f  1 e 3 0 ]
+"4 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\memcmp.c
+[v _memcmp `(i  1 e 2 0 ]
 "34 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\strcmp.c
 [v _strcmp `(i  1 e 2 0 ]
 "3 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\tmul.c
@@ -108,31 +110,37 @@
 [v _Lcd_Shift_Right `(v  1 e 0 0 ]
 "103
 [v _Lcd_Shift_Left `(v  1 e 0 0 ]
-"47 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"46 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _gsm_read_line2 `(v  1 e 0 0 ]
+"63
 [v _ISR `I(v  1 e 0 0 ]
-"51
+"71
 [v _RFID_read `(v  1 e 0 0 ]
-"60
+"80
 [v _DisplayAmnt `(v  1 e 0 0 ]
-"69
+"89
 [v _ReadAmnt `(v  1 e 0 0 ]
-"85
+"105
 [v _ReadStock `(v  1 e 0 0 ]
-"92
-[v _DisplayStock `(v  1 e 0 0 ]
-"106
-[v _DisplaySugar `(v  1 e 0 0 ]
 "112
+[v _DisplayStock `(v  1 e 0 0 ]
+"126
+[v _DisplaySugar `(v  1 e 0 0 ]
+"132
 [v _DisplayRise `(v  1 e 0 0 ]
-"118
+"138
 [v _DisplayKerosene `(v  1 e 0 0 ]
-"125
+"145
 [v _uart_init `(v  1 e 0 0 ]
-"134
+"154
 [v _paramter `(v  1 e 0 0 ]
-"139
+"159
 [v _startup `(v  1 e 0 0 ]
-"155
+"175
+[v _LoadStockToArray `(v  1 e 0 0 ]
+"189
+[v _SendRiseStock `(v  1 e 0 0 ]
+"204
 [v _main `(v  1 e 0 0 ]
 "10 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c
 [v _SoftWareUart_Init `(v  1 e 0 0 ]
@@ -144,23 +152,25 @@
 [v _softuart_string `(v  1 e 0 0 ]
 "2 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C
 [v _receive `(uc  1 e 1 0 ]
-"7
+[v i1_receive `(uc  1 e 1 0 ]
+[v i1_receive `(uc  1 e 1 0 ]
+"8
 [v _transmit `(v  1 e 0 0 ]
-"12
+"13
 [v _UARTinit `(v  1 e 0 0 ]
-"21
+"22
 [v _usartstring `(v  1 e 0 0 ]
-"28
+"29
 [v _gsm_init `(v  1 e 0 0 ]
-"63
+"64
 [v _send_moister_message2 `(v  1 e 0 0 ]
-"73
+"74
 [v _send_moister_message1 `(v  1 e 0 0 ]
-"83
+"84
 [v _send_stage1_message `(v  1 e 0 0 ]
-"93
+"94
 [v _send_stage2_message `(v  1 e 0 0 ]
-"103
+"104
 [v _send_stage3_message `(v  1 e 0 0 ]
 "19 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\include\pic16f887.h
 [v _INDF `Vuc  1 e 1 @0 ]
@@ -1027,65 +1037,75 @@
 [v _digit `DC[11]uc  1 e 11 0 ]
 "34
 [v _card_store `[15]uc  1 e 15 0 ]
+[v _sms `[20]uc  1 e 20 0 ]
+[v _RiseArray `[5]uc  1 e 5 0 ]
+[v _SugarArray `[4]uc  1 e 4 0 ]
+[v _KeroseneArray `[4]uc  1 e 4 0 ]
 "35
 [v _rfid_flag `b  1 e 0 0 ]
+[v _sms_indication `b  1 e 0 0 ]
 "36
 [v _User1 `[13]uc  1 e 13 0 ]
 "37
 [v _User2 `[13]uc  1 e 13 0 ]
 "38
 [v _User3 `[13]uc  1 e 13 0 ]
-"155
+"204
 [v _main `(v  1 e 0 0 ]
 {
-"273
+"325
 } 0
-"139
+"159
 [v _startup `(v  1 e 0 0 ]
 {
-"152
+"172
 } 0
-"92
+"112
 [v _DisplayStock `(v  1 e 0 0 ]
 {
-"104
+"124
 } 0
-"118
+"29 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C
+[v _gsm_init `(v  1 e 0 0 ]
+{
+"61
+} 0
+"138 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _DisplayKerosene `(v  1 e 0 0 ]
 {
 [v DisplayKerosene@Location `uc  1 a 1 wreg ]
 [v DisplayKerosene@Location `uc  1 a 1 wreg ]
-[v DisplayKerosene@Kerosene `uc  1 p 1 7 ]
-"122
+[v DisplayKerosene@Kerosene `uc  1 p 1 5 ]
+"142
 } 0
-"112
+"132
 [v _DisplayRise `(v  1 e 0 0 ]
 {
 [v DisplayRise@Location `uc  1 a 1 wreg ]
 [v DisplayRise@Location `uc  1 a 1 wreg ]
-[v DisplayRise@Rise `uc  1 p 1 7 ]
-"116
+[v DisplayRise@Rise `uc  1 p 1 5 ]
+"136
 } 0
-"106
+"126
 [v _DisplaySugar `(v  1 e 0 0 ]
 {
 [v DisplaySugar@Location `uc  1 a 1 wreg ]
 [v DisplaySugar@Location `uc  1 a 1 wreg ]
-[v DisplaySugar@Sugar `uc  1 p 1 7 ]
-"110
+[v DisplaySugar@Sugar `uc  1 p 1 5 ]
+"130
 } 0
-"60
+"80
 [v _DisplayAmnt `(v  1 e 0 0 ]
 {
 [v DisplayAmnt@Location `uc  1 a 1 wreg ]
 [v DisplayAmnt@Location `uc  1 a 1 wreg ]
-[v DisplayAmnt@Amnt `i  1 p 2 8 ]
-"66
+[v DisplayAmnt@Amnt `i  1 p 2 14 ]
+"86
 } 0
 "90 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c
 [v _lcdstring `(v  1 e 0 0 ]
 {
-[v lcdstring@a `*.dDCuc  1 p 2 7 ]
+[v lcdstring@a `*.mDCuc  1 p 2 5 ]
 "95
 } 0
 "71
@@ -1093,20 +1113,25 @@
 {
 "87
 } 0
-"51 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"189 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _SendRiseStock `(v  1 e 0 0 ]
+{
+"201
+} 0
+"71
 [v _RFID_read `(v  1 e 0 0 ]
 {
-"54
-[v RFID_read@i `i  1 a 2 5 ]
-"58
+"74
+[v RFID_read@i `i  1 a 2 3 ]
+"78
 } 0
 "51 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c
 [v _lcddata `(v  1 e 0 0 ]
 {
 [v lcddata@a `uc  1 a 1 wreg ]
 "52
-[v lcddata@z `uc  1 a 1 5 ]
-[v lcddata@y `uc  1 a 1 4 ]
+[v lcddata@z `uc  1 a 1 3 ]
+[v lcddata@y `uc  1 a 1 2 ]
 "51
 [v lcddata@a `uc  1 a 1 wreg ]
 "61
@@ -1116,34 +1141,45 @@
 {
 [v lcdcmd@a `uc  1 a 1 wreg ]
 "40
-[v lcdcmd@z `uc  1 a 1 5 ]
-[v lcdcmd@y `uc  1 a 1 4 ]
+[v lcdcmd@z `uc  1 a 1 3 ]
+[v lcdcmd@y `uc  1 a 1 2 ]
 "39
 [v lcdcmd@a `uc  1 a 1 wreg ]
 "48
 } 0
-"134 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"175 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _LoadStockToArray `(v  1 e 0 0 ]
+{
+"186
+} 0
+"154
 [v _paramter `(v  1 e 0 0 ]
 {
-"137
+"157
 } 0
-"85
+"105
 [v _ReadStock `(v  1 e 0 0 ]
 {
-"89
+"109
 } 0
-"69
+"89
 [v _ReadAmnt `(v  1 e 0 0 ]
 {
-"82
+"102
+} 0
+"22 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C
+[v _usartstring `(v  1 e 0 0 ]
+{
+[v usartstring@st `*.mDCuc  1 p 2 1 ]
+"25
 } 0
 "21 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c
 [v _softreceive `(uc  1 e 1 0 ]
 {
 "22
-[v softreceive@mask `uc  1 a 1 4 ]
+[v softreceive@mask `uc  1 a 1 2 ]
 "23
-[v softreceive@Data `uc  1 a 1 3 ]
+[v softreceive@Data `uc  1 a 1 1 ]
 "34
 } 0
 "10
@@ -1156,28 +1192,38 @@
 {
 "13
 } 0
+"75 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c
+[v _DelayS `(v  1 e 0 0 ]
+{
+[v DelayS@cnt `uc  1 a 1 wreg ]
+"76
+[v DelayS@i `uc  1 a 1 3 ]
+"75
+[v DelayS@cnt `uc  1 a 1 wreg ]
+"84
+} 0
 "5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awmod.c
 [v ___awmod `(i  1 e 2 0 ]
 {
 "6
-[v ___awmod@sign `uc  1 a 1 7 ]
-[v ___awmod@counter `uc  1 a 1 6 ]
+[v ___awmod@sign `uc  1 a 1 5 ]
+[v ___awmod@counter `uc  1 a 1 4 ]
 "5
-[v ___awmod@divisor `i  1 p 2 2 ]
-[v ___awmod@dividend `i  1 p 2 4 ]
+[v ___awmod@divisor `i  1 p 2 0 ]
+[v ___awmod@dividend `i  1 p 2 2 ]
 "30
 } 0
 "5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awdiv.c
 [v ___awdiv `(i  1 e 2 0 ]
 {
 "6
-[v ___awdiv@quotient `i  1 a 2 6 ]
+[v ___awdiv@quotient `i  1 a 2 12 ]
 "7
-[v ___awdiv@sign `uc  1 a 1 5 ]
-[v ___awdiv@counter `uc  1 a 1 4 ]
+[v ___awdiv@sign `uc  1 a 1 11 ]
+[v ___awdiv@counter `uc  1 a 1 10 ]
 "5
-[v ___awdiv@divisor `i  1 p 2 0 ]
-[v ___awdiv@dividend `i  1 p 2 2 ]
+[v ___awdiv@divisor `i  1 p 2 6 ]
+[v ___awdiv@dividend `i  1 p 2 8 ]
 "37
 } 0
 "5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbmod.c
@@ -1185,12 +1231,12 @@
 {
 [v ___lbmod@dividend `uc  1 a 1 wreg ]
 "6
-[v ___lbmod@rem `uc  1 a 1 6 ]
+[v ___lbmod@rem `uc  1 a 1 4 ]
 "7
-[v ___lbmod@counter `uc  1 a 1 5 ]
+[v ___lbmod@counter `uc  1 a 1 3 ]
 "5
 [v ___lbmod@dividend `uc  1 a 1 wreg ]
-[v ___lbmod@divisor `uc  1 p 1 2 ]
+[v ___lbmod@divisor `uc  1 p 1 0 ]
 "18
 } 0
 "5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbdiv.c
@@ -1198,39 +1244,69 @@
 {
 [v ___lbdiv@dividend `uc  1 a 1 wreg ]
 "6
-[v ___lbdiv@quotient `uc  1 a 1 5 ]
+[v ___lbdiv@quotient `uc  1 a 1 3 ]
 "7
-[v ___lbdiv@counter `uc  1 a 1 4 ]
+[v ___lbdiv@counter `uc  1 a 1 2 ]
 "5
 [v ___lbdiv@dividend `uc  1 a 1 wreg ]
-[v ___lbdiv@divisor `uc  1 p 1 2 ]
+[v ___lbdiv@divisor `uc  1 p 1 0 ]
+"26
+} 0
+"5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lwmod.c
+[v ___lwmod `(ui  1 e 2 0 ]
+{
+"6
+[v ___lwmod@counter `uc  1 a 1 4 ]
+"5
+[v ___lwmod@divisor `ui  1 p 2 0 ]
+[v ___lwmod@dividend `ui  1 p 2 2 ]
+"21
+} 0
+"5 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lwdiv.c
+[v ___lwdiv `(ui  1 e 2 0 ]
+{
+"6
+[v ___lwdiv@quotient `ui  1 a 2 9 ]
+"7
+[v ___lwdiv@counter `uc  1 a 1 11 ]
+"5
+[v ___lwdiv@divisor `ui  1 p 2 5 ]
+[v ___lwdiv@dividend `ui  1 p 2 7 ]
 "26
 } 0
 "3 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\wmul.c
 [v ___wmul `(ui  1 e 2 0 ]
 {
 "4
-[v ___wmul@product `ui  1 a 2 0 ]
+[v ___wmul@product `ui  1 a 2 7 ]
 "3
-[v ___wmul@multiplier `ui  1 p 2 5 ]
-[v ___wmul@multiplicand `ui  1 p 2 7 ]
+[v ___wmul@multiplier `ui  1 p 2 3 ]
+[v ___wmul@multiplicand `ui  1 p 2 5 ]
 "13
+} 0
+"4 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\memcmp.c
+[v _memcmp `(i  1 e 2 0 ]
+{
+[v memcmp@s1 `*.dDCv  1 p 2 0 ]
+[v memcmp@s2 `*.0DCv  1 p 1 2 ]
+[v memcmp@n `ui  1 p 2 3 ]
+"12
 } 0
 "34 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\strcmp.c
 [v _strcmp `(i  1 e 2 0 ]
 {
 [v strcmp@s1 `*.0DCuc  1 a 1 wreg ]
 "35
-[v strcmp@r `c  1 a 1 6 ]
+[v strcmp@r `c  1 a 1 4 ]
 "34
 [v strcmp@s1 `*.0DCuc  1 a 1 wreg ]
-[v strcmp@s2 `*.0DCuc  1 p 1 2 ]
+[v strcmp@s2 `*.0DCuc  1 p 1 0 ]
 "40
 } 0
-"125 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"145 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _uart_init `(v  1 e 0 0 ]
 {
-"132
+"152
 } 0
 "8 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eeread.c
 [v _eeprom_read `(uc  1 e 1 0 ]
@@ -1239,6 +1315,18 @@
 [v eeprom_read@addr `uc  1 a 1 wreg ]
 "13
 } 0
+"8 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C
+[v _transmit `(v  1 e 0 0 ]
+{
+[v transmit@data `uc  1 a 1 wreg ]
+[v transmit@data `uc  1 a 1 wreg ]
+"11
+} 0
+"2
+[v _receive `(uc  1 e 1 0 ]
+{
+"6
+} 0
 "16 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c
 [v _lcdport `(v  1 e 0 0 ]
 {
@@ -1246,8 +1334,34 @@
 [v lcdport@a `uc  1 a 1 wreg ]
 "36
 } 0
-"47 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"39 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c
+[v _DelayMs `(v  1 e 0 0 ]
+{
+[v DelayMs@cnt `uc  1 a 1 wreg ]
+"40
+[v DelayMs@i `uc  1 a 1 1 ]
+"39
+[v DelayMs@cnt `uc  1 a 1 wreg ]
+"48
+} 0
+"63 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _ISR `I(v  1 e 0 0 ]
 {
-"48
+"68
+} 0
+"46
+[v _gsm_read_line2 `(v  1 e 0 0 ]
+{
+[v gsm_read_line2@buffer `*.0uc  1 a 1 wreg ]
+"47
+[v gsm_read_line2@rec_data `uc  1 a 1 2 ]
+[v gsm_read_line2@flag `uc  1 a 1 0 ]
+"46
+[v gsm_read_line2@buffer `*.0uc  1 a 1 wreg ]
+"59
+} 0
+"2 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C
+[v i1_receive `(uc  1 e 1 0 ]
+{
+"6
 } 0

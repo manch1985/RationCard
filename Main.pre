@@ -901,6 +901,7 @@ softtransmit(*p++);
 # 1 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
 unsigned char receive()
 {
+if(OERR){CREN=0;CREN=1;}
 while(!RCIF);
 return(RCREG);
 }
@@ -1029,8 +1030,8 @@ User3Sugar=0;
 
 int User1amt=0,User2amt=0,User3amt=0;
 const char digit[]={"0123456789"};
-unsigned char card_store[15];
-bit rfid_flag=0;
+unsigned char card_store[15],sms[20],RiseArray[5],SugarArray[4],KeroseneArray[4];
+bit rfid_flag=0,sms_indication=0;
 unsigned char User1[]={"1C0082CE6939"};
 unsigned char User2[]={"1B003C5BFC80"};
 unsigned char User3[]={"1B003C5BFC81"};
@@ -1040,9 +1041,29 @@ asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "
 asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "255" "," "200" "," "200" "," "0" "," "0" "," "0");
 
 
+void gsm_read_line2(char *buffer)
+{
+unsigned char rec_data=0,flag=0;
+
+do
+{
+rec_data = receive();
+if(rec_data=='#'){flag=1;rec_data = receive(); }
+if(flag)
+{
+*buffer++ = rec_data;
+}
+}while (rec_data != '\n');
+*buffer='\0';
+}
+
 
 void interrupt ISR(void)
 {
+if (RCIF==1)
+{
+gsm_read_line2(sms);
+}
 }
 
 void RFID_read()
@@ -1149,23 +1170,55 @@ lcdstring("SMART CARD       ");
 _delay((unsigned long)((1000)*(20000000/4000.0)));
 }
 
+void LoadStockToArray()
+{
+RiseArray[0] = digit[RiseStock/1000];
+RiseArray[1] = digit[RiseStock%1000/100];
+RiseArray[2] = digit[RiseStock%1000%100/10];
+RiseArray[3] = digit[RiseStock%1000%100%10];
+SugarArray[0] = digit[SugarStock/100];
+SugarArray[1] = digit[SugarStock/10];
+SugarArray[2] = digit[SugarStock%10];
+KeroseneArray[0] = digit[KeroseneStock/100];
+KeroseneArray[1] = digit[KeroseneStock/10];
+KeroseneArray[2] = digit[KeroseneStock%10];
+}
+
+void SendRiseStock()
+{
+unsigned char d;
+PIE1=0X00;
+usartstring("AT+CMGS=\"+919790080510\"");
+transmit(0x0D);
+while((d=receive())!='>');
+usartstring("Rise Stock:");
+usartstring(RiseArray);
+usartstring(" Kgs");
+transmit(0x1A);
+while((d=receive())!='K');
+PIE1=0X20;
+}
+
 void main()
 {
 ANSEL=0x00;
 ANSELH=0x00;
 TRISD=0X01;
 PORTD=0X00;
-TRISC=0X0F;
+TRISC=0X8F;
 PORTC=0X00;
+INTCON=0xC0;
 uart_init();
 lcd_init();
 paramter();
 SoftWareUart_Init();
 startup();
-
+gsm_init();
+PIE1=0x20;
 
 while(1)
 {
+
 if(!RC0)
 {
 lcdstring("PLEASE TAP YOUR  ");
@@ -1175,6 +1228,8 @@ _delay((unsigned long)((200)*(20000000/4000.0)));
 rfid_flag=0;
 }
 RFID_read();
+lcdcmd(0xD4);
+lcdstring(sms);
 
 
 if(strcmp(card_store,User1)==0)
@@ -1249,13 +1304,22 @@ DisplayKerosene(0XDD,User3Kerosene);
 User=0;
 break;
 }
-
-# 267
 }
 ReadStock();
+LoadStockToArray();
 if(RC1)
 DisplayStock();
 _delay((unsigned long)((500)*(20000000/4000.0)));
+
+if((memcmp("STOCK",&sms,5)==0))
+{
+if(!sms_indication)
+{
+SendRiseStock();
+sms_indication=1;
+}
+}
+
 }
 }
 
