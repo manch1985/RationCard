@@ -43,23 +43,26 @@ pclath	equ	10
 	psect config,class=CONFIG,delta=2 ;#
 # 8 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	dw 0x3FFA & 0x3FF7 & 0x3FEF & 0x3CFF & 0x3FFF & 0x2FFF ;#
-# 32 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+# 36 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
-# 32 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+# 36 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	db	10,0,50,10,8,0,0,0 ;#
-# 33 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+# 37 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
-# 33 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+# 37 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	db	10,0,30,8,6,0,0,0 ;#
-# 34 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+# 38 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
-# 34 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+# 38 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	db	10,0,20,4,5,0,0,0 ;#
 	FNCALL	_main,_uart_init
 	FNCALL	_main,_lcd_init
 	FNCALL	_main,_paramter
+	FNCALL	_main,_SoftWareUart_Init
 	FNCALL	_main,_startup
 	FNCALL	_main,_lcdclear
+	FNCALL	_main,_RFID_read
+	FNCALL	_main,_strcmp
 	FNCALL	_main,_ReadAmnt
 	FNCALL	_main,_lcdcmd
 	FNCALL	_main,_lcdstring
@@ -89,6 +92,7 @@ pclath	equ	10
 	FNCALL	_lcd_init,_lcdport
 	FNCALL	_lcd_init,_lcdcmd
 	FNCALL	_lcdclear,_lcdcmd
+	FNCALL	_RFID_read,_softreceive
 	FNCALL	_lcddata,_lcdport
 	FNCALL	_lcddata,_enable
 	FNCALL	_lcdcmd,_lcdport
@@ -101,6 +105,64 @@ pclath	equ	10
 	FNCALL	intlevel1,_ISR
 	global	intlevel1
 	FNROOT	intlevel1
+	global	_User1
+	global	_User2
+	global	_User3
+psect	idataBANK0,class=CODE,space=0,delta=2
+global __pidataBANK0
+__pidataBANK0:
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	33
+
+;initializer for _User1
+	retlw	031h
+	retlw	043h
+	retlw	030h
+	retlw	030h
+	retlw	038h
+	retlw	032h
+	retlw	043h
+	retlw	045h
+	retlw	036h
+	retlw	039h
+	retlw	033h
+	retlw	039h
+	retlw	0
+	line	34
+
+;initializer for _User2
+	retlw	031h
+	retlw	042h
+	retlw	030h
+	retlw	030h
+	retlw	033h
+	retlw	043h
+	retlw	035h
+	retlw	042h
+	retlw	046h
+	retlw	043h
+	retlw	038h
+	retlw	030h
+	retlw	0
+psect	idataBANK1,class=CODE,space=0,delta=2
+global __pidataBANK1
+__pidataBANK1:
+	line	35
+
+;initializer for _User3
+	retlw	031h
+	retlw	042h
+	retlw	030h
+	retlw	030h
+	retlw	033h
+	retlw	043h
+	retlw	035h
+	retlw	042h
+	retlw	046h
+	retlw	043h
+	retlw	038h
+	retlw	031h
+	retlw	0
 	global	_digit
 psect	stringtext,class=STRCODE,delta=2,reloc=256
 global __pstringtext
@@ -129,7 +191,7 @@ incf btemp+1
 	movwf pc
 __stringbase:
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	29
+	line	30
 _digit:
 	retlw	030h
 	retlw	031h
@@ -150,13 +212,15 @@ _digit:
 	global	_User1Kerosene
 	global	_User1Sugar
 	global	_User2Kerosene
+	global	_User2Rise
 	global	_User2Sugar
 	global	_User3Kerosene
 	global	_User3Rise
 	global	_User3Sugar
 	global	_delayus_variable
 	global	_User1Rise
-	global	_User2Rise
+	global	_rfid_flag
+	global	_card_store
 	global	_PORTC
 _PORTC	set	7
 	global	_PORTD
@@ -167,12 +231,10 @@ _RCREG	set	26
 _RCSTA	set	24
 	global	_RC0
 _RC0	set	56
-	global	_RC1
-_RC1	set	57
-	global	_RC2
-_RC2	set	58
-	global	_RC3
-_RC3	set	59
+	global	_RD0
+_RD0	set	64
+	global	_RD1
+_RD1	set	65
 	global	_RD2
 _RD2	set	66
 	global	_RD3
@@ -193,6 +255,10 @@ _TRISC	set	135
 _TRISD	set	136
 	global	_TXSTA
 _TXSTA	set	152
+	global	_TRISD0
+_TRISD0	set	1088
+	global	_TRISD1
+_TRISD1	set	1089
 	global	_EEADR
 _EEADR	set	269
 	global	_EEDATA
@@ -543,13 +609,16 @@ psect cinit,class=CODE,delta=2
 global start_initialization
 start_initialization:
 
+psect	bitbssCOMMON,class=COMMON,bit,space=1
+global __pbitbssCOMMON
+__pbitbssCOMMON:
+_rfid_flag:
+       ds      1
+
 psect	bssCOMMON,class=COMMON,space=1
 global __pbssCOMMON
 __pbssCOMMON:
 _User1Rise:
-       ds      1
-
-_User2Rise:
        ds      1
 
 psect	bssBANK0,class=BANK0,space=1
@@ -576,6 +645,9 @@ _User1Sugar:
 _User2Kerosene:
        ds      1
 
+_User2Rise:
+       ds      1
+
 _User2Sugar:
        ds      1
 
@@ -590,6 +662,31 @@ _User3Sugar:
 
 _delayus_variable:
        ds      1
+
+_card_store:
+       ds      15
+
+psect	dataBANK0,class=BANK0,space=1
+global __pdataBANK0
+__pdataBANK0:
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	33
+_User1:
+       ds      13
+
+psect	dataBANK0
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	34
+_User2:
+       ds      13
+
+psect	dataBANK1,class=BANK1,space=1
+global __pdataBANK1
+__pdataBANK1:
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	35
+_User3:
+       ds      13
 
 psect clrtext,class=CODE,delta=2
 global clear_ram
@@ -606,17 +703,105 @@ clrloop:
 	xorwf	fsr,w		;XOR again to restore value
 	goto	clrloop		;do the next byte
 
+; Clear objects allocated to BITCOMMON
+psect cinit,class=CODE,delta=2
+	clrf	((__pbitbssCOMMON/8)+0)&07Fh
 ; Clear objects allocated to COMMON
 psect cinit,class=CODE,delta=2
 	clrf	((__pbssCOMMON)+0)&07Fh
-	clrf	((__pbssCOMMON)+1)&07Fh
 ; Clear objects allocated to BANK0
 psect cinit,class=CODE,delta=2
 	bcf	status, 7	;select IRP bank0
 	movlw	low(__pbssBANK0)
 	movwf	fsr
-	movlw	low((__pbssBANK0)+010h)
+	movlw	low((__pbssBANK0)+020h)
 	fcall	clear_ram
+; Initialize objects allocated to BANK1
+	global __pidataBANK1
+psect cinit,class=CODE,delta=2
+	bsf	status, 5	;RP0=1, select bank1
+	fcall	__pidataBANK1+0		;fetch initializer
+	movwf	__pdataBANK1+0&07fh		
+	fcall	__pidataBANK1+1		;fetch initializer
+	movwf	__pdataBANK1+1&07fh		
+	fcall	__pidataBANK1+2		;fetch initializer
+	movwf	__pdataBANK1+2&07fh		
+	fcall	__pidataBANK1+3		;fetch initializer
+	movwf	__pdataBANK1+3&07fh		
+	fcall	__pidataBANK1+4		;fetch initializer
+	movwf	__pdataBANK1+4&07fh		
+	fcall	__pidataBANK1+5		;fetch initializer
+	movwf	__pdataBANK1+5&07fh		
+	fcall	__pidataBANK1+6		;fetch initializer
+	movwf	__pdataBANK1+6&07fh		
+	fcall	__pidataBANK1+7		;fetch initializer
+	movwf	__pdataBANK1+7&07fh		
+	fcall	__pidataBANK1+8		;fetch initializer
+	movwf	__pdataBANK1+8&07fh		
+	fcall	__pidataBANK1+9		;fetch initializer
+	movwf	__pdataBANK1+9&07fh		
+	fcall	__pidataBANK1+10		;fetch initializer
+	movwf	__pdataBANK1+10&07fh		
+	fcall	__pidataBANK1+11		;fetch initializer
+	movwf	__pdataBANK1+11&07fh		
+	fcall	__pidataBANK1+12		;fetch initializer
+	movwf	__pdataBANK1+12&07fh		
+; Initialize objects allocated to BANK0
+	global __pidataBANK0
+psect cinit,class=CODE,delta=2
+	bcf	status, 5	;RP0=0, select bank0
+	fcall	__pidataBANK0+0		;fetch initializer
+	movwf	__pdataBANK0+0&07fh		
+	fcall	__pidataBANK0+1		;fetch initializer
+	movwf	__pdataBANK0+1&07fh		
+	fcall	__pidataBANK0+2		;fetch initializer
+	movwf	__pdataBANK0+2&07fh		
+	fcall	__pidataBANK0+3		;fetch initializer
+	movwf	__pdataBANK0+3&07fh		
+	fcall	__pidataBANK0+4		;fetch initializer
+	movwf	__pdataBANK0+4&07fh		
+	fcall	__pidataBANK0+5		;fetch initializer
+	movwf	__pdataBANK0+5&07fh		
+	fcall	__pidataBANK0+6		;fetch initializer
+	movwf	__pdataBANK0+6&07fh		
+	fcall	__pidataBANK0+7		;fetch initializer
+	movwf	__pdataBANK0+7&07fh		
+	fcall	__pidataBANK0+8		;fetch initializer
+	movwf	__pdataBANK0+8&07fh		
+	fcall	__pidataBANK0+9		;fetch initializer
+	movwf	__pdataBANK0+9&07fh		
+	fcall	__pidataBANK0+10		;fetch initializer
+	movwf	__pdataBANK0+10&07fh		
+	fcall	__pidataBANK0+11		;fetch initializer
+	movwf	__pdataBANK0+11&07fh		
+	fcall	__pidataBANK0+12		;fetch initializer
+	movwf	__pdataBANK0+12&07fh		
+	fcall	__pidataBANK0+13		;fetch initializer
+	movwf	__pdataBANK0+13&07fh		
+	fcall	__pidataBANK0+14		;fetch initializer
+	movwf	__pdataBANK0+14&07fh		
+	fcall	__pidataBANK0+15		;fetch initializer
+	movwf	__pdataBANK0+15&07fh		
+	fcall	__pidataBANK0+16		;fetch initializer
+	movwf	__pdataBANK0+16&07fh		
+	fcall	__pidataBANK0+17		;fetch initializer
+	movwf	__pdataBANK0+17&07fh		
+	fcall	__pidataBANK0+18		;fetch initializer
+	movwf	__pdataBANK0+18&07fh		
+	fcall	__pidataBANK0+19		;fetch initializer
+	movwf	__pdataBANK0+19&07fh		
+	fcall	__pidataBANK0+20		;fetch initializer
+	movwf	__pdataBANK0+20&07fh		
+	fcall	__pidataBANK0+21		;fetch initializer
+	movwf	__pdataBANK0+21&07fh		
+	fcall	__pidataBANK0+22		;fetch initializer
+	movwf	__pdataBANK0+22&07fh		
+	fcall	__pidataBANK0+23		;fetch initializer
+	movwf	__pdataBANK0+23&07fh		
+	fcall	__pidataBANK0+24		;fetch initializer
+	movwf	__pdataBANK0+24&07fh		
+	fcall	__pidataBANK0+25		;fetch initializer
+	movwf	__pdataBANK0+25&07fh		
 psect cinit,class=CODE,delta=2
 global end_of_initialization
 
@@ -640,10 +825,14 @@ __pcstackCOMMON:
 ?_lcdclear:	; 0 bytes @ 0x0
 	global	?_lcd_init
 ?_lcd_init:	; 0 bytes @ 0x0
+	global	?_SoftWareUart_Init
+?_SoftWareUart_Init:	; 0 bytes @ 0x0
 	global	?_ISR
 ?_ISR:	; 0 bytes @ 0x0
 	global	??_ISR
 ??_ISR:	; 0 bytes @ 0x0
+	global	?_RFID_read
+?_RFID_read:	; 0 bytes @ 0x0
 	global	?_ReadAmnt
 ?_ReadAmnt:	; 0 bytes @ 0x0
 	global	?_uart_init
@@ -656,6 +845,8 @@ __pcstackCOMMON:
 ?_main:	; 0 bytes @ 0x0
 	global	?_eeprom_read
 ?_eeprom_read:	; 1 bytes @ 0x0
+	global	?_softreceive
+?_softreceive:	; 1 bytes @ 0x0
 	ds	2
 	global	??_eeprom_read
 ??_eeprom_read:	; 0 bytes @ 0x2
@@ -663,16 +854,24 @@ __pcstackCOMMON:
 ??_enable:	; 0 bytes @ 0x2
 	global	??_lcdport
 ??_lcdport:	; 0 bytes @ 0x2
+	global	??_SoftWareUart_Init
+??_SoftWareUart_Init:	; 0 bytes @ 0x2
+	global	??_softreceive
+??_softreceive:	; 0 bytes @ 0x2
 	global	??_uart_init
 ??_uart_init:	; 0 bytes @ 0x2
 	global	?___lbdiv
 ?___lbdiv:	; 1 bytes @ 0x2
 	global	?___lbmod
 ?___lbmod:	; 1 bytes @ 0x2
+	global	?_strcmp
+?_strcmp:	; 2 bytes @ 0x2
 	global	?___awmod
 ?___awmod:	; 2 bytes @ 0x2
 	global	lcdport@a
 lcdport@a:	; 1 bytes @ 0x2
+	global	strcmp@s2
+strcmp@s2:	; 1 bytes @ 0x2
 	global	___lbdiv@divisor
 ___lbdiv@divisor:	; 1 bytes @ 0x2
 	global	___lbmod@divisor
@@ -684,9 +883,13 @@ ___awmod@divisor:	; 2 bytes @ 0x2
 ??___lbdiv:	; 0 bytes @ 0x3
 	global	??___lbmod
 ??___lbmod:	; 0 bytes @ 0x3
+	global	softreceive@Data
+softreceive@Data:	; 1 bytes @ 0x3
 	global	___lbdiv@dividend
 ___lbdiv@dividend:	; 1 bytes @ 0x3
 	ds	1
+	global	??_strcmp
+??_strcmp:	; 0 bytes @ 0x4
 	global	??_lcdcmd
 ??_lcdcmd:	; 0 bytes @ 0x4
 	global	??_lcddata
@@ -695,6 +898,8 @@ ___lbdiv@dividend:	; 1 bytes @ 0x3
 lcdcmd@y:	; 1 bytes @ 0x4
 	global	lcddata@y
 lcddata@y:	; 1 bytes @ 0x4
+	global	softreceive@mask
+softreceive@mask:	; 1 bytes @ 0x4
 	global	eeprom_read@addr
 eeprom_read@addr:	; 1 bytes @ 0x4
 	global	___lbdiv@counter
@@ -704,6 +909,8 @@ ___lbmod@dividend:	; 1 bytes @ 0x4
 	global	___awmod@dividend
 ___awmod@dividend:	; 2 bytes @ 0x4
 	ds	1
+	global	??_RFID_read
+??_RFID_read:	; 0 bytes @ 0x5
 	global	?___wmul
 ?___wmul:	; 2 bytes @ 0x5
 	global	lcdcmd@z
@@ -714,6 +921,8 @@ lcddata@z:	; 1 bytes @ 0x5
 ___lbdiv@quotient:	; 1 bytes @ 0x5
 	global	___lbmod@counter
 ___lbmod@counter:	; 1 bytes @ 0x5
+	global	RFID_read@i
+RFID_read@i:	; 2 bytes @ 0x5
 	global	___wmul@multiplier
 ___wmul@multiplier:	; 2 bytes @ 0x5
 	ds	1
@@ -723,6 +932,8 @@ ___wmul@multiplier:	; 2 bytes @ 0x5
 lcdcmd@a:	; 1 bytes @ 0x6
 	global	lcddata@a
 lcddata@a:	; 1 bytes @ 0x6
+	global	strcmp@r
+strcmp@r:	; 1 bytes @ 0x6
 	global	___lbmod@rem
 ___lbmod@rem:	; 1 bytes @ 0x6
 	global	___awmod@counter
@@ -746,6 +957,8 @@ DisplaySugar@Sugar:	; 1 bytes @ 0x7
 DisplayRise@Rise:	; 1 bytes @ 0x7
 	global	DisplayKerosene@Kerosene
 DisplayKerosene@Kerosene:	; 1 bytes @ 0x7
+	global	strcmp@s1
+strcmp@s1:	; 1 bytes @ 0x7
 	global	___awmod@sign
 ___awmod@sign:	; 1 bytes @ 0x7
 	global	lcdstring@a
@@ -776,8 +989,6 @@ DisplayKerosene@Location:	; 1 bytes @ 0x8
 ??_ReadAmnt:	; 0 bytes @ 0x9
 	global	??_paramter
 ??_paramter:	; 0 bytes @ 0x9
-	global	??_main
-??_main:	; 0 bytes @ 0x9
 	global	??___wmul
 ??___wmul:	; 0 bytes @ 0x9
 psect	cstackBANK0,class=BANK0,space=1
@@ -812,25 +1023,36 @@ DisplayAmnt@Amnt:	; 2 bytes @ 0x8
 	global	DisplayAmnt@Location
 DisplayAmnt@Location:	; 1 bytes @ 0xA
 	ds	1
-	global	_DisplayAmnt$934
-_DisplayAmnt$934:	; 2 bytes @ 0xB
+	global	_DisplayAmnt$973
+_DisplayAmnt$973:	; 2 bytes @ 0xB
 	ds	2
-;;Data sizes: Strings 282, constant 11, data 0, bss 18, persistent 0 stack 0
+	global	??_main
+??_main:	; 0 bytes @ 0xD
+	ds	3
+;;Data sizes: Strings 282, constant 11, data 39, bss 33, persistent 0 stack 0
 ;;Auto spaces:   Size  Autos    Used
 ;; COMMON          14      9      11
-;; BANK0           80     13      29
-;; BANK1           80      0       0
+;; BANK0           80     16      74
+;; BANK1           80      0      13
 ;; BANK3           96      0       0
 ;; BANK2           96      0       0
 
 ;;
 ;; Pointer list with targets:
 
+;; ?_strcmp	int  size(1) Largest target is 0
+;;
 ;; ?___awmod	int  size(1) Largest target is 0
 ;;
 ;; ?___awdiv	int  size(1) Largest target is 0
 ;;
 ;; ?___wmul	unsigned int  size(1) Largest target is 0
+;;
+;; strcmp@s2	PTR const unsigned char  size(1) Largest target is 13
+;;		 -> User3(BANK1[13]), User2(BANK0[13]), User1(BANK0[13]), 
+;;
+;; strcmp@s1	PTR const unsigned char  size(1) Largest target is 15
+;;		 -> card_store(BANK0[15]), 
 ;;
 ;; lcdstring@a	PTR const unsigned char  size(2) Largest target is 21
 ;;		 -> STR_20(CODE[21]), STR_19(CODE[21]), STR_18(CODE[21]), STR_17(CODE[21]), 
@@ -863,6 +1085,7 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;;   _lcdstring->_lcddata
 ;;   _lcd_init->_lcdcmd
 ;;   _lcdclear->_lcdcmd
+;;   _RFID_read->_softreceive
 ;;   _lcddata->_enable
 ;;   _lcdcmd->_enable
 ;;   _paramter->___wmul
@@ -910,7 +1133,7 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;;   None.
 
 ;;
-;;Main: autosize = 0, tempsize = 0, incstack = 0, save=0
+;;Main: autosize = 0, tempsize = 3, incstack = 0, save=0
 ;;
 
 ;;
@@ -919,12 +1142,16 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;; ---------------------------------------------------------------------------------
 ;; (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;; ---------------------------------------------------------------------------------
-;; (0) _main                                                 0     0      0    5105
+;; (0) _main                                                 3     3      0    5354
+;;                                             13 BANK0      3     3      0
 ;;                          _uart_init
 ;;                           _lcd_init
 ;;                           _paramter
+;;                  _SoftWareUart_Init
 ;;                            _startup
 ;;                           _lcdclear
+;;                          _RFID_read
+;;                             _strcmp
 ;;                           _ReadAmnt
 ;;                             _lcdcmd
 ;;                          _lcdstring
@@ -978,6 +1205,10 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;; (1) _lcdclear                                             0     0      0     180
 ;;                             _lcdcmd
 ;; ---------------------------------------------------------------------------------
+;; (1) _RFID_read                                            2     2      0     160
+;;                                              5 COMMON     2     2      0
+;;                        _softreceive
+;; ---------------------------------------------------------------------------------
 ;; (2) _lcddata                                              3     3      0     180
 ;;                                              4 COMMON     3     3      0
 ;;                            _lcdport
@@ -995,6 +1226,12 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;; (1) _ReadAmnt                                             0     0      0     158
 ;;                        _eeprom_read
 ;;                             ___wmul
+;; ---------------------------------------------------------------------------------
+;; (2) _softreceive                                          3     3      0      92
+;;                                              2 COMMON     3     3      0
+;; ---------------------------------------------------------------------------------
+;; (1) _SoftWareUart_Init                                    1     1      0       0
+;;                                              2 COMMON     1     1      0
 ;; ---------------------------------------------------------------------------------
 ;; (3) _enable                                               2     2      0       0
 ;;                                              2 COMMON     2     2      0
@@ -1016,6 +1253,9 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;;                                              5 COMMON     4     0      4
 ;;                                              0 BANK0      2     2      0
 ;;                        _eeprom_read (ARG)
+;; ---------------------------------------------------------------------------------
+;; (1) _strcmp                                               6     4      2      89
+;;                                              2 COMMON     6     4      2
 ;; ---------------------------------------------------------------------------------
 ;; (1) _uart_init                                            0     0      0       0
 ;; ---------------------------------------------------------------------------------
@@ -1048,6 +1288,7 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;;     _eeprom_read
 ;;     ___wmul
 ;;       _eeprom_read (ARG)
+;;   _SoftWareUart_Init
 ;;   _startup
 ;;     _lcdcmd
 ;;       _lcdport
@@ -1060,6 +1301,9 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;;     _lcdcmd
 ;;       _lcdport
 ;;       _enable
+;;   _RFID_read
+;;     _softreceive
+;;   _strcmp
 ;;   _ReadAmnt
 ;;     _eeprom_read
 ;;     ___wmul
@@ -1115,30 +1359,30 @@ _DisplayAmnt$934:	; 2 bytes @ 0xB
 ;; Address spaces:
 
 ;;Name               Size   Autos  Total    Cost      Usage
-;;BITCOMMON            E      0       0       0        0.0%
-;;EEDATA             100      0       0       0        0.0%
-;;NULL                 0      0       0       0        0.0%
-;;CODE                 0      0       0       0        0.0%
-;;COMMON               E      9       B       1       78.6%
-;;BITSFR0              0      0       0       1        0.0%
-;;SFR0                 0      0       0       1        0.0%
-;;BITSFR1              0      0       0       2        0.0%
-;;SFR1                 0      0       0       2        0.0%
-;;STACK                0      0       4       2        0.0%
-;;ABS                  0      0      28       3        0.0%
-;;BITBANK0            50      0       0       4        0.0%
-;;BITSFR3              0      0       0       4        0.0%
-;;SFR3                 0      0       0       4        0.0%
-;;BANK0               50      D      1D       5       36.3%
-;;BITSFR2              0      0       0       5        0.0%
-;;SFR2                 0      0       0       5        0.0%
-;;BITBANK1            50      0       0       6        0.0%
-;;BANK1               50      0       0       7        0.0%
-;;BITBANK3            60      0       0       8        0.0%
 ;;BANK3               60      0       0       9        0.0%
-;;BITBANK2            60      0       0      10        0.0%
+;;BITBANK3            60      0       0       8        0.0%
+;;SFR3                 0      0       0       4        0.0%
+;;BITSFR3              0      0       0       4        0.0%
 ;;BANK2               60      0       0      11        0.0%
-;;DATA                 0      0      2C      12        0.0%
+;;BITBANK2            60      0       0      10        0.0%
+;;SFR2                 0      0       0       5        0.0%
+;;BITSFR2              0      0       0       5        0.0%
+;;SFR1                 0      0       0       2        0.0%
+;;BITSFR1              0      0       0       2        0.0%
+;;BANK1               50      0       D       7       16.3%
+;;BITBANK1            50      0       0       6        0.0%
+;;CODE                 0      0       0       0        0.0%
+;;DATA                 0      0      66      12        0.0%
+;;ABS                  0      0      62       3        0.0%
+;;NULL                 0      0       0       0        0.0%
+;;STACK                0      0       4       2        0.0%
+;;BANK0               50     10      4A       5       92.5%
+;;BITBANK0            50      0       0       4        0.0%
+;;SFR0                 0      0       0       1        0.0%
+;;BITSFR0              0      0       0       1        0.0%
+;;COMMON               E      9       B       1       78.6%
+;;BITCOMMON            E      0       1       0        7.1%
+;;EEDATA             100      0       0       0        0.0%
 
 	global	_main
 psect	maintext,global,class=CODE,delta=2
@@ -1147,7 +1391,7 @@ __pmaintext:
 
 ;; *************** function _main *****************
 ;; Defined at:
-;;		line 129 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 143 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -1158,21 +1402,24 @@ __pmaintext:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
 ;;		On entry : 17F/0
-;;		On exit  : 60/0
+;;		On exit  : 160/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
+;;      Temps:          0       3       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels required when called:    5
 ;; This function calls:
 ;;		_uart_init
 ;;		_lcd_init
 ;;		_paramter
+;;		_SoftWareUart_Init
 ;;		_startup
 ;;		_lcdclear
+;;		_RFID_read
+;;		_strcmp
 ;;		_ReadAmnt
 ;;		_lcdcmd
 ;;		_lcdstring
@@ -1186,488 +1433,558 @@ __pmaintext:
 ;;
 psect	maintext
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	129
+	line	143
 	global	__size_of_main
 	__size_of_main	equ	__end_of_main-_main
 	
 _main:	
 	opt	stack 3
 ; Regs used in _main: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
-	line	130
+	line	144
 	
-l2625:	
-;Main.c: 130: ANSEL=0x00;
+l2799:	
+;Main.c: 144: ANSEL=0x00;
 	bsf	status, 5	;RP0=1, select bank3
 	bsf	status, 6	;RP1=1, select bank3
 	clrf	(392)^0180h	;volatile
-	line	131
-;Main.c: 131: ANSELH=0x00;
+	line	145
+;Main.c: 145: ANSELH=0x00;
 	clrf	(393)^0180h	;volatile
-	line	132
-;Main.c: 132: TRISD=0X00;
+	line	146
+	
+l2801:	
+;Main.c: 146: TRISD=0X01;
+	movlw	(01h)
 	bcf	status, 6	;RP1=0, select bank1
-	clrf	(136)^080h	;volatile
-	line	133
-;Main.c: 133: PORTD=0X00;
+	movwf	(136)^080h	;volatile
+	line	147
+	
+l2803:	
+;Main.c: 147: PORTD=0X00;
 	bcf	status, 5	;RP0=0, select bank0
 	clrf	(8)	;volatile
-	line	134
-	
-l2627:	
-;Main.c: 134: TRISC=0X0F;
+	line	148
+;Main.c: 148: TRISC=0X0F;
 	movlw	(0Fh)
 	bsf	status, 5	;RP0=1, select bank1
 	movwf	(135)^080h	;volatile
-	line	135
+	line	149
 	
-l2629:	
-;Main.c: 135: PORTC=0X00;
+l2805:	
+;Main.c: 149: PORTC=0X00;
 	bcf	status, 5	;RP0=0, select bank0
 	clrf	(7)	;volatile
-	line	136
+	line	150
 	
-l2631:	
-;Main.c: 136: uart_init();
+l2807:	
+;Main.c: 150: uart_init();
 	fcall	_uart_init
-	line	137
+	line	151
 	
-l2633:	
-;Main.c: 137: lcd_init();
+l2809:	
+;Main.c: 151: lcd_init();
 	fcall	_lcd_init
-	line	138
+	line	152
 	
-l2635:	
-;Main.c: 138: paramter();
+l2811:	
+;Main.c: 152: paramter();
 	fcall	_paramter
-	line	139
+	line	153
 	
-l2637:	
-;Main.c: 139: startup();
+l2813:	
+;Main.c: 153: SoftWareUart_Init();
+	fcall	_SoftWareUart_Init
+	line	154
+	
+l2815:	
+;Main.c: 154: startup();
 	fcall	_startup
-	line	140
+	line	155
 	
-l2639:	
-;Main.c: 140: lcdclear();
+l2817:	
+;Main.c: 155: lcdclear();
 	fcall	_lcdclear
-	line	144
+	line	158
 	
-l2641:	
-;Main.c: 142: {
-;Main.c: 144: if(RC0)
-	btfss	(56/8),(56)&7
-	goto	u761
-	goto	u760
-u761:
-	goto	l2645
-u760:
-	line	145
+l2819:	
+;Main.c: 157: {
+;Main.c: 158: if(!RC0)
+	btfsc	(56/8),(56)&7
+	goto	u901
+	goto	u900
+u901:
+	goto	l2825
+u900:
+	line	160
 	
-l2643:	
-;Main.c: 145: User=1;
+l2821:	
+;Main.c: 159: {
+;Main.c: 160: _delay((unsigned long)((200)*(20000000/4000.0)));
+	opt asmopt_off
+movlw  6
+movwf	((??_main+0)+0+2),f
+movlw	14
+movwf	((??_main+0)+0+1),f
+	movlw	176
+movwf	((??_main+0)+0),f
+u947:
+	decfsz	((??_main+0)+0),f
+	goto	u947
+	decfsz	((??_main+0)+0+1),f
+	goto	u947
+	decfsz	((??_main+0)+0+2),f
+	goto	u947
+opt asmopt_on
+
+	line	161
+	
+l2823:	
+;Main.c: 161: rfid_flag=0;
+	bcf	(_rfid_flag/8),(_rfid_flag)&7
+	line	163
+	
+l2825:	
+;Main.c: 162: }
+;Main.c: 163: RFID_read();
+	fcall	_RFID_read
+	line	166
+	
+l2827:	
+;Main.c: 166: if(strcmp(card_store,User1)==0)
+	movlw	(_User1)&0ffh
+	movwf	(?_strcmp)
+	movlw	(_card_store)&0ffh
+	fcall	_strcmp
+	movf	((1+(?_strcmp))),w
+	iorwf	((0+(?_strcmp))),w
+	skipz
+	goto	u911
+	goto	u910
+u911:
+	goto	l2831
+u910:
+	line	167
+	
+l2829:	
+;Main.c: 167: {User=1;}
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	clrf	(_User)
 	incf	(_User),f
 	clrf	(_User+1)
-	line	146
+	goto	l2907
+	line	168
 	
-l2645:	
-;Main.c: 146: if(RC1)
-	btfss	(57/8),(57)&7
-	goto	u771
-	goto	u770
-u771:
-	goto	l2649
-u770:
-	line	147
+l2831:	
+;Main.c: 168: else if(strcmp(card_store,User2)==0)
+	movlw	(_User2)&0ffh
+	movwf	(?_strcmp)
+	movlw	(_card_store)&0ffh
+	fcall	_strcmp
+	movf	((1+(?_strcmp))),w
+	iorwf	((0+(?_strcmp))),w
+	skipz
+	goto	u921
+	goto	u920
+u921:
+	goto	l2835
+u920:
+	line	169
 	
-l2647:	
-;Main.c: 147: User=2;
+l2833:	
+;Main.c: 169: {User=2;}
 	movlw	02h
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User)
 	clrf	(_User+1)
-	line	148
+	goto	l2907
+	line	170
 	
-l2649:	
-;Main.c: 148: if(RC2)
-	btfss	(58/8),(58)&7
-	goto	u781
-	goto	u780
-u781:
-	goto	l2653
-u780:
-	line	149
+l2835:	
+;Main.c: 170: else if(strcmp(card_store,User3)==0)
+	movlw	(_User3)&0ffh
+	movwf	(?_strcmp)
+	movlw	(_card_store)&0ffh
+	fcall	_strcmp
+	movf	((1+(?_strcmp))),w
+	iorwf	((0+(?_strcmp))),w
+	skipz
+	goto	u931
+	goto	u930
+u931:
+	goto	l2839
+u930:
+	line	171
 	
-l2651:	
-;Main.c: 149: User=3;
+l2837:	
+;Main.c: 171: {User=3;}
 	movlw	03h
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User)
 	clrf	(_User+1)
-	line	150
+	goto	l2907
+	line	173
 	
-l2653:	
-;Main.c: 150: if(RC3)
-	btfss	(59/8),(59)&7
-	goto	u791
-	goto	u790
-u791:
-	goto	l2723
-u790:
-	line	151
-	
-l2655:	
-;Main.c: 151: User=4;
-	movlw	04h
+l2839:	
+;Main.c: 172: else
+;Main.c: 173: {User=8;}
+	movlw	08h
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User)
 	clrf	(_User+1)
-	goto	l2723
-	line	156
+	goto	l2907
+	line	178
 	
-l2657:	
-;Main.c: 155: {
-;Main.c: 156: ReadAmnt();
+l2841:	
+;Main.c: 177: {
+;Main.c: 178: ReadAmnt();
 	fcall	_ReadAmnt
-	line	157
-;Main.c: 157: lcdcmd(0x80);
+	line	179
+;Main.c: 179: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
-	line	158
+	line	180
 	
-l2659:	
-;Main.c: 158: lcdstring("USER1 AMOUNT:       ");
+l2843:	
+;Main.c: 180: lcdstring("USER1 AMOUNT:       ");
 	movlw	low(STR_5|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_5|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	159
+	line	181
 	
-l2661:	
-;Main.c: 159: DisplayAmnt(0X8D,User1amt);
+l2845:	
+;Main.c: 181: DisplayAmnt(0X8D,User1amt);
 	movf	(_User1amt+1),w
 	movwf	(?_DisplayAmnt+1)
 	movf	(_User1amt),w
 	movwf	(?_DisplayAmnt)
 	movlw	(08Dh)
 	fcall	_DisplayAmnt
-	line	160
-;Main.c: 160: lcdcmd(0xC0);
+	line	182
+;Main.c: 182: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
-	line	161
+	line	183
 	
-l2663:	
-;Main.c: 161: lcdstring("RISE:   Kg          ");
+l2847:	
+;Main.c: 183: lcdstring("RISE:   Kg          ");
 	movlw	low(STR_6|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_6|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	162
+	line	184
 	
-l2665:	
-;Main.c: 162: DisplayRise(0XC5,User1Rise);
+l2849:	
+;Main.c: 184: DisplayRise(0XC5,User1Rise);
 	movf	(_User1Rise),w
 	movwf	(?_DisplayRise)
 	movlw	(0C5h)
 	fcall	_DisplayRise
-	line	163
-;Main.c: 163: lcdcmd(0x94);
+	line	185
+;Main.c: 185: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
-	line	164
+	line	186
 	
-l2667:	
-;Main.c: 164: lcdstring("SUGAR:   Kg         ");
+l2851:	
+;Main.c: 186: lcdstring("SUGAR:   Kg         ");
 	movlw	low(STR_7|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_7|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	165
+	line	187
 	
-l2669:	
-;Main.c: 165: DisplaySugar(0x9A,User1Sugar);
+l2853:	
+;Main.c: 187: DisplaySugar(0x9A,User1Sugar);
 	movf	(_User1Sugar),w
 	movwf	(?_DisplaySugar)
 	movlw	(09Ah)
 	fcall	_DisplaySugar
-	line	166
-;Main.c: 166: lcdcmd(0xD4);
+	line	188
+;Main.c: 188: lcdcmd(0xD4);
 	movlw	(0D4h)
 	fcall	_lcdcmd
-	line	167
+	line	189
 	
-l2671:	
-;Main.c: 167: lcdstring("KEROSENE:   Lts     ");
+l2855:	
+;Main.c: 189: lcdstring("KEROSENE:   Lts     ");
 	movlw	low(STR_8|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_8|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	168
+	line	190
 	
-l2673:	
-;Main.c: 168: DisplayKerosene(0XDD,User1Kerosene);
+l2857:	
+;Main.c: 190: DisplayKerosene(0XDD,User1Kerosene);
 	movf	(_User1Kerosene),w
 	movwf	(?_DisplayKerosene)
 	movlw	(0DDh)
 	fcall	_DisplayKerosene
-	line	169
-;Main.c: 169: break;
-	goto	l2641
-	line	173
+	line	191
+;Main.c: 191: break;
+	goto	l2819
+	line	195
 	
-l2675:	
-;Main.c: 172: {
-;Main.c: 173: ReadAmnt();
+l2859:	
+;Main.c: 194: {
+;Main.c: 195: ReadAmnt();
 	fcall	_ReadAmnt
-	line	174
-;Main.c: 174: lcdcmd(0x80);
+	line	196
+;Main.c: 196: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
-	line	175
+	line	197
 	
-l2677:	
-;Main.c: 175: lcdstring("USER2 AMOUNT:       ");
+l2861:	
+;Main.c: 197: lcdstring("USER2 AMOUNT:       ");
 	movlw	low(STR_9|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_9|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	176
+	line	198
 	
-l2679:	
-;Main.c: 176: DisplayAmnt(0X8D,User2amt);
+l2863:	
+;Main.c: 198: DisplayAmnt(0X8D,User2amt);
 	movf	(_User2amt+1),w
 	movwf	(?_DisplayAmnt+1)
 	movf	(_User2amt),w
 	movwf	(?_DisplayAmnt)
 	movlw	(08Dh)
 	fcall	_DisplayAmnt
-	line	177
-;Main.c: 177: lcdcmd(0xC0);
+	line	199
+;Main.c: 199: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
-	line	178
+	line	200
 	
-l2681:	
-;Main.c: 178: lcdstring("RISE:   Kg          ");
+l2865:	
+;Main.c: 200: lcdstring("RISE:   Kg          ");
 	movlw	low(STR_10|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_10|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	179
+	line	201
 	
-l2683:	
-;Main.c: 179: DisplayRise(0XC5,User2Rise);
+l2867:	
+;Main.c: 201: DisplayRise(0XC5,User2Rise);
 	movf	(_User2Rise),w
 	movwf	(?_DisplayRise)
 	movlw	(0C5h)
 	fcall	_DisplayRise
-	line	180
-;Main.c: 180: lcdcmd(0x94);
+	line	202
+;Main.c: 202: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
-	line	181
+	line	203
 	
-l2685:	
-;Main.c: 181: lcdstring("SUGAR:   Kg         ");
+l2869:	
+;Main.c: 203: lcdstring("SUGAR:   Kg         ");
 	movlw	low(STR_11|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_11|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	182
+	line	204
 	
-l2687:	
-;Main.c: 182: DisplaySugar(0x9A,User2Sugar);
+l2871:	
+;Main.c: 204: DisplaySugar(0x9A,User2Sugar);
 	movf	(_User2Sugar),w
 	movwf	(?_DisplaySugar)
 	movlw	(09Ah)
 	fcall	_DisplaySugar
-	line	183
-;Main.c: 183: lcdcmd(0xD4);
+	line	205
+;Main.c: 205: lcdcmd(0xD4);
 	movlw	(0D4h)
 	fcall	_lcdcmd
-	line	184
+	line	206
 	
-l2689:	
-;Main.c: 184: lcdstring("KEROSENE:   Lts     ");
+l2873:	
+;Main.c: 206: lcdstring("KEROSENE:   Lts     ");
 	movlw	low(STR_12|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_12|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	185
+	line	207
 	
-l2691:	
-;Main.c: 185: DisplayKerosene(0XDD,User2Kerosene);
+l2875:	
+;Main.c: 207: DisplayKerosene(0XDD,User2Kerosene);
 	movf	(_User2Kerosene),w
 	movwf	(?_DisplayKerosene)
 	movlw	(0DDh)
 	fcall	_DisplayKerosene
-	line	186
-;Main.c: 186: break;
-	goto	l2641
-	line	190
+	line	208
+;Main.c: 208: break;
+	goto	l2819
+	line	212
 	
-l2693:	
-;Main.c: 189: {
-;Main.c: 190: ReadAmnt();
+l2877:	
+;Main.c: 211: {
+;Main.c: 212: ReadAmnt();
 	fcall	_ReadAmnt
-	line	191
-;Main.c: 191: lcdcmd(0x80);
+	line	213
+;Main.c: 213: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
-	line	192
+	line	214
 	
-l2695:	
-;Main.c: 192: lcdstring("USER3 AMOUNT:       ");
+l2879:	
+;Main.c: 214: lcdstring("USER3 AMOUNT:       ");
 	movlw	low(STR_13|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_13|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	193
+	line	215
 	
-l2697:	
-;Main.c: 193: DisplayAmnt(0X8D,User3amt);
+l2881:	
+;Main.c: 215: DisplayAmnt(0X8D,User3amt);
 	movf	(_User3amt+1),w
 	movwf	(?_DisplayAmnt+1)
 	movf	(_User3amt),w
 	movwf	(?_DisplayAmnt)
 	movlw	(08Dh)
 	fcall	_DisplayAmnt
-	line	194
-;Main.c: 194: lcdcmd(0xC0);
+	line	216
+;Main.c: 216: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
-	line	195
+	line	217
 	
-l2699:	
-;Main.c: 195: lcdstring("RISE:   Kg          ");
+l2883:	
+;Main.c: 217: lcdstring("RISE:   Kg          ");
 	movlw	low(STR_14|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_14|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	196
+	line	218
 	
-l2701:	
-;Main.c: 196: DisplayRise(0XC5,User3Rise);
+l2885:	
+;Main.c: 218: DisplayRise(0XC5,User3Rise);
 	movf	(_User3Rise),w
 	movwf	(?_DisplayRise)
 	movlw	(0C5h)
 	fcall	_DisplayRise
-	line	197
-;Main.c: 197: lcdcmd(0x94);
+	line	219
+;Main.c: 219: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
-	line	198
+	line	220
 	
-l2703:	
-;Main.c: 198: lcdstring("SUGAR:   Kg         ");
+l2887:	
+;Main.c: 220: lcdstring("SUGAR:   Kg         ");
 	movlw	low(STR_15|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_15|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	199
+	line	221
 	
-l2705:	
-;Main.c: 199: DisplaySugar(0x9A,User3Sugar);
+l2889:	
+;Main.c: 221: DisplaySugar(0x9A,User3Sugar);
 	movf	(_User3Sugar),w
 	movwf	(?_DisplaySugar)
 	movlw	(09Ah)
 	fcall	_DisplaySugar
-	line	200
-;Main.c: 200: lcdcmd(0xD4);
+	line	222
+;Main.c: 222: lcdcmd(0xD4);
 	movlw	(0D4h)
 	fcall	_lcdcmd
-	line	201
+	line	223
 	
-l2707:	
-;Main.c: 201: lcdstring("KEROSENE:   Lts     ");
+l2891:	
+;Main.c: 223: lcdstring("KEROSENE:   Lts     ");
 	movlw	low(STR_16|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_16|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	202
+	line	224
 	
-l2709:	
-;Main.c: 202: DisplayKerosene(0XDD,User3Kerosene);
+l2893:	
+;Main.c: 224: DisplayKerosene(0XDD,User3Kerosene);
 	movf	(_User3Kerosene),w
 	movwf	(?_DisplayKerosene)
 	movlw	(0DDh)
 	fcall	_DisplayKerosene
-	line	203
-;Main.c: 203: break;
-	goto	l2641
-	line	208
+	line	225
+;Main.c: 225: break;
+	goto	l2819
+	line	230
 	
-l2711:	
-;Main.c: 206: {
-;Main.c: 208: lcdcmd(0x80);
+l2895:	
+;Main.c: 228: {
+;Main.c: 230: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
-	line	209
+	line	231
 	
-l2713:	
-;Main.c: 209: lcdstring("USER NOT AUTHENTICAT");
+l2897:	
+;Main.c: 231: lcdstring("USER NOT AUTHENTICAT");
 	movlw	low(STR_17|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_17|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	210
+	line	232
 	
-l2715:	
-;Main.c: 210: lcdcmd(0xC0);
+l2899:	
+;Main.c: 232: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
-	line	211
-;Main.c: 211: lcdstring(" PLEASE CHECK YOUR  ");
+	line	233
+;Main.c: 233: lcdstring(" PLEASE CHECK YOUR  ");
 	movlw	low(STR_18|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_18|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	212
+	line	234
 	
-l2717:	
-;Main.c: 212: lcdcmd(0x94);
+l2901:	
+;Main.c: 234: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
-	line	213
+	line	235
 	
-l2719:	
-;Main.c: 213: lcdstring("       CARD         ");
+l2903:	
+;Main.c: 235: lcdstring("       CARD         ");
 	movlw	low(STR_19|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_19|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	214
-;Main.c: 214: lcdcmd(0xD4);
+	line	236
+;Main.c: 236: lcdcmd(0xD4);
 	movlw	(0D4h)
 	fcall	_lcdcmd
-	line	215
+	line	237
 	
-l2721:	
-;Main.c: 215: lcdstring("                    ");
+l2905:	
+;Main.c: 237: lcdstring("                    ");
 	movlw	low(STR_20|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_20|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	218
-;Main.c: 217: }
-;Main.c: 218: }
-	goto	l2641
-	line	152
+	line	240
+;Main.c: 239: }
+;Main.c: 240: }
+	goto	l2819
+	line	174
 	
-l2723:	
+l2907:	
 	; Switch on 2 bytes has been partitioned into a top level switch of size 1, and 1 sub-switches
 ; Switch size 1, requested type "space"
 ; Number of cases is 1, Range of values is 0 to 0
@@ -1680,10 +1997,10 @@ l2723:
 	movf (_User+1),w
 	xorlw	0^0	; case 0
 	skipnz
-	goto	l2749
-	goto	l2711
+	goto	l2933
+	goto	l2895
 	
-l2749:	
+l2933:	
 ; Switch size 1, requested type "space"
 ; Number of cases is 3, Range of values is 1 to 3
 ; switch strategies available:
@@ -1695,33 +2012,33 @@ l2749:
 	movf (_User),w
 	xorlw	1^0	; case 1
 	skipnz
-	goto	l2657
+	goto	l2841
 	xorlw	2^1	; case 2
 	skipnz
-	goto	l2675
+	goto	l2859
 	xorlw	3^2	; case 3
 	skipnz
-	goto	l2693
-	goto	l2711
+	goto	l2877
+	goto	l2895
 
 	global	start
 	ljmp	start
 	opt stack 0
 psect	maintext
-	line	220
+	line	242
 GLOBAL	__end_of_main
 	__end_of_main:
 ;; =============== function _main ends ============
 
 	signat	_main,88
 	global	_startup
-psect	text573,local,class=CODE,delta=2
-global __ptext573
-__ptext573:
+psect	text721,local,class=CODE,delta=2
+global __ptext721
+__ptext721:
 
 ;; *************** function _startup *****************
 ;; Defined at:
-;;		line 114 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 128 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -1731,7 +2048,7 @@ __ptext573:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/40
+;;		On entry : 0/40
 ;;		On exit  : 60/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
@@ -1749,47 +2066,47 @@ __ptext573:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text573
+psect	text721
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	114
+	line	128
 	global	__size_of_startup
 	__size_of_startup	equ	__end_of_startup-_startup
 	
 _startup:	
 	opt	stack 3
 ; Regs used in _startup: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
-	line	115
+	line	129
 	
-l2607:	
-;Main.c: 115: lcdcmd(0x80);
+l2781:	
+;Main.c: 129: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
-	line	116
+	line	130
 	
-l2609:	
-;Main.c: 116: lcdstring("AUTOMATIC RATION ");
+l2783:	
+;Main.c: 130: lcdstring("AUTOMATIC RATION ");
 	movlw	low(STR_1|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_1|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	117
+	line	131
 	
-l2611:	
-;Main.c: 117: lcdcmd(0xC0);
+l2785:	
+;Main.c: 131: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
-	line	118
-;Main.c: 118: lcdstring("   CARD SYSTEM   ");
+	line	132
+;Main.c: 132: lcdstring("   CARD SYSTEM   ");
 	movlw	low(STR_2|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_2|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	119
+	line	133
 	
-l2613:	
-;Main.c: 119: _delay((unsigned long)((5000)*(20000000/4000.0)));
+l2787:	
+;Main.c: 133: _delay((unsigned long)((5000)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  127
 movwf	((??_startup+0)+0+2),f
@@ -1797,26 +2114,26 @@ movlw	86
 movwf	((??_startup+0)+0+1),f
 	movlw	132
 movwf	((??_startup+0)+0),f
-u807:
+u957:
 	decfsz	((??_startup+0)+0),f
-	goto	u807
+	goto	u957
 	decfsz	((??_startup+0)+0+1),f
-	goto	u807
+	goto	u957
 	decfsz	((??_startup+0)+0+2),f
-	goto	u807
+	goto	u957
 	nop2
 opt asmopt_on
 
-	line	120
+	line	134
 	
-l2615:	
-;Main.c: 120: lcdcmd(0x01);
+l2789:	
+;Main.c: 134: lcdcmd(0x01);
 	movlw	(01h)
 	fcall	_lcdcmd
-	line	121
+	line	135
 	
-l2617:	
-;Main.c: 121: _delay((unsigned long)((500)*(20000000/4000.0)));
+l2791:	
+;Main.c: 135: _delay((unsigned long)((500)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  13
 movwf	((??_startup+0)+0+2),f
@@ -1824,47 +2141,47 @@ movlw	163
 movwf	((??_startup+0)+0+1),f
 	movlw	189
 movwf	((??_startup+0)+0),f
-u817:
+u967:
 	decfsz	((??_startup+0)+0),f
-	goto	u817
+	goto	u967
 	decfsz	((??_startup+0)+0+1),f
-	goto	u817
+	goto	u967
 	decfsz	((??_startup+0)+0+2),f
-	goto	u817
+	goto	u967
 	clrwdt
 opt asmopt_on
 
-	line	122
+	line	136
 	
-l2619:	
-;Main.c: 122: lcdcmd(0x80);
+l2793:	
+;Main.c: 136: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
-	line	123
-;Main.c: 123: lcdstring("PLEASE TAP YOUR  ");
+	line	137
+;Main.c: 137: lcdstring("PLEASE TAP YOUR  ");
 	movlw	low(STR_3|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_3|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	124
+	line	138
 	
-l2621:	
-;Main.c: 124: lcdcmd(0xC0);
+l2795:	
+;Main.c: 138: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
-	line	125
+	line	139
 	
-l2623:	
-;Main.c: 125: lcdstring("SMART CARD       ");
+l2797:	
+;Main.c: 139: lcdstring("SMART CARD       ");
 	movlw	low(STR_4|8000h)
 	movwf	(?_lcdstring)
 	movlw	high(STR_4|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	line	126
+	line	140
 	
-l1003:	
+l1042:	
 	return
 	opt stack 0
 GLOBAL	__end_of_startup
@@ -1873,13 +2190,13 @@ GLOBAL	__end_of_startup
 
 	signat	_startup,88
 	global	_DisplayKerosene
-psect	text574,local,class=CODE,delta=2
-global __ptext574
-__ptext574:
+psect	text722,local,class=CODE,delta=2
+global __ptext722
+__ptext722:
 
 ;; *************** function _DisplayKerosene *****************
 ;; Defined at:
-;;		line 76 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 90 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
 ;;  Kerosene        1    7[COMMON] unsigned char 
@@ -1910,9 +2227,9 @@ __ptext574:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text574
+psect	text722
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	76
+	line	90
 	global	__size_of_DisplayKerosene
 	__size_of_DisplayKerosene	equ	__end_of_DisplayKerosene-_DisplayKerosene
 	
@@ -1921,16 +2238,16 @@ _DisplayKerosene:
 ; Regs used in _DisplayKerosene: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplayKerosene@Location stored from wreg
 	movwf	(DisplayKerosene@Location)
-	line	77
+	line	91
 	
-l2357:	
-;Main.c: 77: lcdcmd(Location);
+l2521:	
+;Main.c: 91: lcdcmd(Location);
 	movf	(DisplayKerosene@Location),w
 	fcall	_lcdcmd
-	line	78
+	line	92
 	
-l2359:	
-;Main.c: 78: lcddata(digit[Kerosene/10]);
+l2523:	
+;Main.c: 92: lcddata(digit[Kerosene/10]);
 	movlw	(0Ah)
 	movwf	(?___lbdiv)
 	movf	(DisplayKerosene@Kerosene),w
@@ -1943,10 +2260,10 @@ l2359:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	79
+	line	93
 	
-l2361:	
-;Main.c: 79: lcddata(digit[Kerosene%10]);
+l2525:	
+;Main.c: 93: lcddata(digit[Kerosene%10]);
 	movlw	(0Ah)
 	movwf	(?___lbmod)
 	movf	(DisplayKerosene@Kerosene),w
@@ -1959,9 +2276,9 @@ l2361:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	80
+	line	94
 	
-l976:	
+l1015:	
 	return
 	opt stack 0
 GLOBAL	__end_of_DisplayKerosene
@@ -1970,13 +2287,13 @@ GLOBAL	__end_of_DisplayKerosene
 
 	signat	_DisplayKerosene,8312
 	global	_DisplayRise
-psect	text575,local,class=CODE,delta=2
-global __ptext575
-__ptext575:
+psect	text723,local,class=CODE,delta=2
+global __ptext723
+__ptext723:
 
 ;; *************** function _DisplayRise *****************
 ;; Defined at:
-;;		line 70 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 84 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
 ;;  Rise            1    7[COMMON] unsigned char 
@@ -2007,9 +2324,9 @@ __ptext575:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text575
+psect	text723
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	70
+	line	84
 	global	__size_of_DisplayRise
 	__size_of_DisplayRise	equ	__end_of_DisplayRise-_DisplayRise
 	
@@ -2018,16 +2335,16 @@ _DisplayRise:
 ; Regs used in _DisplayRise: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplayRise@Location stored from wreg
 	movwf	(DisplayRise@Location)
-	line	71
+	line	85
 	
-l2351:	
-;Main.c: 71: lcdcmd(Location);
+l2515:	
+;Main.c: 85: lcdcmd(Location);
 	movf	(DisplayRise@Location),w
 	fcall	_lcdcmd
-	line	72
+	line	86
 	
-l2353:	
-;Main.c: 72: lcddata(digit[Rise/10]);
+l2517:	
+;Main.c: 86: lcddata(digit[Rise/10]);
 	movlw	(0Ah)
 	movwf	(?___lbdiv)
 	movf	(DisplayRise@Rise),w
@@ -2040,10 +2357,10 @@ l2353:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	73
+	line	87
 	
-l2355:	
-;Main.c: 73: lcddata(digit[Rise%10]);
+l2519:	
+;Main.c: 87: lcddata(digit[Rise%10]);
 	movlw	(0Ah)
 	movwf	(?___lbmod)
 	movf	(DisplayRise@Rise),w
@@ -2056,9 +2373,9 @@ l2355:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	74
+	line	88
 	
-l973:	
+l1012:	
 	return
 	opt stack 0
 GLOBAL	__end_of_DisplayRise
@@ -2067,13 +2384,13 @@ GLOBAL	__end_of_DisplayRise
 
 	signat	_DisplayRise,8312
 	global	_DisplaySugar
-psect	text576,local,class=CODE,delta=2
-global __ptext576
-__ptext576:
+psect	text724,local,class=CODE,delta=2
+global __ptext724
+__ptext724:
 
 ;; *************** function _DisplaySugar *****************
 ;; Defined at:
-;;		line 64 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 78 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
 ;;  Sugar           1    7[COMMON] unsigned char 
@@ -2104,9 +2421,9 @@ __ptext576:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text576
+psect	text724
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	64
+	line	78
 	global	__size_of_DisplaySugar
 	__size_of_DisplaySugar	equ	__end_of_DisplaySugar-_DisplaySugar
 	
@@ -2115,16 +2432,16 @@ _DisplaySugar:
 ; Regs used in _DisplaySugar: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplaySugar@Location stored from wreg
 	movwf	(DisplaySugar@Location)
-	line	65
+	line	79
 	
-l2345:	
-;Main.c: 65: lcdcmd(Location);
+l2509:	
+;Main.c: 79: lcdcmd(Location);
 	movf	(DisplaySugar@Location),w
 	fcall	_lcdcmd
-	line	66
+	line	80
 	
-l2347:	
-;Main.c: 66: lcddata(digit[Sugar/10]);
+l2511:	
+;Main.c: 80: lcddata(digit[Sugar/10]);
 	movlw	(0Ah)
 	movwf	(?___lbdiv)
 	movf	(DisplaySugar@Sugar),w
@@ -2137,10 +2454,10 @@ l2347:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	67
+	line	81
 	
-l2349:	
-;Main.c: 67: lcddata(digit[Sugar%10]);
+l2513:	
+;Main.c: 81: lcddata(digit[Sugar%10]);
 	movlw	(0Ah)
 	movwf	(?___lbmod)
 	movf	(DisplaySugar@Sugar),w
@@ -2153,9 +2470,9 @@ l2349:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	68
+	line	82
 	
-l970:	
+l1009:	
 	return
 	opt stack 0
 GLOBAL	__end_of_DisplaySugar
@@ -2164,13 +2481,13 @@ GLOBAL	__end_of_DisplaySugar
 
 	signat	_DisplaySugar,8312
 	global	_DisplayAmnt
-psect	text577,local,class=CODE,delta=2
-global __ptext577
-__ptext577:
+psect	text725,local,class=CODE,delta=2
+global __ptext725
+__ptext725:
 
 ;; *************** function _DisplayAmnt *****************
 ;; Defined at:
-;;		line 56 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 70 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
 ;;  Amnt            2    8[BANK0 ] int 
@@ -2201,9 +2518,9 @@ __ptext577:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text577
+psect	text725
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	56
+	line	70
 	global	__size_of_DisplayAmnt
 	__size_of_DisplayAmnt	equ	__end_of_DisplayAmnt-_DisplayAmnt
 	
@@ -2212,16 +2529,16 @@ _DisplayAmnt:
 ; Regs used in _DisplayAmnt: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplayAmnt@Location stored from wreg
 	movwf	(DisplayAmnt@Location)
-	line	57
+	line	71
 	
-l2597:	
-;Main.c: 57: lcdcmd(Location);
+l2771:	
+;Main.c: 71: lcdcmd(Location);
 	movf	(DisplayAmnt@Location),w
 	fcall	_lcdcmd
-	line	58
+	line	72
 	
-l2599:	
-;Main.c: 58: lcddata(digit[Amnt/1000]);
+l2773:	
+;Main.c: 72: lcddata(digit[Amnt/1000]);
 	movlw	low(03E8h)
 	movwf	(?___awdiv)
 	movlw	high(03E8h)
@@ -2240,10 +2557,10 @@ l2599:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	59
+	line	73
 	
-l2601:	
-;Main.c: 59: lcddata(digit[Amnt%1000/100]);
+l2775:	
+;Main.c: 73: lcddata(digit[Amnt%1000/100]);
 	movlw	064h
 	movwf	(?___awdiv)
 	clrf	(?___awdiv+1)
@@ -2270,10 +2587,10 @@ l2601:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	60
+	line	74
 	
-l2603:	
-;Main.c: 60: lcddata(digit[Amnt%1000%100/10]);
+l2777:	
+;Main.c: 74: lcddata(digit[Amnt%1000%100/10]);
 	movlw	0Ah
 	movwf	(?___awdiv)
 	clrf	(?___awdiv+1)
@@ -2308,10 +2625,10 @@ l2603:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	61
+	line	75
 	
-l2605:	
-;Main.c: 61: lcddata(digit[Amnt%1000%100%10]);
+l2779:	
+;Main.c: 75: lcddata(digit[Amnt%1000%100%10]);
 	movf	(DisplayAmnt@Amnt+1),w
 	movwf	1+(?___awmod)+02h
 	movf	(DisplayAmnt@Amnt),w
@@ -2330,16 +2647,16 @@ l2605:
 	clrf	(?___awmod+1)
 	fcall	___awmod
 	movf	(1+(?___awmod)),w
-	movwf	(_DisplayAmnt$934+1)
+	movwf	(_DisplayAmnt$973+1)
 	movf	(0+(?___awmod)),w
-	movwf	(_DisplayAmnt$934)
-;Main.c: 61: lcddata(digit[Amnt%1000%100%10]);
+	movwf	(_DisplayAmnt$973)
+;Main.c: 75: lcddata(digit[Amnt%1000%100%10]);
 	movlw	0Ah
 	movwf	(?___awmod)
 	clrf	(?___awmod+1)
-	movf	(_DisplayAmnt$934+1),w
+	movf	(_DisplayAmnt$973+1),w
 	movwf	1+(?___awmod)+02h
-	movf	(_DisplayAmnt$934),w
+	movf	(_DisplayAmnt$973),w
 	movwf	0+(?___awmod)+02h
 	fcall	___awmod
 	movf	(0+(?___awmod)),w
@@ -2351,9 +2668,9 @@ l2605:
 	movwf	btemp+1
 	fcall	stringtab
 	fcall	_lcddata
-	line	62
+	line	76
 	
-l967:	
+l1006:	
 	return
 	opt stack 0
 GLOBAL	__end_of_DisplayAmnt
@@ -2362,9 +2679,9 @@ GLOBAL	__end_of_DisplayAmnt
 
 	signat	_DisplayAmnt,8312
 	global	_lcdstring
-psect	text578,local,class=CODE,delta=2
-global __ptext578
-__ptext578:
+psect	text726,local,class=CODE,delta=2
+global __ptext726
+__ptext726:
 
 ;; *************** function _lcdstring *****************
 ;; Defined at:
@@ -2401,7 +2718,7 @@ __ptext578:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text578
+psect	text726
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	90
 	global	__size_of_lcdstring
@@ -2412,12 +2729,12 @@ _lcdstring:
 ; Regs used in _lcdstring: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	91
 	
-l2327:	
+l2491:	
 ;lcd.c: 91: while(*a)
-	goto	l2333
+	goto	l2497
 	line	93
 	
-l2329:	
+l2493:	
 ;lcd.c: 92: {
 ;lcd.c: 93: lcddata(*a++);
 	movf	(lcdstring@a+1),w
@@ -2427,13 +2744,13 @@ l2329:
 	fcall	stringtab
 	fcall	_lcddata
 	
-l2331:	
+l2495:	
 	incf	(lcdstring@a),f
 	skipnz
 	incf	(lcdstring@a+1),f
 	line	91
 	
-l2333:	
+l2497:	
 	movf	(lcdstring@a+1),w
 	movwf	btemp+1
 	movf	(lcdstring@a),w
@@ -2441,14 +2758,14 @@ l2333:
 	fcall	stringtab
 	iorlw	0
 	skipz
-	goto	u621
-	goto	u620
-u621:
-	goto	l2329
-u620:
+	goto	u761
+	goto	u760
+u761:
+	goto	l2493
+u760:
 	line	95
 	
-l952:	
+l960:	
 	return
 	opt stack 0
 GLOBAL	__end_of_lcdstring
@@ -2457,9 +2774,9 @@ GLOBAL	__end_of_lcdstring
 
 	signat	_lcdstring,4216
 	global	_lcd_init
-psect	text579,local,class=CODE,delta=2
-global __ptext579
-__ptext579:
+psect	text727,local,class=CODE,delta=2
+global __ptext727
+__ptext727:
 
 ;; *************** function _lcd_init *****************
 ;; Defined at:
@@ -2491,7 +2808,7 @@ __ptext579:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text579
+psect	text727
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	71
 	global	__size_of_lcd_init
@@ -2502,30 +2819,30 @@ _lcd_init:
 ; Regs used in _lcd_init: [wreg+status,2+status,0+pclath+cstack]
 	line	72
 	
-l2317:	
+l2481:	
 ;lcd.c: 72: lcdport(0x00);
 	movlw	(0)
 	fcall	_lcdport
 	line	73
 	
-l2319:	
+l2483:	
 ;lcd.c: 73: _delay((unsigned long)((20)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	130
 movwf	((??_lcd_init+0)+0+1),f
 	movlw	221
 movwf	((??_lcd_init+0)+0),f
-u827:
+u977:
 	decfsz	((??_lcd_init+0)+0),f
-	goto	u827
+	goto	u977
 	decfsz	((??_lcd_init+0)+0+1),f
-	goto	u827
+	goto	u977
 	nop2
 opt asmopt_on
 
 	line	74
 	
-l2321:	
+l2485:	
 ;lcd.c: 74: lcdcmd(0x03);
 	movlw	(03h)
 	fcall	_lcdcmd
@@ -2536,34 +2853,34 @@ movlw	33
 movwf	((??_lcd_init+0)+0+1),f
 	movlw	118
 movwf	((??_lcd_init+0)+0),f
-u837:
+u987:
 	decfsz	((??_lcd_init+0)+0),f
-	goto	u837
+	goto	u987
 	decfsz	((??_lcd_init+0)+0+1),f
-	goto	u837
+	goto	u987
 	clrwdt
 opt asmopt_on
 
 	line	76
 	
-l2323:	
+l2487:	
 ;lcd.c: 76: lcdcmd(0x03);
 	movlw	(03h)
 	fcall	_lcdcmd
 	line	77
 	
-l2325:	
+l2489:	
 ;lcd.c: 77: _delay((unsigned long)((11)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	72
 movwf	((??_lcd_init+0)+0+1),f
 	movlw	108
 movwf	((??_lcd_init+0)+0),f
-u847:
+u997:
 	decfsz	((??_lcd_init+0)+0),f
-	goto	u847
+	goto	u997
 	decfsz	((??_lcd_init+0)+0+1),f
-	goto	u847
+	goto	u997
 	clrwdt
 opt asmopt_on
 
@@ -2601,7 +2918,7 @@ opt asmopt_on
 	fcall	_lcdcmd
 	line	87
 	
-l946:	
+l954:	
 	return
 	opt stack 0
 GLOBAL	__end_of_lcd_init
@@ -2610,9 +2927,9 @@ GLOBAL	__end_of_lcd_init
 
 	signat	_lcd_init,88
 	global	_lcdclear
-psect	text580,local,class=CODE,delta=2
-global __ptext580
-__ptext580:
+psect	text728,local,class=CODE,delta=2
+global __ptext728
+__ptext728:
 
 ;; *************** function _lcdclear *****************
 ;; Defined at:
@@ -2643,7 +2960,7 @@ __ptext580:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text580
+psect	text728
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	64
 	global	__size_of_lcdclear
@@ -2654,7 +2971,7 @@ _lcdclear:
 ; Regs used in _lcdclear: [wreg+status,2+status,0+pclath+cstack]
 	line	65
 	
-l2315:	
+l2479:	
 ;lcd.c: 65: lcdcmd(0);
 	movlw	(0)
 	fcall	_lcdcmd
@@ -2664,7 +2981,7 @@ l2315:
 	fcall	_lcdcmd
 	line	67
 	
-l943:	
+l951:	
 	return
 	opt stack 0
 GLOBAL	__end_of_lcdclear
@@ -2672,10 +2989,120 @@ GLOBAL	__end_of_lcdclear
 ;; =============== function _lcdclear ends ============
 
 	signat	_lcdclear,88
+	global	_RFID_read
+psect	text729,local,class=CODE,delta=2
+global __ptext729
+__ptext729:
+
+;; *************** function _RFID_read *****************
+;; Defined at:
+;;		line 45 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;  i               2    5[COMMON] int 
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         2       0       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         2       0       0       0       0
+;;Total ram usage:        2 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    2
+;; This function calls:
+;;		_softreceive
+;; This function is called by:
+;;		_main
+;; This function uses a non-reentrant model
+;;
+psect	text729
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	45
+	global	__size_of_RFID_read
+	__size_of_RFID_read	equ	__end_of_RFID_read-_RFID_read
+	
+_RFID_read:	
+	opt	stack 5
+; Regs used in _RFID_read: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
+	line	46
+	
+l2465:	
+;Main.c: 46: if(!rfid_flag)
+	btfsc	(_rfid_flag/8),(_rfid_flag)&7
+	goto	u741
+	goto	u740
+u741:
+	goto	l1000
+u740:
+	line	48
+	
+l2467:	
+;Main.c: 47: {
+;Main.c: 48: for(int i=0;i<12;i++)
+	clrf	(RFID_read@i)
+	clrf	(RFID_read@i+1)
+	line	49
+	
+l2473:	
+;Main.c: 49: {card_store[i]=softreceive();}
+	movf	(RFID_read@i),w
+	addlw	_card_store&0ffh
+	movwf	fsr0
+	fcall	_softreceive
+	bcf	status, 7	;select IRP bank0
+	movwf	indf
+	line	48
+	
+l2475:	
+	incf	(RFID_read@i),f
+	skipnz
+	incf	(RFID_read@i+1),f
+	
+l2477:	
+	movf	(RFID_read@i+1),w
+	xorlw	80h
+	movwf	btemp+1
+	movlw	(high(0Ch))^80h
+	subwf	btemp+1,w
+	skipz
+	goto	u755
+	movlw	low(0Ch)
+	subwf	(RFID_read@i),w
+u755:
+
+	skipc
+	goto	u751
+	goto	u750
+u751:
+	goto	l2473
+u750:
+	
+l999:	
+	line	50
+;Main.c: 50: rfid_flag=1;
+	bsf	(_rfid_flag/8),(_rfid_flag)&7
+	line	52
+	
+l1000:	
+	return
+	opt stack 0
+GLOBAL	__end_of_RFID_read
+	__end_of_RFID_read:
+;; =============== function _RFID_read ends ============
+
+	signat	_RFID_read,88
 	global	_lcddata
-psect	text581,local,class=CODE,delta=2
-global __ptext581
-__ptext581:
+psect	text730,local,class=CODE,delta=2
+global __ptext730
+__ptext730:
 
 ;; *************** function _lcddata *****************
 ;; Defined at:
@@ -2713,7 +3140,7 @@ __ptext581:
 ;;		_DisplayKerosene
 ;; This function uses a non-reentrant model
 ;;
-psect	text581
+psect	text730
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	51
 	global	__size_of_lcddata
@@ -2726,7 +3153,7 @@ _lcddata:
 	line	53
 	movwf	(lcddata@a)
 	
-l2297:	
+l2447:	
 ;lcd.c: 52: unsigned char y,z;
 ;lcd.c: 53: z=a>>4&0x0F;
 	swapf	(lcddata@a),w
@@ -2736,49 +3163,49 @@ l2297:
 	andwf	(lcddata@z),f
 	line	54
 	
-l2299:	
+l2449:	
 ;lcd.c: 54: y=a&0x0F;
 	movf	(lcddata@a),w
 	movwf	(lcddata@y)
 	
-l2301:	
+l2451:	
 	movlw	(0Fh)
 	andwf	(lcddata@y),f
 	line	55
 	
-l2303:	
+l2453:	
 ;lcd.c: 55: RD2=1;
 	bsf	(66/8),(66)&7
 	line	56
 	
-l2305:	
+l2455:	
 ;lcd.c: 56: lcdport(z);
 	movf	(lcddata@z),w
 	fcall	_lcdport
 	line	57
 	
-l2307:	
+l2457:	
 ;lcd.c: 57: enable();
 	fcall	_enable
 	line	58
 	
-l2309:	
+l2459:	
 ;lcd.c: 58: lcdport(y);
 	movf	(lcddata@y),w
 	fcall	_lcdport
 	line	59
 	
-l2311:	
+l2461:	
 ;lcd.c: 59: enable();
 	fcall	_enable
 	line	60
 	
-l2313:	
+l2463:	
 ;lcd.c: 60: RD2 = 0;
 	bcf	(66/8),(66)&7
 	line	61
 	
-l940:	
+l948:	
 	return
 	opt stack 0
 GLOBAL	__end_of_lcddata
@@ -2787,9 +3214,9 @@ GLOBAL	__end_of_lcddata
 
 	signat	_lcddata,4216
 	global	_lcdcmd
-psect	text582,local,class=CODE,delta=2
-global __ptext582
-__ptext582:
+psect	text731,local,class=CODE,delta=2
+global __ptext731
+__ptext731:
 
 ;; *************** function _lcdcmd *****************
 ;; Defined at:
@@ -2830,7 +3257,7 @@ __ptext582:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text582
+psect	text731
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	39
 	global	__size_of_lcdcmd
@@ -2843,7 +3270,7 @@ _lcdcmd:
 	line	41
 	movwf	(lcdcmd@a)
 	
-l2283:	
+l2433:	
 ;lcd.c: 40: unsigned char y,z;
 ;lcd.c: 41: z=a>>4&0x0F;
 	swapf	(lcdcmd@a),w
@@ -2853,39 +3280,39 @@ l2283:
 	andwf	(lcdcmd@z),f
 	line	42
 	
-l2285:	
+l2435:	
 ;lcd.c: 42: y=a&0x0F;
 	movf	(lcdcmd@a),w
 	movwf	(lcdcmd@y)
 	
-l2287:	
+l2437:	
 	movlw	(0Fh)
 	andwf	(lcdcmd@y),f
 	line	44
 	
-l2289:	
+l2439:	
 ;lcd.c: 44: lcdport(z);
 	movf	(lcdcmd@z),w
 	fcall	_lcdport
 	line	45
 	
-l2291:	
+l2441:	
 ;lcd.c: 45: enable();
 	fcall	_enable
 	line	46
 	
-l2293:	
+l2443:	
 ;lcd.c: 46: lcdport(y);
 	movf	(lcdcmd@y),w
 	fcall	_lcdport
 	line	47
 	
-l2295:	
+l2445:	
 ;lcd.c: 47: enable();
 	fcall	_enable
 	line	48
 	
-l937:	
+l945:	
 	return
 	opt stack 0
 GLOBAL	__end_of_lcdcmd
@@ -2894,13 +3321,13 @@ GLOBAL	__end_of_lcdcmd
 
 	signat	_lcdcmd,4216
 	global	_paramter
-psect	text583,local,class=CODE,delta=2
-global __ptext583
-__ptext583:
+psect	text732,local,class=CODE,delta=2
+global __ptext732
+__ptext732:
 
 ;; *************** function _paramter *****************
 ;; Defined at:
-;;		line 109 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 123 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -2928,19 +3355,19 @@ __ptext583:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text583
+psect	text732
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	109
+	line	123
 	global	__size_of_paramter
 	__size_of_paramter	equ	__end_of_paramter-_paramter
 	
 _paramter:	
 	opt	stack 5
 ; Regs used in _paramter: [wreg+status,2+status,0+pclath+cstack]
-	line	110
+	line	124
 	
-l2595:	
-;Main.c: 110: c1=(eeprom_read(0)*100)+eeprom_read(1);
+l2769:	
+;Main.c: 124: c1=(eeprom_read(0)*100)+eeprom_read(1);
 	movlw	(0)
 	fcall	_eeprom_read
 	movwf	(?___wmul)
@@ -2951,8 +3378,8 @@ l2595:
 	fcall	___wmul
 	movlw	(01h)
 	fcall	_eeprom_read
-	line	111
-;Main.c: 111: c2=(eeprom_read(2)*100)+eeprom_read(3);
+	line	125
+;Main.c: 125: c2=(eeprom_read(2)*100)+eeprom_read(3);
 	movlw	(02h)
 	fcall	_eeprom_read
 	movwf	(?___wmul)
@@ -2963,9 +3390,9 @@ l2595:
 	fcall	___wmul
 	movlw	(03h)
 	fcall	_eeprom_read
-	line	112
+	line	126
 	
-l1000:	
+l1039:	
 	return
 	opt stack 0
 GLOBAL	__end_of_paramter
@@ -2974,13 +3401,13 @@ GLOBAL	__end_of_paramter
 
 	signat	_paramter,88
 	global	_ReadAmnt
-psect	text584,local,class=CODE,delta=2
-global __ptext584
-__ptext584:
+psect	text733,local,class=CODE,delta=2
+global __ptext733
+__ptext733:
 
 ;; *************** function _ReadAmnt *****************
 ;; Defined at:
-;;		line 41 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 55 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -2990,7 +3417,7 @@ __ptext584:
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
+;;		On entry : 160/0
 ;;		On exit  : 60/0
 ;;		Unchanged: FFE00/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
@@ -3008,19 +3435,19 @@ __ptext584:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text584
+psect	text733
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	41
+	line	55
 	global	__size_of_ReadAmnt
 	__size_of_ReadAmnt	equ	__end_of_ReadAmnt-_ReadAmnt
 	
 _ReadAmnt:	
 	opt	stack 5
 ; Regs used in _ReadAmnt: [wreg+status,2+status,0+pclath+cstack]
-	line	42
+	line	56
 	
-l2593:	
-;Main.c: 42: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
+l2767:	
+;Main.c: 56: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
 	movlw	(0)
 	fcall	_eeprom_read
 	movwf	(?___wmul)
@@ -3039,8 +3466,8 @@ l2593:
 	addwf	(_User1amt),f
 	skipnc
 	incf	(_User1amt+1),f
-	line	43
-;Main.c: 43: User2amt=(eeprom_read(8)*100)+eeprom_read(15);
+	line	57
+;Main.c: 57: User2amt=(eeprom_read(8)*100)+eeprom_read(15);
 	movlw	(08h)
 	fcall	_eeprom_read
 	movwf	(?___wmul)
@@ -3059,8 +3486,8 @@ l2593:
 	addwf	(_User2amt),f
 	skipnc
 	incf	(_User2amt+1),f
-	line	44
-;Main.c: 44: User3amt=(eeprom_read(16)*100)+eeprom_read(23);
+	line	58
+;Main.c: 58: User3amt=(eeprom_read(16)*100)+eeprom_read(23);
 	movlw	(010h)
 	fcall	_eeprom_read
 	movwf	(?___wmul)
@@ -3079,61 +3506,62 @@ l2593:
 	addwf	(_User3amt),f
 	skipnc
 	incf	(_User3amt+1),f
-	line	45
-;Main.c: 45: User1Rise = eeprom_read(2);
+	line	59
+;Main.c: 59: User1Rise = eeprom_read(2);
 	movlw	(02h)
 	fcall	_eeprom_read
 	movwf	(_User1Rise)
-	line	46
-;Main.c: 46: User2Rise = eeprom_read(10);
+	line	60
+;Main.c: 60: User2Rise = eeprom_read(10);
 	movlw	(0Ah)
 	fcall	_eeprom_read
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User2Rise)
-	line	47
-;Main.c: 47: User3Rise = eeprom_read(18);
+	line	61
+;Main.c: 61: User3Rise = eeprom_read(18);
 	movlw	(012h)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User3Rise)
-	line	48
-;Main.c: 48: User1Kerosene = eeprom_read(4);
+	line	62
+;Main.c: 62: User1Kerosene = eeprom_read(4);
 	movlw	(04h)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User1Kerosene)
-	line	49
-;Main.c: 49: User2Kerosene = eeprom_read(12);
+	line	63
+;Main.c: 63: User2Kerosene = eeprom_read(12);
 	movlw	(0Ch)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User2Kerosene)
-	line	50
-;Main.c: 50: User3Kerosene = eeprom_read(20);
+	line	64
+;Main.c: 64: User3Kerosene = eeprom_read(20);
 	movlw	(014h)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User3Kerosene)
-	line	51
-;Main.c: 51: User1Sugar = eeprom_read(3);
+	line	65
+;Main.c: 65: User1Sugar = eeprom_read(3);
 	movlw	(03h)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User1Sugar)
-	line	52
-;Main.c: 52: User2Sugar = eeprom_read(11);
+	line	66
+;Main.c: 66: User2Sugar = eeprom_read(11);
 	movlw	(0Bh)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User2Sugar)
-	line	53
-;Main.c: 53: User3Sugar = eeprom_read(19);
+	line	67
+;Main.c: 67: User3Sugar = eeprom_read(19);
 	movlw	(013h)
 	fcall	_eeprom_read
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_User3Sugar)
-	line	54
+	line	68
 	
-l964:	
+l1003:	
 	return
 	opt stack 0
 GLOBAL	__end_of_ReadAmnt
@@ -3141,10 +3569,249 @@ GLOBAL	__end_of_ReadAmnt
 ;; =============== function _ReadAmnt ends ============
 
 	signat	_ReadAmnt,88
+	global	_softreceive
+psect	text734,local,class=CODE,delta=2
+global __ptext734
+__ptext734:
+
+;; *************** function _softreceive *****************
+;; Defined at:
+;;		line 21 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;  mask            1    4[COMMON] unsigned char 
+;;  Data            1    3[COMMON] unsigned char 
+;; Return value:  Size  Location     Type
+;;                  1    wreg      unsigned char 
+;; Registers used:
+;;		wreg, status,2, status,0
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         2       0       0       0       0
+;;      Temps:          1       0       0       0       0
+;;      Totals:         3       0       0       0       0
+;;Total ram usage:        3 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    1
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_RFID_read
+;; This function uses a non-reentrant model
+;;
+psect	text734
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c"
+	line	21
+	global	__size_of_softreceive
+	__size_of_softreceive	equ	__end_of_softreceive-_softreceive
+	
+_softreceive:	
+	opt	stack 5
+; Regs used in _softreceive: [wreg+status,2+status,0]
+	line	24
+	
+l2405:	
+;softuart.c: 22: char mask;
+;softuart.c: 23: char Data;
+;softuart.c: 24: Data=0;
+	clrf	(softreceive@Data)
+	line	25
+;softuart.c: 25: while(RD0);
+	
+l972:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	btfsc	(64/8),(64)&7
+	goto	u711
+	goto	u710
+u711:
+	goto	l972
+u710:
+	line	26
+	
+l2407:	
+;softuart.c: 26: _delay((unsigned long)(((((1000000/9600)-2)/2))*(20000000/4000000.0)));
+	opt asmopt_off
+movlw	84
+movwf	(??_softreceive+0)+0,f
+u1007:
+decfsz	(??_softreceive+0)+0,f
+	goto	u1007
+	nop2	;nop
+opt asmopt_on
+
+	line	27
+	
+l2409:	
+;softuart.c: 27: for(mask=0x01;mask!=0;mask=mask<<1)
+	clrf	(softreceive@mask)
+	incf	(softreceive@mask),f
+	line	29
+	
+l2415:	
+;softuart.c: 28: {
+;softuart.c: 29: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+	opt asmopt_off
+movlw	169
+movwf	(??_softreceive+0)+0,f
+u1017:
+decfsz	(??_softreceive+0)+0,f
+	goto	u1017
+	nop2	;nop
+opt asmopt_on
+
+	line	30
+	
+l2417:	
+;softuart.c: 30: if(RD0)Data=Data|mask;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	btfss	(64/8),(64)&7
+	goto	u721
+	goto	u720
+u721:
+	goto	l2421
+u720:
+	
+l2419:	
+	movf	(softreceive@mask),w
+	iorwf	(softreceive@Data),f
+	line	27
+	
+l2421:	
+	clrc
+	rlf	(softreceive@mask),f
+	
+l2423:	
+	movf	(softreceive@mask),f
+	skipz
+	goto	u731
+	goto	u730
+u731:
+	goto	l2415
+u730:
+	line	32
+	
+l2425:	
+;softuart.c: 31: }
+;softuart.c: 32: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+	opt asmopt_off
+movlw	169
+movwf	(??_softreceive+0)+0,f
+u1027:
+decfsz	(??_softreceive+0)+0,f
+	goto	u1027
+	nop2	;nop
+opt asmopt_on
+
+	line	33
+;softuart.c: 33: return Data;
+	movf	(softreceive@Data),w
+	line	34
+	
+l978:	
+	return
+	opt stack 0
+GLOBAL	__end_of_softreceive
+	__end_of_softreceive:
+;; =============== function _softreceive ends ============
+
+	signat	_softreceive,89
+	global	_SoftWareUart_Init
+psect	text735,local,class=CODE,delta=2
+global __ptext735
+__ptext735:
+
+;; *************** function _SoftWareUart_Init *****************
+;; Defined at:
+;;		line 10 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;		None
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg
+;; Tracked objects:
+;;		On entry : 60/40
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       0       0       0       0
+;;      Temps:          1       0       0       0       0
+;;      Totals:         1       0       0       0       0
+;;Total ram usage:        1 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    1
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_main
+;; This function uses a non-reentrant model
+;;
+psect	text735
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c"
+	line	10
+	global	__size_of_SoftWareUart_Init
+	__size_of_SoftWareUart_Init	equ	__end_of_SoftWareUart_Init-_SoftWareUart_Init
+	
+_SoftWareUart_Init:	
+	opt	stack 6
+; Regs used in _SoftWareUart_Init: [wreg]
+	line	11
+	
+l2401:	
+;softuart.c: 11: RD1=1;
+	bcf	status, 6	;RP1=0, select bank0
+	bsf	(65/8),(65)&7
+	line	12
+;softuart.c: 12: RD0=1;
+	bsf	(64/8),(64)&7
+	line	13
+;softuart.c: 13: TRISD1=0;
+	bsf	status, 5	;RP0=1, select bank1
+	bcf	(1089/8)^080h,(1089)&7
+	line	14
+;softuart.c: 14: TRISD0=1;
+	bsf	(1088/8)^080h,(1088)&7
+	line	15
+;softuart.c: 15: RD1=1;
+	bcf	status, 5	;RP0=0, select bank0
+	bsf	(65/8),(65)&7
+	line	16
+	
+l2403:	
+;softuart.c: 16: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+	opt asmopt_off
+movlw	169
+movwf	(??_SoftWareUart_Init+0)+0,f
+u1037:
+decfsz	(??_SoftWareUart_Init+0)+0,f
+	goto	u1037
+	nop2	;nop
+opt asmopt_on
+
+	line	17
+	
+l969:	
+	return
+	opt stack 0
+GLOBAL	__end_of_SoftWareUart_Init
+	__end_of_SoftWareUart_Init:
+;; =============== function _SoftWareUart_Init ends ============
+
+	signat	_SoftWareUart_Init,88
 	global	_enable
-psect	text585,local,class=CODE,delta=2
-global __ptext585
-__ptext585:
+psect	text736,local,class=CODE,delta=2
+global __ptext736
+__ptext736:
 
 ;; *************** function _enable *****************
 ;; Defined at:
@@ -3176,7 +3843,7 @@ __ptext585:
 ;;		_lcddata
 ;; This function uses a non-reentrant model
 ;;
-psect	text585
+psect	text736
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	9
 	global	__size_of_enable
@@ -3187,36 +3854,36 @@ _enable:
 ; Regs used in _enable: [wreg]
 	line	10
 	
-l2273:	
+l2395:	
 ;lcd.c: 10: RD3 = 1;
 	bsf	(67/8),(67)&7
 	line	11
 	
-l2275:	
+l2397:	
 ;lcd.c: 11: _delay((unsigned long)((4)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	26
 movwf	((??_enable+0)+0+1),f
 	movlw	248
 movwf	((??_enable+0)+0),f
-u857:
+u1047:
 	decfsz	((??_enable+0)+0),f
-	goto	u857
+	goto	u1047
 	decfsz	((??_enable+0)+0+1),f
-	goto	u857
+	goto	u1047
 	clrwdt
 opt asmopt_on
 
 	line	12
 	
-l2277:	
+l2399:	
 ;lcd.c: 12: RD3 = 0;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bcf	(67/8),(67)&7
 	line	13
 	
-l923:	
+l931:	
 	return
 	opt stack 0
 GLOBAL	__end_of_enable
@@ -3225,9 +3892,9 @@ GLOBAL	__end_of_enable
 
 	signat	_enable,88
 	global	___awmod
-psect	text586,local,class=CODE,delta=2
-global __ptext586
-__ptext586:
+psect	text737,local,class=CODE,delta=2
+global __ptext737
+__ptext737:
 
 ;; *************** function ___awmod *****************
 ;; Defined at:
@@ -3260,7 +3927,7 @@ __ptext586:
 ;;		_DisplayAmnt
 ;; This function uses a non-reentrant model
 ;;
-psect	text586
+psect	text737
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awmod.c"
 	line	5
 	global	__size_of___awmod
@@ -3271,20 +3938,20 @@ ___awmod:
 ; Regs used in ___awmod: [wreg+status,2+status,0]
 	line	8
 	
-l2237:	
+l2359:	
 	clrf	(___awmod@sign)
 	line	9
 	
-l2239:	
+l2361:	
 	btfss	(___awmod@dividend+1),7
-	goto	u551
-	goto	u550
-u551:
-	goto	l2245
-u550:
+	goto	u641
+	goto	u640
+u641:
+	goto	l2367
+u640:
 	line	10
 	
-l2241:	
+l2363:	
 	comf	(___awmod@dividend),f
 	comf	(___awmod@dividend+1),f
 	incf	(___awmod@dividend),f
@@ -3292,21 +3959,21 @@ l2241:
 	incf	(___awmod@dividend+1),f
 	line	11
 	
-l2243:	
+l2365:	
 	clrf	(___awmod@sign)
 	incf	(___awmod@sign),f
 	line	13
 	
-l2245:	
+l2367:	
 	btfss	(___awmod@divisor+1),7
-	goto	u561
-	goto	u560
-u561:
-	goto	l2249
-u560:
+	goto	u651
+	goto	u650
+u651:
+	goto	l2371
+u650:
 	line	14
 	
-l2247:	
+l2369:	
 	comf	(___awmod@divisor),f
 	comf	(___awmod@divisor+1),f
 	incf	(___awmod@divisor),f
@@ -3314,25 +3981,25 @@ l2247:
 	incf	(___awmod@divisor+1),f
 	line	15
 	
-l2249:	
+l2371:	
 	movf	(___awmod@divisor+1),w
 	iorwf	(___awmod@divisor),w
 	skipnz
-	goto	u571
-	goto	u570
-u571:
-	goto	l2265
-u570:
+	goto	u661
+	goto	u660
+u661:
+	goto	l2387
+u660:
 	line	16
 	
-l2251:	
+l2373:	
 	clrf	(___awmod@counter)
 	incf	(___awmod@counter),f
 	line	17
-	goto	l2255
+	goto	l2377
 	line	18
 	
-l2253:	
+l2375:	
 	clrc
 	rlf	(___awmod@divisor),f
 	rlf	(___awmod@divisor+1),f
@@ -3340,32 +4007,32 @@ l2253:
 	incf	(___awmod@counter),f
 	line	17
 	
-l2255:	
+l2377:	
 	btfss	(___awmod@divisor+1),(15)&7
-	goto	u581
-	goto	u580
-u581:
-	goto	l2253
-u580:
+	goto	u671
+	goto	u670
+u671:
+	goto	l2375
+u670:
 	line	22
 	
-l2257:	
+l2379:	
 	movf	(___awmod@divisor+1),w
 	subwf	(___awmod@dividend+1),w
 	skipz
-	goto	u595
+	goto	u685
 	movf	(___awmod@divisor),w
 	subwf	(___awmod@dividend),w
-u595:
+u685:
 	skipc
-	goto	u591
-	goto	u590
-u591:
-	goto	l2261
-u590:
+	goto	u681
+	goto	u680
+u681:
+	goto	l2383
+u680:
 	line	23
 	
-l2259:	
+l2381:	
 	movf	(___awmod@divisor),w
 	subwf	(___awmod@dividend),f
 	movf	(___awmod@divisor+1),w
@@ -3374,30 +4041,30 @@ l2259:
 	subwf	(___awmod@dividend+1),f
 	line	24
 	
-l2261:	
+l2383:	
 	clrc
 	rrf	(___awmod@divisor+1),f
 	rrf	(___awmod@divisor),f
 	line	25
 	
-l2263:	
+l2385:	
 	decfsz	(___awmod@counter),f
-	goto	u601
-	goto	u600
-u601:
-	goto	l2257
-u600:
+	goto	u691
+	goto	u690
+u691:
+	goto	l2379
+u690:
 	line	27
 	
-l2265:	
+l2387:	
 	movf	(___awmod@sign),w
 	skipz
-	goto	u610
-	goto	l2269
-u610:
+	goto	u700
+	goto	l2391
+u700:
 	line	28
 	
-l2267:	
+l2389:	
 	comf	(___awmod@dividend),f
 	comf	(___awmod@dividend+1),f
 	incf	(___awmod@dividend),f
@@ -3405,14 +4072,14 @@ l2267:
 	incf	(___awmod@dividend+1),f
 	line	29
 	
-l2269:	
+l2391:	
 	movf	(___awmod@dividend+1),w
 	movwf	(?___awmod+1)
 	movf	(___awmod@dividend),w
 	movwf	(?___awmod)
 	line	30
 	
-l1261:	
+l1311:	
 	return
 	opt stack 0
 GLOBAL	__end_of___awmod
@@ -3421,9 +4088,9 @@ GLOBAL	__end_of___awmod
 
 	signat	___awmod,8314
 	global	___awdiv
-psect	text587,local,class=CODE,delta=2
-global __ptext587
-__ptext587:
+psect	text738,local,class=CODE,delta=2
+global __ptext738
+__ptext738:
 
 ;; *************** function ___awdiv *****************
 ;; Defined at:
@@ -3457,7 +4124,7 @@ __ptext587:
 ;;		_DisplayAmnt
 ;; This function uses a non-reentrant model
 ;;
-psect	text587
+psect	text738
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awdiv.c"
 	line	5
 	global	__size_of___awdiv
@@ -3468,20 +4135,20 @@ ___awdiv:
 ; Regs used in ___awdiv: [wreg+status,2+status,0]
 	line	9
 	
-l2549:	
+l2723:	
 	clrf	(___awdiv@sign)
 	line	10
 	
-l2551:	
+l2725:	
 	btfss	(___awdiv@divisor+1),7
-	goto	u691
-	goto	u690
-u691:
-	goto	l2557
-u690:
+	goto	u831
+	goto	u830
+u831:
+	goto	l2731
+u830:
 	line	11
 	
-l2553:	
+l2727:	
 	comf	(___awdiv@divisor),f
 	comf	(___awdiv@divisor+1),f
 	incf	(___awdiv@divisor),f
@@ -3489,21 +4156,21 @@ l2553:
 	incf	(___awdiv@divisor+1),f
 	line	12
 	
-l2555:	
+l2729:	
 	clrf	(___awdiv@sign)
 	incf	(___awdiv@sign),f
 	line	14
 	
-l2557:	
+l2731:	
 	btfss	(___awdiv@dividend+1),7
-	goto	u701
-	goto	u700
-u701:
-	goto	l2563
-u700:
+	goto	u841
+	goto	u840
+u841:
+	goto	l2737
+u840:
 	line	15
 	
-l2559:	
+l2733:	
 	comf	(___awdiv@dividend),f
 	comf	(___awdiv@dividend+1),f
 	incf	(___awdiv@dividend),f
@@ -3511,35 +4178,35 @@ l2559:
 	incf	(___awdiv@dividend+1),f
 	line	16
 	
-l2561:	
+l2735:	
 	movlw	(01h)
 	xorwf	(___awdiv@sign),f
 	line	18
 	
-l2563:	
+l2737:	
 	clrf	(___awdiv@quotient)
 	clrf	(___awdiv@quotient+1)
 	line	19
 	
-l2565:	
+l2739:	
 	movf	(___awdiv@divisor+1),w
 	iorwf	(___awdiv@divisor),w
 	skipnz
-	goto	u711
-	goto	u710
-u711:
-	goto	l2585
-u710:
+	goto	u851
+	goto	u850
+u851:
+	goto	l2759
+u850:
 	line	20
 	
-l2567:	
+l2741:	
 	clrf	(___awdiv@counter)
 	incf	(___awdiv@counter),f
 	line	21
-	goto	l2571
+	goto	l2745
 	line	22
 	
-l2569:	
+l2743:	
 	clrc
 	rlf	(___awdiv@divisor),f
 	rlf	(___awdiv@divisor+1),f
@@ -3547,38 +4214,38 @@ l2569:
 	incf	(___awdiv@counter),f
 	line	21
 	
-l2571:	
+l2745:	
 	btfss	(___awdiv@divisor+1),(15)&7
-	goto	u721
-	goto	u720
-u721:
-	goto	l2569
-u720:
+	goto	u861
+	goto	u860
+u861:
+	goto	l2743
+u860:
 	line	26
 	
-l2573:	
+l2747:	
 	clrc
 	rlf	(___awdiv@quotient),f
 	rlf	(___awdiv@quotient+1),f
 	line	27
 	
-l2575:	
+l2749:	
 	movf	(___awdiv@divisor+1),w
 	subwf	(___awdiv@dividend+1),w
 	skipz
-	goto	u735
+	goto	u875
 	movf	(___awdiv@divisor),w
 	subwf	(___awdiv@dividend),w
-u735:
+u875:
 	skipc
-	goto	u731
-	goto	u730
-u731:
-	goto	l2581
-u730:
+	goto	u871
+	goto	u870
+u871:
+	goto	l2755
+u870:
 	line	28
 	
-l2577:	
+l2751:	
 	movf	(___awdiv@divisor),w
 	subwf	(___awdiv@dividend),f
 	movf	(___awdiv@divisor+1),w
@@ -3587,34 +4254,34 @@ l2577:
 	subwf	(___awdiv@dividend+1),f
 	line	29
 	
-l2579:	
+l2753:	
 	bsf	(___awdiv@quotient)+(0/8),(0)&7
 	line	31
 	
-l2581:	
+l2755:	
 	clrc
 	rrf	(___awdiv@divisor+1),f
 	rrf	(___awdiv@divisor),f
 	line	32
 	
-l2583:	
+l2757:	
 	decfsz	(___awdiv@counter),f
-	goto	u741
-	goto	u740
-u741:
-	goto	l2573
-u740:
+	goto	u881
+	goto	u880
+u881:
+	goto	l2747
+u880:
 	line	34
 	
-l2585:	
+l2759:	
 	movf	(___awdiv@sign),w
 	skipz
-	goto	u750
-	goto	l2589
-u750:
+	goto	u890
+	goto	l2763
+u890:
 	line	35
 	
-l2587:	
+l2761:	
 	comf	(___awdiv@quotient),f
 	comf	(___awdiv@quotient+1),f
 	incf	(___awdiv@quotient),f
@@ -3622,14 +4289,14 @@ l2587:
 	incf	(___awdiv@quotient+1),f
 	line	36
 	
-l2589:	
+l2763:	
 	movf	(___awdiv@quotient+1),w
 	movwf	(?___awdiv+1)
 	movf	(___awdiv@quotient),w
 	movwf	(?___awdiv)
 	line	37
 	
-l1193:	
+l1243:	
 	return
 	opt stack 0
 GLOBAL	__end_of___awdiv
@@ -3638,9 +4305,9 @@ GLOBAL	__end_of___awdiv
 
 	signat	___awdiv,8314
 	global	___lbmod
-psect	text588,local,class=CODE,delta=2
-global __ptext588
-__ptext588:
+psect	text739,local,class=CODE,delta=2
+global __ptext739
+__ptext739:
 
 ;; *************** function ___lbmod *****************
 ;; Defined at:
@@ -3676,7 +4343,7 @@ __ptext588:
 ;;		_DisplayKerosene
 ;; This function uses a non-reentrant model
 ;;
-psect	text588
+psect	text739
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbmod.c"
 	line	5
 	global	__size_of___lbmod
@@ -3689,66 +4356,66 @@ ___lbmod:
 	line	9
 	movwf	(___lbmod@dividend)
 	
-l2175:	
+l2297:	
 	movlw	(08h)
 	movwf	(___lbmod@counter)
 	line	10
 	
-l2177:	
+l2299:	
 	clrf	(___lbmod@rem)
 	line	12
 	
-l2179:	
+l2301:	
 	movf	(___lbmod@dividend),w
 	movwf	(??___lbmod+0)+0
 	movlw	07h
-u455:
+u545:
 	clrc
 	rrf	(??___lbmod+0)+0,f
 	addlw	-1
 	skipz
-	goto	u455
+	goto	u545
 	clrc
 	rlf	(___lbmod@rem),w
 	iorwf	0+(??___lbmod+0)+0,w
 	movwf	(___lbmod@rem)
 	line	13
 	
-l2181:	
+l2303:	
 	clrc
 	rlf	(___lbmod@dividend),f
 	line	14
 	
-l2183:	
+l2305:	
 	movf	(___lbmod@divisor),w
 	subwf	(___lbmod@rem),w
 	skipc
-	goto	u461
-	goto	u460
-u461:
-	goto	l2187
-u460:
+	goto	u551
+	goto	u550
+u551:
+	goto	l2309
+u550:
 	line	15
 	
-l2185:	
+l2307:	
 	movf	(___lbmod@divisor),w
 	subwf	(___lbmod@rem),f
 	line	16
 	
-l2187:	
+l2309:	
 	decfsz	(___lbmod@counter),f
-	goto	u471
-	goto	u470
-u471:
-	goto	l2179
-u470:
+	goto	u561
+	goto	u560
+u561:
+	goto	l2301
+u560:
 	line	17
 	
-l2189:	
+l2311:	
 	movf	(___lbmod@rem),w
 	line	18
 	
-l1082:	
+l1132:	
 	return
 	opt stack 0
 GLOBAL	__end_of___lbmod
@@ -3757,9 +4424,9 @@ GLOBAL	__end_of___lbmod
 
 	signat	___lbmod,8313
 	global	___lbdiv
-psect	text589,local,class=CODE,delta=2
-global __ptext589
-__ptext589:
+psect	text740,local,class=CODE,delta=2
+global __ptext740
+__ptext740:
 
 ;; *************** function ___lbdiv *****************
 ;; Defined at:
@@ -3795,7 +4462,7 @@ __ptext589:
 ;;		_DisplayKerosene
 ;; This function uses a non-reentrant model
 ;;
-psect	text589
+psect	text740
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbdiv.c"
 	line	5
 	global	__size_of___lbdiv
@@ -3808,88 +4475,88 @@ ___lbdiv:
 	line	9
 	movwf	(___lbdiv@dividend)
 	
-l2151:	
+l2273:	
 	clrf	(___lbdiv@quotient)
 	line	10
 	
-l2153:	
+l2275:	
 	movf	(___lbdiv@divisor),w
 	skipz
-	goto	u410
-	goto	l2171
-u410:
+	goto	u500
+	goto	l2293
+u500:
 	line	11
 	
-l2155:	
+l2277:	
 	clrf	(___lbdiv@counter)
 	incf	(___lbdiv@counter),f
 	line	12
-	goto	l2159
+	goto	l2281
 	
-l1071:	
+l1121:	
 	line	13
 	clrc
 	rlf	(___lbdiv@divisor),f
 	line	14
 	
-l2157:	
+l2279:	
 	incf	(___lbdiv@counter),f
 	line	12
 	
-l2159:	
+l2281:	
 	btfss	(___lbdiv@divisor),(7)&7
-	goto	u421
-	goto	u420
-u421:
-	goto	l1071
-u420:
+	goto	u511
+	goto	u510
+u511:
+	goto	l1121
+u510:
 	line	16
 	
-l1073:	
+l1123:	
 	line	17
 	clrc
 	rlf	(___lbdiv@quotient),f
 	line	18
 	
-l2161:	
+l2283:	
 	movf	(___lbdiv@divisor),w
 	subwf	(___lbdiv@dividend),w
 	skipc
-	goto	u431
-	goto	u430
-u431:
-	goto	l2167
-u430:
+	goto	u521
+	goto	u520
+u521:
+	goto	l2289
+u520:
 	line	19
 	
-l2163:	
+l2285:	
 	movf	(___lbdiv@divisor),w
 	subwf	(___lbdiv@dividend),f
 	line	20
 	
-l2165:	
+l2287:	
 	bsf	(___lbdiv@quotient)+(0/8),(0)&7
 	line	22
 	
-l2167:	
+l2289:	
 	clrc
 	rrf	(___lbdiv@divisor),f
 	line	23
 	
-l2169:	
+l2291:	
 	decfsz	(___lbdiv@counter),f
-	goto	u441
-	goto	u440
-u441:
-	goto	l1073
-u440:
+	goto	u531
+	goto	u530
+u531:
+	goto	l1123
+u530:
 	line	25
 	
-l2171:	
+l2293:	
 	movf	(___lbdiv@quotient),w
 	line	26
 	
-l1076:	
+l1126:	
 	return
 	opt stack 0
 GLOBAL	__end_of___lbdiv
@@ -3898,9 +4565,9 @@ GLOBAL	__end_of___lbdiv
 
 	signat	___lbdiv,8313
 	global	___wmul
-psect	text590,local,class=CODE,delta=2
-global __ptext590
-__ptext590:
+psect	text741,local,class=CODE,delta=2
+global __ptext741
+__ptext741:
 
 ;; *************** function ___wmul *****************
 ;; Defined at:
@@ -3933,7 +4600,7 @@ __ptext590:
 ;;		_paramter
 ;; This function uses a non-reentrant model
 ;;
-psect	text590
+psect	text741
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\wmul.c"
 	line	3
 	global	__size_of___wmul
@@ -3944,22 +4611,22 @@ ___wmul:
 ; Regs used in ___wmul: [wreg+status,2+status,0]
 	line	4
 	
-l2533:	
+l2707:	
 	bcf	status, 6	;RP1=0, select bank0
 	clrf	(___wmul@product)
 	clrf	(___wmul@product+1)
 	line	7
 	
-l2535:	
+l2709:	
 	btfss	(___wmul@multiplier),(0)&7
-	goto	u671
-	goto	u670
-u671:
-	goto	l2539
-u670:
+	goto	u811
+	goto	u810
+u811:
+	goto	l2713
+u810:
 	line	8
 	
-l2537:	
+l2711:	
 	movf	(___wmul@multiplicand),w
 	bcf	status, 6	;RP1=0, select bank0
 	addwf	(___wmul@product),f
@@ -3969,30 +4636,30 @@ l2537:
 	addwf	(___wmul@product+1),f
 	line	9
 	
-l2539:	
+l2713:	
 	clrc
 	rlf	(___wmul@multiplicand),f
 	rlf	(___wmul@multiplicand+1),f
 	line	10
 	
-l2541:	
+l2715:	
 	clrc
 	rrf	(___wmul@multiplier+1),f
 	rrf	(___wmul@multiplier),f
 	line	11
 	
-l2543:	
+l2717:	
 	movf	((___wmul@multiplier+1)),w
 	iorwf	((___wmul@multiplier)),w
 	skipz
-	goto	u681
-	goto	u680
-u681:
-	goto	l2535
-u680:
+	goto	u821
+	goto	u820
+u821:
+	goto	l2709
+u820:
 	line	12
 	
-l2545:	
+l2719:	
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(___wmul@product+1),w
 	movwf	(?___wmul+1)
@@ -4000,7 +4667,7 @@ l2545:
 	movwf	(?___wmul)
 	line	13
 	
-l1046:	
+l1096:	
 	return
 	opt stack 0
 GLOBAL	__end_of___wmul
@@ -4008,14 +4675,119 @@ GLOBAL	__end_of___wmul
 ;; =============== function ___wmul ends ============
 
 	signat	___wmul,8314
+	global	_strcmp
+psect	text742,local,class=CODE,delta=2
+global __ptext742
+__ptext742:
+
+;; *************** function _strcmp *****************
+;; Defined at:
+;;		line 34 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\strcmp.c"
+;; Parameters:    Size  Location     Type
+;;  s1              1    wreg     PTR const unsigned char 
+;;		 -> card_store(15), 
+;;  s2              1    2[COMMON] PTR const unsigned char 
+;;		 -> User3(13), User2(13), User1(13), 
+;; Auto vars:     Size  Location     Type
+;;  s1              1    7[COMMON] PTR const unsigned char 
+;;		 -> card_store(15), 
+;;  r               1    6[COMMON] char 
+;; Return value:  Size  Location     Type
+;;                  2    2[COMMON] int 
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 100/0
+;;		Unchanged: FFEFF/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         2       0       0       0       0
+;;      Locals:         2       0       0       0       0
+;;      Temps:          2       0       0       0       0
+;;      Totals:         6       0       0       0       0
+;;Total ram usage:        6 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    1
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_main
+;; This function uses a non-reentrant model
+;;
+psect	text742
+	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\strcmp.c"
+	line	34
+	global	__size_of_strcmp
+	__size_of_strcmp	equ	__end_of_strcmp-_strcmp
+	
+_strcmp:	
+	opt	stack 6
+; Regs used in _strcmp: [wreg-fsr0h+status,2+status,0]
+;strcmp@s1 stored from wreg
+	movwf	(strcmp@s1)
+	line	37
+	
+l2247:	
+	
+l2249:	
+	movf	(strcmp@s2),w
+	incf	(strcmp@s2),f
+	movwf	fsr0
+	bcf	status, 7	;select IRP bank0
+	movf	indf,w
+	movwf	(??_strcmp+0)+0
+	movf	(strcmp@s1),w
+	movwf	fsr0
+	movf	indf,w
+	movwf	(??_strcmp+1)+0
+	movf	(??_strcmp+0)+0,w
+	subwf	(??_strcmp+1)+0,w
+	movwf	(strcmp@r)
+	movf	((strcmp@r)),f
+	skipz
+	goto	u461
+	goto	u460
+u461:
+	goto	l2253
+u460:
+	
+l2251:	
+	movf	(strcmp@s1),w
+	incf	(strcmp@s1),f
+	movwf	fsr0
+	movf	indf,f
+	skipz
+	goto	u471
+	goto	u470
+u471:
+	goto	l2249
+u470:
+	line	39
+	
+l2253:	
+	movf	(strcmp@r),w
+	movwf	(?_strcmp)
+	clrf	(?_strcmp+1)
+	btfsc	(?_strcmp),7
+	decf	(?_strcmp+1),f
+	line	40
+	
+l1084:	
+	return
+	opt stack 0
+GLOBAL	__end_of_strcmp
+	__end_of_strcmp:
+;; =============== function _strcmp ends ============
+
+	signat	_strcmp,8314
 	global	_uart_init
-psect	text591,local,class=CODE,delta=2
-global __ptext591
-__ptext591:
+psect	text743,local,class=CODE,delta=2
+global __ptext743
+__ptext743:
 
 ;; *************** function _uart_init *****************
 ;; Defined at:
-;;		line 100 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 114 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -4042,49 +4814,49 @@ __ptext591:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text591
+psect	text743
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	100
+	line	114
 	global	__size_of_uart_init
 	__size_of_uart_init	equ	__end_of_uart_init-_uart_init
 	
 _uart_init:	
 	opt	stack 6
 ; Regs used in _uart_init: [wreg+status,2]
-	line	101
+	line	115
 	
-l2131:	
-;Main.c: 101: PORTC=0xFF;
+l2243:	
+;Main.c: 115: PORTC=0xFF;
 	movlw	(0FFh)
 	movwf	(7)	;volatile
-	line	102
-;Main.c: 102: TRISC=0x80;
+	line	116
+;Main.c: 116: TRISC=0x80;
 	movlw	(080h)
 	bsf	status, 5	;RP0=1, select bank1
 	movwf	(135)^080h	;volatile
-	line	103
-;Main.c: 103: TXSTA=0X24;
+	line	117
+;Main.c: 117: TXSTA=0X24;
 	movlw	(024h)
 	movwf	(152)^080h	;volatile
-	line	104
-;Main.c: 104: RCSTA=0X90;
+	line	118
+;Main.c: 118: RCSTA=0X90;
 	movlw	(090h)
 	bcf	status, 5	;RP0=0, select bank0
 	movwf	(24)	;volatile
-	line	105
-;Main.c: 105: SPBRG=129;
+	line	119
+;Main.c: 119: SPBRG=129;
 	movlw	(081h)
 	bsf	status, 5	;RP0=1, select bank1
 	movwf	(153)^080h	;volatile
-	line	106
+	line	120
 	
-l2133:	
-;Main.c: 106: RCREG=0;
+l2245:	
+;Main.c: 120: RCREG=0;
 	bcf	status, 5	;RP0=0, select bank0
 	clrf	(26)	;volatile
-	line	107
+	line	121
 	
-l997:	
+l1036:	
 	return
 	opt stack 0
 GLOBAL	__end_of_uart_init
@@ -4093,9 +4865,9 @@ GLOBAL	__end_of_uart_init
 
 	signat	_uart_init,88
 	global	_eeprom_read
-psect	text592,local,class=CODE,delta=2
-global __ptext592
-__ptext592:
+psect	text744,local,class=CODE,delta=2
+global __ptext744
+__ptext744:
 
 ;; *************** function _eeprom_read *****************
 ;; Defined at:
@@ -4127,7 +4899,7 @@ __ptext592:
 ;;		_paramter
 ;; This function uses a non-reentrant model
 ;;
-psect	text592
+psect	text744
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eeread.c"
 	line	8
 	global	__size_of_eeprom_read
@@ -4141,23 +4913,23 @@ _eeprom_read:
 	movwf	(eeprom_read@addr)
 	line	9
 	
-l1032:	
+l1074:	
 	line	10
 # 10 "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eeread.c"
 clrwdt ;#
-psect	text592
+psect	text744
 	line	11
 	bsf	status, 5	;RP0=1, select bank3
 	bsf	status, 6	;RP1=1, select bank3
 	btfsc	(3169/8)^0180h,(3169)&7
-	goto	u381
-	goto	u380
-u381:
-	goto	l1032
-u380:
+	goto	u451
+	goto	u450
+u451:
+	goto	l1074
+u450:
 	line	12
 	
-l2127:	
+l2239:	
 	movf	(eeprom_read@addr),w
 	bcf	status, 5	;RP0=0, select bank2
 	movwf	(269)^0100h	;volatile
@@ -4178,7 +4950,7 @@ l2127:
 	movf	(268)^0100h,w	;volatile
 	line	13
 	
-l1034:	
+l1076:	
 	return
 	opt stack 0
 GLOBAL	__end_of_eeprom_read
@@ -4187,9 +4959,9 @@ GLOBAL	__end_of_eeprom_read
 
 	signat	_eeprom_read,4217
 	global	_lcdport
-psect	text593,local,class=CODE,delta=2
-global __ptext593
-__ptext593:
+psect	text745,local,class=CODE,delta=2
+global __ptext745
+__ptext745:
 
 ;; *************** function _lcdport *****************
 ;; Defined at:
@@ -4222,7 +4994,7 @@ __ptext593:
 ;;		_lcd_init
 ;; This function uses a non-reentrant model
 ;;
-psect	text593
+psect	text745
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	16
 	global	__size_of_lcdport
@@ -4235,25 +5007,25 @@ _lcdport:
 	movwf	(lcdport@a)
 	line	17
 	
-l2117:	
+l2229:	
 ;lcd.c: 17: if(a & 1)
 	btfss	(lcdport@a),(0)&7
-	goto	u341
-	goto	u340
-u341:
-	goto	l926
-u340:
+	goto	u411
+	goto	u410
+u411:
+	goto	l934
+u410:
 	line	18
 	
-l2119:	
+l2231:	
 ;lcd.c: 18: RD4 = 1;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bsf	(68/8),(68)&7
-	goto	l927
+	goto	l935
 	line	19
 	
-l926:	
+l934:	
 	line	20
 ;lcd.c: 19: else
 ;lcd.c: 20: RD4 = 0;
@@ -4261,77 +5033,77 @@ l926:
 	bcf	status, 6	;RP1=0, select bank0
 	bcf	(68/8),(68)&7
 	
-l927:	
+l935:	
 	line	22
 ;lcd.c: 22: if(a & 2)
 	btfss	(lcdport@a),(1)&7
-	goto	u351
-	goto	u350
-u351:
-	goto	l928
-u350:
+	goto	u421
+	goto	u420
+u421:
+	goto	l936
+u420:
 	line	23
 	
-l2121:	
+l2233:	
 ;lcd.c: 23: RD5 = 1;
 	bsf	(69/8),(69)&7
-	goto	l929
+	goto	l937
 	line	24
 	
-l928:	
+l936:	
 	line	25
 ;lcd.c: 24: else
 ;lcd.c: 25: RD5 = 0;
 	bcf	(69/8),(69)&7
 	
-l929:	
+l937:	
 	line	27
 ;lcd.c: 27: if(a & 4)
 	btfss	(lcdport@a),(2)&7
-	goto	u361
-	goto	u360
-u361:
-	goto	l930
-u360:
+	goto	u431
+	goto	u430
+u431:
+	goto	l938
+u430:
 	line	28
 	
-l2123:	
+l2235:	
 ;lcd.c: 28: RD6 = 1;
 	bsf	(70/8),(70)&7
-	goto	l931
+	goto	l939
 	line	29
 	
-l930:	
+l938:	
 	line	30
 ;lcd.c: 29: else
 ;lcd.c: 30: RD6 = 0;
 	bcf	(70/8),(70)&7
 	
-l931:	
+l939:	
 	line	32
 ;lcd.c: 32: if(a & 8)
 	btfss	(lcdport@a),(3)&7
-	goto	u371
-	goto	u370
-u371:
-	goto	l932
-u370:
+	goto	u441
+	goto	u440
+u441:
+	goto	l940
+u440:
 	line	33
 	
-l2125:	
+l2237:	
 ;lcd.c: 33: RD7 = 1;
 	bsf	(71/8),(71)&7
-	goto	l934
+	goto	l942
 	line	34
 	
-l932:	
+l940:	
 	line	35
 ;lcd.c: 34: else
 ;lcd.c: 35: RD7 = 0;
 	bcf	(71/8),(71)&7
 	line	36
 	
-l934:	
+l942:	
 	return
 	opt stack 0
 GLOBAL	__end_of_lcdport
@@ -4340,13 +5112,13 @@ GLOBAL	__end_of_lcdport
 
 	signat	_lcdport,4216
 	global	_ISR
-psect	text594,local,class=CODE,delta=2
-global __ptext594
-__ptext594:
+psect	text746,local,class=CODE,delta=2
+global __ptext746
+__ptext746:
 
 ;; *************** function _ISR *****************
 ;; Defined at:
-;;		line 37 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;;		line 41 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -4372,9 +5144,9 @@ __ptext594:
 ;;		Interrupt level 1
 ;; This function uses a non-reentrant model
 ;;
-psect	text594
+psect	text746
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-	line	37
+	line	41
 	global	__size_of_ISR
 	__size_of_ISR	equ	__end_of_ISR-_ISR
 	
@@ -4394,10 +5166,10 @@ interrupt_function:
 	movf	pclath,w
 	movwf	(??_ISR+1)
 	ljmp	_ISR
-psect	text594
-	line	38
+psect	text746
+	line	42
 	
-i1l961:	
+i1l994:	
 	movf	(??_ISR+1),w
 	movwf	pclath
 	movf	(??_ISR+0),w
@@ -4411,9 +5183,9 @@ GLOBAL	__end_of_ISR
 ;; =============== function _ISR ends ============
 
 	signat	_ISR,88
-psect	text595,local,class=CODE,delta=2
-global __ptext595
-__ptext595:
+psect	text747,local,class=CODE,delta=2
+global __ptext747
+__ptext747:
 	global	btemp
 	btemp set 07Eh
 

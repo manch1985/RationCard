@@ -838,55 +838,63 @@ Version 3.2 HI-TECH Software Intermediate Code
 "630 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\include\pic.h
 [v __delay `(v 0 ef1`ul ]
 [p i __delay ]
-"17 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _c1bal `ui 1 e ]
-"17 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _c2bal `ui 1 e ]
-"17 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _c1 `ui 1 e ]
-"17 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _c2 `ui 1 e ]
-"17 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _User `ui 1 e ]
-"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _j `uc 1 e ]
-"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _i `uc 1 e ]
-"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _k `uc -> 15 `i e ]
 "19 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User1Rise `uc 1 e ]
+[v _j `uc 1 e ]
+"19 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _i `uc 1 e ]
+"19 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _k `uc -> 15 `i e ]
 "20 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User2Rise `uc 1 e ]
+[v _User1Rise `uc 1 e ]
 "21 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User3Rise `uc 1 e ]
+[v _User2Rise `uc 1 e ]
 "22 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User1Kerosene `uc 1 e ]
+[v _User3Rise `uc 1 e ]
 "23 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User2Kerosene `uc 1 e ]
+[v _User1Kerosene `uc 1 e ]
 "24 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User3Kerosene `uc 1 e ]
+[v _User2Kerosene `uc 1 e ]
 "25 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User1Sugar `uc 1 e ]
+[v _User3Kerosene `uc 1 e ]
 "26 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User2Sugar `uc 1 e ]
+[v _User1Sugar `uc 1 e ]
 "27 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _User2Sugar `uc 1 e ]
+"28 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [v _User3Sugar `uc 1 e ]
-"28 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User1amt `i 1 e ]
-"28 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User2amt `i 1 e ]
-"28 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _User3amt `i 1 e ]
 "29 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _digit `Cuc -> 0 `x e ]
+[v _User1amt `i 1 e ]
+"29 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _User2amt `i 1 e ]
+"29 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _User3amt `i 1 e ]
 "30 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _card1 `uc -> 0 `x e ]
+[v _digit `Cuc -> 0 `x e ]
 "31 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _card2 `uc -> 0 `x e ]
+[v _card_store `uc -> 15 `i e ]
+"32 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _rfid_flag `b 1 e ]
+"33 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _User1 `uc -> 0 `x e ]
+"34 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _User2 `uc -> 0 `x e ]
+"35 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+[v _User3 `uc -> 0 `x e ]
 "42 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\include\eeprom_routines.h
 [v _eeprom_read `(uc 0 ef1`uc ]
 [p mainexit ]
+"44 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\include\string.h
+[v _strcmp `(i 0 ef2`*Cuc`*Cuc ]
 [; ;pic16f887.h: 19: volatile unsigned char INDF @ 0x000;
 [; ;pic16f887.h: 20: volatile unsigned char TMR0 @ 0x001;
 [; ;pic16f887.h: 21: volatile unsigned char PCL @ 0x002;
@@ -1961,7 +1969,186 @@ Version 3.2 HI-TECH Software Intermediate Code
 "105
 [e :UE 57 ]
 }
-"17 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
+"10 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c
+[v _SoftWareUart_Init `(v 1 ef ]
+{
+[; ;softuart.c: 9: void SoftWareUart_Init()
+[; ;softuart.c: 10: {
+[e :U _SoftWareUart_Init ]
+[f ]
+[; ;softuart.c: 11: RD1=1;
+"11
+[e = _RD1 -> -> 1 `i `b ]
+[; ;softuart.c: 12: RD0=1;
+"12
+[e = _RD0 -> -> 1 `i `b ]
+[; ;softuart.c: 13: TRISD1=0;
+"13
+[e = _TRISD1 -> -> 0 `i `b ]
+[; ;softuart.c: 14: TRISD0=1;
+"14
+[e = _TRISD0 -> -> 1 `i `b ]
+[; ;softuart.c: 15: RD1=1;
+"15
+[e = _RD1 -> -> 1 `i `b ]
+[; ;softuart.c: 16: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+"16
+[e ( __delay (1 -> * -> - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+[; ;softuart.c: 17: }
+"17
+[e :UE 58 ]
+}
+"21
+[v _softreceive `(uc 1 ef ]
+{
+[; ;softuart.c: 20: unsigned char softreceive()
+[; ;softuart.c: 21: {
+[e :U _softreceive ]
+[f ]
+"22
+[v _mask `uc 1 a ]
+"23
+[v _Data `uc 1 a ]
+[; ;softuart.c: 22: char mask;
+[; ;softuart.c: 23: char Data;
+[; ;softuart.c: 24: Data=0;
+"24
+[e = _Data -> -> 0 `i `uc ]
+[; ;softuart.c: 25: while(RD0);
+"25
+[e $U 60  ]
+[e :U 61 ]
+[e :U 60 ]
+[e $ _RD0 61  ]
+[e :U 62 ]
+[; ;softuart.c: 26: _delay((unsigned long)(((((1000000/9600)-2)/2))*(20000000/4000000.0)));
+"26
+[e ( __delay (1 -> * -> / - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+[; ;softuart.c: 27: for(mask=0x01;mask!=0;mask=mask<<1)
+"27
+{
+[e = _mask -> -> 1 `i `uc ]
+[e $ != -> _mask `i -> 0 `i 63  ]
+[e $U 64  ]
+"28
+[e :U 63 ]
+[; ;softuart.c: 28: {
+{
+[; ;softuart.c: 29: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+"29
+[e ( __delay (1 -> * -> - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+[; ;softuart.c: 30: if(RD0)Data=Data|mask;
+"30
+[e $ ! _RD0 66  ]
+[e = _Data -> | -> _Data `i -> _mask `i `uc ]
+[e :U 66 ]
+"31
+}
+"27
+[e = _mask -> << -> _mask `i -> 1 `i `uc ]
+[e $ != -> _mask `i -> 0 `i 63  ]
+[e :U 64 ]
+"31
+}
+[; ;softuart.c: 31: }
+[; ;softuart.c: 32: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+"32
+[e ( __delay (1 -> * -> - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+[; ;softuart.c: 33: return Data;
+"33
+[e ) _Data ]
+[e $UE 59  ]
+[; ;softuart.c: 34: }
+"34
+[e :UE 59 ]
+}
+"37
+[v _softtransmit `(v 1 ef1`uc ]
+{
+[; ;softuart.c: 36: void softtransmit(unsigned char Data)
+[; ;softuart.c: 37: {
+[e :U _softtransmit ]
+[v _Data `uc 1 r1 ]
+[f ]
+"38
+[v _mask `uc 1 a ]
+[; ;softuart.c: 38: char mask;
+[; ;softuart.c: 39: RD1 = 0;
+"39
+[e = _RD1 -> -> 0 `i `b ]
+[; ;softuart.c: 40: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+"40
+[e ( __delay (1 -> * -> - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+[; ;softuart.c: 42: for (mask=0x01;mask!=0;mask=mask<<1)
+"42
+{
+[e = _mask -> -> 1 `i `uc ]
+[e $ != -> _mask `i -> 0 `i 68  ]
+[e $U 69  ]
+"43
+[e :U 68 ]
+[; ;softuart.c: 43: {
+{
+[; ;softuart.c: 44: if(Data&mask) RD1 = 1;
+"44
+[e $ ! != & -> _Data `i -> _mask `i -> 0 `i 71  ]
+[e = _RD1 -> -> 1 `i `b ]
+[e $U 72  ]
+"45
+[e :U 71 ]
+[; ;softuart.c: 45: else RD1 = 0;
+[e = _RD1 -> -> 0 `i `b ]
+[e :U 72 ]
+[; ;softuart.c: 46: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+"46
+[e ( __delay (1 -> * -> - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+"47
+}
+"42
+[e = _mask -> << -> _mask `i -> 1 `i `uc ]
+[e $ != -> _mask `i -> 0 `i 68  ]
+[e :U 69 ]
+"47
+}
+[; ;softuart.c: 47: }
+[; ;softuart.c: 48: RD1 = 1;
+"48
+[e = _RD1 -> -> 1 `i `b ]
+[; ;softuart.c: 49: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
+"49
+[e ( __delay (1 -> * -> - / -> 1000000 `l -> -> 9600 `i `l -> -> 2 `i `l `d / -> -> 20000000 `l `d .4000000.0 `ul ]
+[; ;softuart.c: 50: }
+"50
+[e :UE 67 ]
+}
+"53
+[v _softuart_string `(v 1 ef1`*Cuc ]
+{
+[; ;softuart.c: 52: void softuart_string(const char *p)
+[; ;softuart.c: 53: {
+[e :U _softuart_string ]
+[v _p `*Cuc 1 r1 ]
+[f ]
+[; ;softuart.c: 54: while(*p){
+"54
+[e $U 74  ]
+[e :U 75 ]
+{
+[; ;softuart.c: 55: softtransmit(*p++);
+"55
+[e ( _softtransmit (1 *U ++ _p * -> -> 1 `i `x -> -> # *U _p `i `x ]
+"56
+}
+[e :U 74 ]
+"54
+[e $ != -> *U _p `i -> -> -> 0 `i `Cuc `i 75  ]
+[e :U 76 ]
+[; ;softuart.c: 56: }
+[; ;softuart.c: 57: }
+"57
+[e :UE 73 ]
+}
+"18 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
 [i _c1bal
 -> -> 999 `i `ui
 ]
@@ -1971,54 +2158,54 @@ Version 3.2 HI-TECH Software Intermediate Code
 [i _User
 -> -> 0 `i `ui
 ]
-[; ;Main.c: 17: unsigned int c1bal=999,c2bal=999,c1,c2,User=0;
-[; ;Main.c: 18: char j,i,k[15];
-"19
+[; ;Main.c: 18: unsigned int c1bal=999,c2bal=999,c1,c2,User=0;
+[; ;Main.c: 19: char j,i,k[15];
+"20
 [i _User1Rise
 -> -> 0 `i `uc
 ]
-"20
+"21
 [i _User2Rise
 -> -> 0 `i `uc
 ]
-"21
+"22
 [i _User3Rise
 -> -> 0 `i `uc
 ]
-"22
+"23
 [i _User1Kerosene
 -> -> 0 `i `uc
 ]
-"23
+"24
 [i _User2Kerosene
 -> -> 0 `i `uc
 ]
-"24
+"25
 [i _User3Kerosene
 -> -> 0 `i `uc
 ]
-"25
+"26
 [i _User1Sugar
 -> -> 0 `i `uc
 ]
-"26
+"27
 [i _User2Sugar
 -> -> 0 `i `uc
 ]
-"27
+"28
 [i _User3Sugar
 -> -> 0 `i `uc
 ]
-[; ;Main.c: 19: unsigned char User1Rise=0,
-[; ;Main.c: 20: User2Rise=0,
-[; ;Main.c: 21: User3Rise=0,
-[; ;Main.c: 22: User1Kerosene=0,
-[; ;Main.c: 23: User2Kerosene=0,
-[; ;Main.c: 24: User3Kerosene=0,
-[; ;Main.c: 25: User1Sugar=0,
-[; ;Main.c: 26: User2Sugar=0,
-[; ;Main.c: 27: User3Sugar=0;
-"28
+[; ;Main.c: 20: unsigned char User1Rise=0,
+[; ;Main.c: 21: User2Rise=0,
+[; ;Main.c: 22: User3Rise=0,
+[; ;Main.c: 23: User1Kerosene=0,
+[; ;Main.c: 24: User2Kerosene=0,
+[; ;Main.c: 25: User3Kerosene=0,
+[; ;Main.c: 26: User1Sugar=0,
+[; ;Main.c: 27: User2Sugar=0,
+[; ;Main.c: 28: User3Sugar=0;
+"29
 [i _User1amt
 -> 0 `i
 ]
@@ -2028,8 +2215,8 @@ Version 3.2 HI-TECH Software Intermediate Code
 [i _User3amt
 -> 0 `i
 ]
-[; ;Main.c: 28: int User1amt=0,User2amt=0,User3amt=0;
-"29
+[; ;Main.c: 29: int User1amt=0,User2amt=0,User3amt=0;
+"30
 [i _digit
 :U ..
 -> 48 `c
@@ -2045,9 +2232,15 @@ Version 3.2 HI-TECH Software Intermediate Code
 -> 0 `c
 ..
 ]
-[; ;Main.c: 29: const char digit[]={"0123456789"};
-"30
-[i _card1
+[; ;Main.c: 30: const char digit[]={"0123456789"};
+[; ;Main.c: 31: unsigned char card_store[15];
+"32
+[i _rfid_flag
+-> 0 `i
+]
+[; ;Main.c: 32: bit rfid_flag=0;
+"33
+[i _User1
 :U ..
 -> 49 `c
 -> 67 `c
@@ -2064,9 +2257,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 -> 0 `c
 ..
 ]
-[; ;Main.c: 30: unsigned char card1[]={"1C0082CE6939"};
-"31
-[i _card2
+[; ;Main.c: 33: unsigned char User1[]={"1C0082CE6939"};
+"34
+[i _User2
 :U ..
 -> 49 `c
 -> 66 `c
@@ -2083,617 +2276,713 @@ Version 3.2 HI-TECH Software Intermediate Code
 -> 0 `c
 ..
 ]
-[; ;Main.c: 31: unsigned char card2[]={"1B003C5BFC80"};
-"32
-[; ;Main.c: 32: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "50" "," "10" "," "8" "," "0" "," "0" "," "0");
+[; ;Main.c: 34: unsigned char User2[]={"1B003C5BFC80"};
+"35
+[i _User3
+:U ..
+-> 49 `c
+-> 66 `c
+-> 48 `c
+-> 48 `c
+-> 51 `c
+-> 67 `c
+-> 53 `c
+-> 66 `c
+-> 70 `c
+-> 67 `c
+-> 56 `c
+-> 49 `c
+-> 0 `c
+..
+]
+[; ;Main.c: 35: unsigned char User3[]={"1B003C5BFC81"};
+"36
+[; ;Main.c: 36: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "50" "," "10" "," "8" "," "0" "," "0" "," "0");
 [; 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
 [; 	db	10,0,50,10,8,0,0,0 ;#
-"33
-[; ;Main.c: 33: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "30" "," "8" "," "6" "," "0" "," "0" "," "0");
+"37
+[; ;Main.c: 37: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "30" "," "8" "," "6" "," "0" "," "0" "," "0");
 [; 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
 [; 	db	10,0,30,8,6,0,0,0 ;#
-"34
-[; ;Main.c: 34: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "20" "," "4" "," "5" "," "0" "," "0" "," "0");
+"38
+[; ;Main.c: 38: asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "20" "," "4" "," "5" "," "0" "," "0" "," "0");
 [; 	psect eeprom_data,class=EEDATA,delta=2,space=2 ;#
 [; 	db	10,0,20,4,5,0,0,0 ;#
-"37
-[v F1028 `(v 1 tf ]
-[v _ISR `IF1028 1 e ]
+"41
+[v F1047 `(v 1 tf ]
+[v _ISR `IF1047 1 e ]
 {
-[; ;Main.c: 36: void interrupt ISR(void)
-[; ;Main.c: 37: {
+[; ;Main.c: 40: void interrupt ISR(void)
+[; ;Main.c: 41: {
 [e :U _ISR ]
 [f ]
-[; ;Main.c: 38: }
-"38
-[e :UE 58 ]
+[; ;Main.c: 42: }
+"42
+[e :UE 77 ]
 }
-"41
+"45
+[v _RFID_read `(v 1 ef ]
+{
+[; ;Main.c: 44: void RFID_read()
+[; ;Main.c: 45: {
+[e :U _RFID_read ]
+[f ]
+[; ;Main.c: 46: if(!rfid_flag)
+"46
+[e $ ! ! _rfid_flag 79  ]
+[; ;Main.c: 47: {
+"47
+{
+[; ;Main.c: 48: for(int i=0;i<12;i++)
+"48
+{
+[v _i `i 1 a ]
+[e = _i -> 0 `i ]
+[e $ < _i -> 12 `i 80  ]
+[e $U 81  ]
+"49
+[e :U 80 ]
+[; ;Main.c: 49: {card_store[i]=softreceive();}
+{
+[e = *U + &U _card_store * -> -> _i `ui `ux -> -> # *U &U _card_store `ui `ux ( _softreceive ..  ]
+}
+"48
+[e ++ _i -> 1 `i ]
+[e $ < _i -> 12 `i 80  ]
+[e :U 81 ]
+"49
+}
+[; ;Main.c: 50: rfid_flag=1;
+"50
+[e = _rfid_flag -> -> 1 `i `b ]
+"51
+}
+[e :U 79 ]
+[; ;Main.c: 51: }
+[; ;Main.c: 52: }
+"52
+[e :UE 78 ]
+}
+"55
 [v _ReadAmnt `(v 1 ef ]
 {
-[; ;Main.c: 40: void ReadAmnt()
-[; ;Main.c: 41: {
+[; ;Main.c: 54: void ReadAmnt()
+[; ;Main.c: 55: {
 [e :U _ReadAmnt ]
 [f ]
-[; ;Main.c: 42: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
-"42
-[e = _User1amt + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i ]
-[; ;Main.c: 43: User2amt=(eeprom_read(8)*100)+eeprom_read(15);
-"43
-[e = _User2amt + * -> ( _eeprom_read (1 -> -> 8 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 15 `i `uc `i ]
-[; ;Main.c: 44: User3amt=(eeprom_read(16)*100)+eeprom_read(23);
-"44
-[e = _User3amt + * -> ( _eeprom_read (1 -> -> 16 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 23 `i `uc `i ]
-[; ;Main.c: 45: User1Rise = eeprom_read(2);
-"45
-[e = _User1Rise ( _eeprom_read (1 -> -> 2 `i `uc ]
-[; ;Main.c: 46: User2Rise = eeprom_read(10);
-"46
-[e = _User2Rise ( _eeprom_read (1 -> -> 10 `i `uc ]
-[; ;Main.c: 47: User3Rise = eeprom_read(18);
-"47
-[e = _User3Rise ( _eeprom_read (1 -> -> 18 `i `uc ]
-[; ;Main.c: 48: User1Kerosene = eeprom_read(4);
-"48
-[e = _User1Kerosene ( _eeprom_read (1 -> -> 4 `i `uc ]
-[; ;Main.c: 49: User2Kerosene = eeprom_read(12);
-"49
-[e = _User2Kerosene ( _eeprom_read (1 -> -> 12 `i `uc ]
-[; ;Main.c: 50: User3Kerosene = eeprom_read(20);
-"50
-[e = _User3Kerosene ( _eeprom_read (1 -> -> 20 `i `uc ]
-[; ;Main.c: 51: User1Sugar = eeprom_read(3);
-"51
-[e = _User1Sugar ( _eeprom_read (1 -> -> 3 `i `uc ]
-[; ;Main.c: 52: User2Sugar = eeprom_read(11);
-"52
-[e = _User2Sugar ( _eeprom_read (1 -> -> 11 `i `uc ]
-[; ;Main.c: 53: User3Sugar = eeprom_read(19);
-"53
-[e = _User3Sugar ( _eeprom_read (1 -> -> 19 `i `uc ]
-[; ;Main.c: 54: }
-"54
-[e :UE 59 ]
-}
+[; ;Main.c: 56: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
 "56
+[e = _User1amt + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i ]
+[; ;Main.c: 57: User2amt=(eeprom_read(8)*100)+eeprom_read(15);
+"57
+[e = _User2amt + * -> ( _eeprom_read (1 -> -> 8 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 15 `i `uc `i ]
+[; ;Main.c: 58: User3amt=(eeprom_read(16)*100)+eeprom_read(23);
+"58
+[e = _User3amt + * -> ( _eeprom_read (1 -> -> 16 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 23 `i `uc `i ]
+[; ;Main.c: 59: User1Rise = eeprom_read(2);
+"59
+[e = _User1Rise ( _eeprom_read (1 -> -> 2 `i `uc ]
+[; ;Main.c: 60: User2Rise = eeprom_read(10);
+"60
+[e = _User2Rise ( _eeprom_read (1 -> -> 10 `i `uc ]
+[; ;Main.c: 61: User3Rise = eeprom_read(18);
+"61
+[e = _User3Rise ( _eeprom_read (1 -> -> 18 `i `uc ]
+[; ;Main.c: 62: User1Kerosene = eeprom_read(4);
+"62
+[e = _User1Kerosene ( _eeprom_read (1 -> -> 4 `i `uc ]
+[; ;Main.c: 63: User2Kerosene = eeprom_read(12);
+"63
+[e = _User2Kerosene ( _eeprom_read (1 -> -> 12 `i `uc ]
+[; ;Main.c: 64: User3Kerosene = eeprom_read(20);
+"64
+[e = _User3Kerosene ( _eeprom_read (1 -> -> 20 `i `uc ]
+[; ;Main.c: 65: User1Sugar = eeprom_read(3);
+"65
+[e = _User1Sugar ( _eeprom_read (1 -> -> 3 `i `uc ]
+[; ;Main.c: 66: User2Sugar = eeprom_read(11);
+"66
+[e = _User2Sugar ( _eeprom_read (1 -> -> 11 `i `uc ]
+[; ;Main.c: 67: User3Sugar = eeprom_read(19);
+"67
+[e = _User3Sugar ( _eeprom_read (1 -> -> 19 `i `uc ]
+[; ;Main.c: 68: }
+"68
+[e :UE 83 ]
+}
+"70
 [v _DisplayAmnt `(v 1 ef2`uc`i ]
 {
-[; ;Main.c: 55: void DisplayAmnt(unsigned char Location, int Amnt)
-[; ;Main.c: 56: {
+[; ;Main.c: 69: void DisplayAmnt(unsigned char Location, int Amnt)
+[; ;Main.c: 70: {
 [e :U _DisplayAmnt ]
 [v _Location `uc 1 r1 ]
 [v _Amnt `i 1 r2 ]
 [f ]
-[; ;Main.c: 57: lcdcmd(Location);
-"57
+[; ;Main.c: 71: lcdcmd(Location);
+"71
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 58: lcddata(digit[Amnt/1000]);
-"58
+[; ;Main.c: 72: lcddata(digit[Amnt/1000]);
+"72
 [e ( _lcddata (1 *U + &U _digit * -> -> / _Amnt -> 1000 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 59: lcddata(digit[Amnt%1000/100]);
-"59
+[; ;Main.c: 73: lcddata(digit[Amnt%1000/100]);
+"73
 [e ( _lcddata (1 *U + &U _digit * -> -> / % _Amnt -> 1000 `i -> 100 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 60: lcddata(digit[Amnt%1000%100/10]);
-"60
+[; ;Main.c: 74: lcddata(digit[Amnt%1000%100/10]);
+"74
 [e ( _lcddata (1 *U + &U _digit * -> -> / % % _Amnt -> 1000 `i -> 100 `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 61: lcddata(digit[Amnt%1000%100%10]);
-"61
+[; ;Main.c: 75: lcddata(digit[Amnt%1000%100%10]);
+"75
 [e ( _lcddata (1 *U + &U _digit * -> -> % % % _Amnt -> 1000 `i -> 100 `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 62: }
-"62
-[e :UE 60 ]
+[; ;Main.c: 76: }
+"76
+[e :UE 84 ]
 }
-"64
+"78
 [v _DisplaySugar `(v 1 ef2`uc`uc ]
 {
-[; ;Main.c: 63: void DisplaySugar(unsigned char Location, unsigned char Sugar)
-[; ;Main.c: 64: {
+[; ;Main.c: 77: void DisplaySugar(unsigned char Location, unsigned char Sugar)
+[; ;Main.c: 78: {
 [e :U _DisplaySugar ]
 [v _Location `uc 1 r1 ]
 [v _Sugar `uc 1 r2 ]
 [f ]
-[; ;Main.c: 65: lcdcmd(Location);
-"65
+[; ;Main.c: 79: lcdcmd(Location);
+"79
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 66: lcddata(digit[Sugar/10]);
-"66
+[; ;Main.c: 80: lcddata(digit[Sugar/10]);
+"80
 [e ( _lcddata (1 *U + &U _digit * -> -> / -> _Sugar `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 67: lcddata(digit[Sugar%10]);
-"67
+[; ;Main.c: 81: lcddata(digit[Sugar%10]);
+"81
 [e ( _lcddata (1 *U + &U _digit * -> -> % -> _Sugar `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 68: }
-"68
-[e :UE 61 ]
+[; ;Main.c: 82: }
+"82
+[e :UE 85 ]
 }
-"70
+"84
 [v _DisplayRise `(v 1 ef2`uc`uc ]
 {
-[; ;Main.c: 69: void DisplayRise(unsigned char Location, unsigned char Rise)
-[; ;Main.c: 70: {
+[; ;Main.c: 83: void DisplayRise(unsigned char Location, unsigned char Rise)
+[; ;Main.c: 84: {
 [e :U _DisplayRise ]
 [v _Location `uc 1 r1 ]
 [v _Rise `uc 1 r2 ]
 [f ]
-[; ;Main.c: 71: lcdcmd(Location);
-"71
+[; ;Main.c: 85: lcdcmd(Location);
+"85
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 72: lcddata(digit[Rise/10]);
-"72
+[; ;Main.c: 86: lcddata(digit[Rise/10]);
+"86
 [e ( _lcddata (1 *U + &U _digit * -> -> / -> _Rise `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 73: lcddata(digit[Rise%10]);
-"73
+[; ;Main.c: 87: lcddata(digit[Rise%10]);
+"87
 [e ( _lcddata (1 *U + &U _digit * -> -> % -> _Rise `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 74: }
-"74
-[e :UE 62 ]
+[; ;Main.c: 88: }
+"88
+[e :UE 86 ]
 }
-"76
+"90
 [v _DisplayKerosene `(v 1 ef2`uc`uc ]
 {
-[; ;Main.c: 75: void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
-[; ;Main.c: 76: {
+[; ;Main.c: 89: void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
+[; ;Main.c: 90: {
 [e :U _DisplayKerosene ]
 [v _Location `uc 1 r1 ]
 [v _Kerosene `uc 1 r2 ]
 [f ]
-[; ;Main.c: 77: lcdcmd(Location);
-"77
+[; ;Main.c: 91: lcdcmd(Location);
+"91
 [e ( _lcdcmd (1 _Location ]
-[; ;Main.c: 78: lcddata(digit[Kerosene/10]);
-"78
+[; ;Main.c: 92: lcddata(digit[Kerosene/10]);
+"92
 [e ( _lcddata (1 *U + &U _digit * -> -> / -> _Kerosene `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 79: lcddata(digit[Kerosene%10]);
-"79
+[; ;Main.c: 93: lcddata(digit[Kerosene%10]);
+"93
 [e ( _lcddata (1 *U + &U _digit * -> -> % -> _Kerosene `i -> 10 `i `ui `ux -> -> # *U &U _digit `ui `ux ]
-[; ;Main.c: 80: }
-"80
-[e :UE 63 ]
+[; ;Main.c: 94: }
+"94
+[e :UE 87 ]
 }
-"82
+"96
 [v _receive `(uc 1 ef ]
 {
-[; ;Main.c: 81: unsigned char receive()
-[; ;Main.c: 82: {
+[; ;Main.c: 95: unsigned char receive()
+[; ;Main.c: 96: {
 [e :U _receive ]
 [f ]
-[; ;Main.c: 83: while(!RCIF);
-"83
-[e $U 65  ]
-[e :U 66 ]
-[e :U 65 ]
-[e $ ! _RCIF 66  ]
-[e :U 67 ]
-[; ;Main.c: 84: return(RCREG);
-"84
+[; ;Main.c: 97: while(!RCIF);
+"97
+[e $U 89  ]
+[e :U 90 ]
+[e :U 89 ]
+[e $ ! _RCIF 90  ]
+[e :U 91 ]
+[; ;Main.c: 98: return(RCREG);
+"98
 [e ) _RCREG ]
-[e $UE 64  ]
-[; ;Main.c: 85: }
-"85
-[e :UE 64 ]
+[e $UE 88  ]
+[; ;Main.c: 99: }
+"99
+[e :UE 88 ]
 }
-"87
+"101
 [v _transmit `(v 1 ef1`uc ]
 {
-[; ;Main.c: 86: void transmit(unsigned char data)
-[; ;Main.c: 87: {
+[; ;Main.c: 100: void transmit(unsigned char data)
+[; ;Main.c: 101: {
 [e :U _transmit ]
 [v _data `uc 1 r1 ]
 [f ]
-[; ;Main.c: 88: while(!TXIF);
-"88
-[e $U 69  ]
-[e :U 70 ]
-[e :U 69 ]
-[e $ ! _TXIF 70  ]
-[e :U 71 ]
-[; ;Main.c: 89: TXREG=data;
-"89
+[; ;Main.c: 102: while(!TXIF);
+"102
+[e $U 93  ]
+[e :U 94 ]
+[e :U 93 ]
+[e $ ! _TXIF 94  ]
+[e :U 95 ]
+[; ;Main.c: 103: TXREG=data;
+"103
 [e = _TXREG _data ]
-[; ;Main.c: 90: }
-"90
-[e :UE 68 ]
+[; ;Main.c: 104: }
+"104
+[e :UE 92 ]
 }
-"94
+"108
 [v _usartstring `(v 1 ef1`*Cuc ]
 {
-[; ;Main.c: 93: void usartstring(const unsigned char *st)
-[; ;Main.c: 94: {
+[; ;Main.c: 107: void usartstring(const unsigned char *st)
+[; ;Main.c: 108: {
 [e :U _usartstring ]
 [v _st `*Cuc 1 r1 ]
 [f ]
-[; ;Main.c: 95: while(*st)
-"95
-[e $U 73  ]
-[e :U 74 ]
-[; ;Main.c: 96: transmit(*st++);
-"96
-[e ( _transmit (1 *U ++ _st * -> -> 1 `i `x -> -> # *U _st `i `x ]
-[e :U 73 ]
-"95
-[e $ != -> *U _st `i -> -> -> 0 `i `Cuc `i 74  ]
-[e :U 75 ]
-[; ;Main.c: 97: }
-"97
-[e :UE 72 ]
-}
-"100
-[v _uart_init `(v 1 ef ]
-{
-[; ;Main.c: 99: void uart_init()
-[; ;Main.c: 100: {
-[e :U _uart_init ]
-[f ]
-[; ;Main.c: 101: PORTC=0xFF;
-"101
-[e = _PORTC -> -> 255 `i `uc ]
-[; ;Main.c: 102: TRISC=0x80;
-"102
-[e = _TRISC -> -> 128 `i `uc ]
-[; ;Main.c: 103: TXSTA=0X24;
-"103
-[e = _TXSTA -> -> 36 `i `uc ]
-[; ;Main.c: 104: RCSTA=0X90;
-"104
-[e = _RCSTA -> -> 144 `i `uc ]
-[; ;Main.c: 105: SPBRG=129;
-"105
-[e = _SPBRG -> -> 129 `i `uc ]
-[; ;Main.c: 106: RCREG=0;
-"106
-[e = _RCREG -> -> 0 `i `uc ]
-[; ;Main.c: 107: }
-"107
-[e :UE 76 ]
-}
+[; ;Main.c: 109: while(*st)
 "109
-[v _paramter `(v 1 ef ]
-{
-[; ;Main.c: 108: void paramter()
-[; ;Main.c: 109: {
-[e :U _paramter ]
-[f ]
-[; ;Main.c: 110: c1=(eeprom_read(0)*100)+eeprom_read(1);
+[e $U 97  ]
+[e :U 98 ]
+[; ;Main.c: 110: transmit(*st++);
 "110
-[e = _c1 -> + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i `ui ]
-[; ;Main.c: 111: c2=(eeprom_read(2)*100)+eeprom_read(3);
+[e ( _transmit (1 *U ++ _st * -> -> 1 `i `x -> -> # *U _st `i `x ]
+[e :U 97 ]
+"109
+[e $ != -> *U _st `i -> -> -> 0 `i `Cuc `i 98  ]
+[e :U 99 ]
+[; ;Main.c: 111: }
 "111
-[e = _c2 -> + * -> ( _eeprom_read (1 -> -> 2 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 3 `i `uc `i `ui ]
-[; ;Main.c: 112: }
-"112
-[e :UE 77 ]
+[e :UE 96 ]
 }
 "114
-[v _startup `(v 1 ef ]
+[v _uart_init `(v 1 ef ]
 {
-[; ;Main.c: 113: void startup()
+[; ;Main.c: 113: void uart_init()
 [; ;Main.c: 114: {
-[e :U _startup ]
+[e :U _uart_init ]
 [f ]
-[; ;Main.c: 115: lcdcmd(0x80);
+[; ;Main.c: 115: PORTC=0xFF;
 "115
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 116: lcdstring("AUTOMATIC RATION ");
+[e = _PORTC -> -> 255 `i `uc ]
+[; ;Main.c: 116: TRISC=0x80;
 "116
-[e ( _lcdstring (1 :s 1C ]
-[; ;Main.c: 117: lcdcmd(0xC0);
+[e = _TRISC -> -> 128 `i `uc ]
+[; ;Main.c: 117: TXSTA=0X24;
 "117
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 118: lcdstring("   CARD SYSTEM   ");
+[e = _TXSTA -> -> 36 `i `uc ]
+[; ;Main.c: 118: RCSTA=0X90;
 "118
-[e ( _lcdstring (1 :s 2C ]
-[; ;Main.c: 119: _delay((unsigned long)((5000)*(20000000/4000.0)));
+[e = _RCSTA -> -> 144 `i `uc ]
+[; ;Main.c: 119: SPBRG=129;
 "119
-[e ( __delay (1 -> * -> -> 5000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
-[; ;Main.c: 120: lcdcmd(0x01);
+[e = _SPBRG -> -> 129 `i `uc ]
+[; ;Main.c: 120: RCREG=0;
 "120
-[e ( _lcdcmd (1 -> -> 1 `i `uc ]
-[; ;Main.c: 121: _delay((unsigned long)((500)*(20000000/4000.0)));
+[e = _RCREG -> -> 0 `i `uc ]
+[; ;Main.c: 121: }
 "121
-[e ( __delay (1 -> * -> -> 500 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
-[; ;Main.c: 122: lcdcmd(0x80);
-"122
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 123: lcdstring("PLEASE TAP YOUR  ");
+[e :UE 100 ]
+}
 "123
-[e ( _lcdstring (1 :s 3C ]
-[; ;Main.c: 124: lcdcmd(0xC0);
+[v _paramter `(v 1 ef ]
+{
+[; ;Main.c: 122: void paramter()
+[; ;Main.c: 123: {
+[e :U _paramter ]
+[f ]
+[; ;Main.c: 124: c1=(eeprom_read(0)*100)+eeprom_read(1);
 "124
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 125: lcdstring("SMART CARD       ");
+[e = _c1 -> + * -> ( _eeprom_read (1 -> -> 0 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 1 `i `uc `i `ui ]
+[; ;Main.c: 125: c2=(eeprom_read(2)*100)+eeprom_read(3);
 "125
-[e ( _lcdstring (1 :s 4C ]
+[e = _c2 -> + * -> ( _eeprom_read (1 -> -> 2 `i `uc `i -> 100 `i -> ( _eeprom_read (1 -> -> 3 `i `uc `i `ui ]
 [; ;Main.c: 126: }
 "126
-[e :UE 78 ]
+[e :UE 101 ]
 }
+"128
+[v _startup `(v 1 ef ]
+{
+[; ;Main.c: 127: void startup()
+[; ;Main.c: 128: {
+[e :U _startup ]
+[f ]
+[; ;Main.c: 129: lcdcmd(0x80);
 "129
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 130: lcdstring("AUTOMATIC RATION ");
+"130
+[e ( _lcdstring (1 :s 1C ]
+[; ;Main.c: 131: lcdcmd(0xC0);
+"131
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 132: lcdstring("   CARD SYSTEM   ");
+"132
+[e ( _lcdstring (1 :s 2C ]
+[; ;Main.c: 133: _delay((unsigned long)((5000)*(20000000/4000.0)));
+"133
+[e ( __delay (1 -> * -> -> 5000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 134: lcdcmd(0x01);
+"134
+[e ( _lcdcmd (1 -> -> 1 `i `uc ]
+[; ;Main.c: 135: _delay((unsigned long)((500)*(20000000/4000.0)));
+"135
+[e ( __delay (1 -> * -> -> 500 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 136: lcdcmd(0x80);
+"136
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 137: lcdstring("PLEASE TAP YOUR  ");
+"137
+[e ( _lcdstring (1 :s 3C ]
+[; ;Main.c: 138: lcdcmd(0xC0);
+"138
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 139: lcdstring("SMART CARD       ");
+"139
+[e ( _lcdstring (1 :s 4C ]
+[; ;Main.c: 140: }
+"140
+[e :UE 102 ]
+}
+"143
 [v _main `(v 1 ef ]
 {
-[; ;Main.c: 128: void main()
-[; ;Main.c: 129: {
+[; ;Main.c: 142: void main()
+[; ;Main.c: 143: {
 [e :U _main ]
 [f ]
-[; ;Main.c: 130: ANSEL=0x00;
-"130
-[e = _ANSEL -> -> 0 `i `uc ]
-[; ;Main.c: 131: ANSELH=0x00;
-"131
-[e = _ANSELH -> -> 0 `i `uc ]
-[; ;Main.c: 132: TRISD=0X00;
-"132
-[e = _TRISD -> -> 0 `i `uc ]
-[; ;Main.c: 133: PORTD=0X00;
-"133
-[e = _PORTD -> -> 0 `i `uc ]
-[; ;Main.c: 134: TRISC=0X0F;
-"134
-[e = _TRISC -> -> 15 `i `uc ]
-[; ;Main.c: 135: PORTC=0X00;
-"135
-[e = _PORTC -> -> 0 `i `uc ]
-[; ;Main.c: 136: uart_init();
-"136
-[e ( _uart_init ..  ]
-[; ;Main.c: 137: lcd_init();
-"137
-[e ( _lcd_init ..  ]
-[; ;Main.c: 138: paramter();
-"138
-[e ( _paramter ..  ]
-[; ;Main.c: 139: startup();
-"139
-[e ( _startup ..  ]
-[; ;Main.c: 140: lcdclear();
-"140
-[e ( _lcdclear ..  ]
-[; ;Main.c: 141: while(1)
-"141
-[e :U 81 ]
-[; ;Main.c: 142: {
-"142
-{
-[; ;Main.c: 144: if(RC0)
+[; ;Main.c: 144: ANSEL=0x00;
 "144
-[e $ ! _RC0 83  ]
-[; ;Main.c: 145: User=1;
+[e = _ANSEL -> -> 0 `i `uc ]
+[; ;Main.c: 145: ANSELH=0x00;
 "145
-[e = _User -> -> 1 `i `ui ]
-[e :U 83 ]
-[; ;Main.c: 146: if(RC1)
+[e = _ANSELH -> -> 0 `i `uc ]
+[; ;Main.c: 146: TRISD=0X01;
 "146
-[e $ ! _RC1 84  ]
-[; ;Main.c: 147: User=2;
+[e = _TRISD -> -> 1 `i `uc ]
+[; ;Main.c: 147: PORTD=0X00;
 "147
-[e = _User -> -> 2 `i `ui ]
-[e :U 84 ]
-[; ;Main.c: 148: if(RC2)
+[e = _PORTD -> -> 0 `i `uc ]
+[; ;Main.c: 148: TRISC=0X0F;
 "148
-[e $ ! _RC2 85  ]
-[; ;Main.c: 149: User=3;
+[e = _TRISC -> -> 15 `i `uc ]
+[; ;Main.c: 149: PORTC=0X00;
 "149
-[e = _User -> -> 3 `i `ui ]
-[e :U 85 ]
-[; ;Main.c: 150: if(RC3)
+[e = _PORTC -> -> 0 `i `uc ]
+[; ;Main.c: 150: uart_init();
 "150
-[e $ ! _RC3 86  ]
-[; ;Main.c: 151: User=4;
+[e ( _uart_init ..  ]
+[; ;Main.c: 151: lcd_init();
 "151
-[e = _User -> -> 4 `i `ui ]
-[e :U 86 ]
-[; ;Main.c: 152: switch(User)
+[e ( _lcd_init ..  ]
+[; ;Main.c: 152: paramter();
 "152
-[e $U 88  ]
-[; ;Main.c: 153: {
+[e ( _paramter ..  ]
+[; ;Main.c: 153: SoftWareUart_Init();
 "153
-{
-[; ;Main.c: 154: case 1:
+[e ( _SoftWareUart_Init ..  ]
+[; ;Main.c: 154: startup();
 "154
-[e :U 89 ]
-[; ;Main.c: 155: {
+[e ( _startup ..  ]
+[; ;Main.c: 155: lcdclear();
 "155
-{
-[; ;Main.c: 156: ReadAmnt();
+[e ( _lcdclear ..  ]
+[; ;Main.c: 156: while(1)
 "156
-[e ( _ReadAmnt ..  ]
-[; ;Main.c: 157: lcdcmd(0x80);
+[e :U 105 ]
+[; ;Main.c: 157: {
 "157
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 158: lcdstring("USER1 AMOUNT:       ");
+{
+[; ;Main.c: 158: if(!RC0)
 "158
-[e ( _lcdstring (1 :s 5C ]
-[; ;Main.c: 159: DisplayAmnt(0X8D,User1amt);
+[e $ ! ! _RC0 107  ]
+[; ;Main.c: 159: {
 "159
-[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User1amt ]
-[; ;Main.c: 160: lcdcmd(0xC0);
+{
+[; ;Main.c: 160: _delay((unsigned long)((200)*(20000000/4000.0)));
 "160
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 161: lcdstring("RISE:   Kg          ");
+[e ( __delay (1 -> * -> -> 200 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[; ;Main.c: 161: rfid_flag=0;
 "161
-[e ( _lcdstring (1 :s 6C ]
-[; ;Main.c: 162: DisplayRise(0XC5,User1Rise);
+[e = _rfid_flag -> -> 0 `i `b ]
 "162
-[e ( _DisplayRise (2 , -> -> 197 `i `uc _User1Rise ]
-[; ;Main.c: 163: lcdcmd(0x94);
+}
+[e :U 107 ]
+[; ;Main.c: 162: }
+[; ;Main.c: 163: RFID_read();
 "163
-[e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 164: lcdstring("SUGAR:   Kg         ");
-"164
-[e ( _lcdstring (1 :s 7C ]
-[; ;Main.c: 165: DisplaySugar(0x9A,User1Sugar);
-"165
-[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User1Sugar ]
-[; ;Main.c: 166: lcdcmd(0xD4);
+[e ( _RFID_read ..  ]
+[; ;Main.c: 166: if(strcmp(card_store,User1)==0)
 "166
-[e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 167: lcdstring("KEROSENE:   Lts     ");
+[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User1 `*Cuc -> 0 `i 108  ]
+[; ;Main.c: 167: {User=1;}
 "167
-[e ( _lcdstring (1 :s 8C ]
-[; ;Main.c: 168: DisplayKerosene(0XDD,User1Kerosene);
+{
+[e = _User -> -> 1 `i `ui ]
+}
+[e $U 109  ]
 "168
-[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User1Kerosene ]
-[; ;Main.c: 169: break;
+[e :U 108 ]
+[; ;Main.c: 168: else if(strcmp(card_store,User2)==0)
+[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User2 `*Cuc -> 0 `i 110  ]
+[; ;Main.c: 169: {User=2;}
 "169
-[e $U 87  ]
+{
+[e = _User -> -> 2 `i `ui ]
+}
+[e $U 111  ]
 "170
-}
-[; ;Main.c: 170: }
-[; ;Main.c: 171: case 2:
+[e :U 110 ]
+[; ;Main.c: 170: else if(strcmp(card_store,User3)==0)
+[e $ ! == ( _strcmp (2 , -> &U _card_store `*Cuc -> &U _User3 `*Cuc -> 0 `i 112  ]
+[; ;Main.c: 171: {User=3;}
 "171
-[e :U 90 ]
-[; ;Main.c: 172: {
+{
+[e = _User -> -> 3 `i `ui ]
+}
+[e $U 113  ]
 "172
-{
-[; ;Main.c: 173: ReadAmnt();
+[e :U 112 ]
+[; ;Main.c: 172: else
+[; ;Main.c: 173: {User=8;}
 "173
-[e ( _ReadAmnt ..  ]
-[; ;Main.c: 174: lcdcmd(0x80);
+{
+[e = _User -> -> 8 `i `ui ]
+}
+[e :U 113 ]
+[e :U 111 ]
+[e :U 109 ]
+[; ;Main.c: 174: switch(User)
 "174
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 175: lcdstring("USER2 AMOUNT:       ");
+[e $U 115  ]
+[; ;Main.c: 175: {
 "175
-[e ( _lcdstring (1 :s 9C ]
-[; ;Main.c: 176: DisplayAmnt(0X8D,User2amt);
+{
+[; ;Main.c: 176: case 1:
 "176
-[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User2amt ]
-[; ;Main.c: 177: lcdcmd(0xC0);
+[e :U 116 ]
+[; ;Main.c: 177: {
 "177
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 178: lcdstring("RISE:   Kg          ");
+{
+[; ;Main.c: 178: ReadAmnt();
 "178
-[e ( _lcdstring (1 :s 10C ]
-[; ;Main.c: 179: DisplayRise(0XC5,User2Rise);
-"179
-[e ( _DisplayRise (2 , -> -> 197 `i `uc _User2Rise ]
-[; ;Main.c: 180: lcdcmd(0x94);
-"180
-[e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 181: lcdstring("SUGAR:   Kg         ");
-"181
-[e ( _lcdstring (1 :s 11C ]
-[; ;Main.c: 182: DisplaySugar(0x9A,User2Sugar);
-"182
-[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User2Sugar ]
-[; ;Main.c: 183: lcdcmd(0xD4);
-"183
-[e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 184: lcdstring("KEROSENE:   Lts     ");
-"184
-[e ( _lcdstring (1 :s 12C ]
-[; ;Main.c: 185: DisplayKerosene(0XDD,User2Kerosene);
-"185
-[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User2Kerosene ]
-[; ;Main.c: 186: break;
-"186
-[e $U 87  ]
-"187
-}
-[; ;Main.c: 187: }
-[; ;Main.c: 188: case 3:
-"188
-[e :U 91 ]
-[; ;Main.c: 189: {
-"189
-{
-[; ;Main.c: 190: ReadAmnt();
-"190
 [e ( _ReadAmnt ..  ]
-[; ;Main.c: 191: lcdcmd(0x80);
+[; ;Main.c: 179: lcdcmd(0x80);
+"179
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 180: lcdstring("USER1 AMOUNT:       ");
+"180
+[e ( _lcdstring (1 :s 5C ]
+[; ;Main.c: 181: DisplayAmnt(0X8D,User1amt);
+"181
+[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User1amt ]
+[; ;Main.c: 182: lcdcmd(0xC0);
+"182
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 183: lcdstring("RISE:   Kg          ");
+"183
+[e ( _lcdstring (1 :s 6C ]
+[; ;Main.c: 184: DisplayRise(0XC5,User1Rise);
+"184
+[e ( _DisplayRise (2 , -> -> 197 `i `uc _User1Rise ]
+[; ;Main.c: 185: lcdcmd(0x94);
+"185
+[e ( _lcdcmd (1 -> -> 148 `i `uc ]
+[; ;Main.c: 186: lcdstring("SUGAR:   Kg         ");
+"186
+[e ( _lcdstring (1 :s 7C ]
+[; ;Main.c: 187: DisplaySugar(0x9A,User1Sugar);
+"187
+[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User1Sugar ]
+[; ;Main.c: 188: lcdcmd(0xD4);
+"188
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 189: lcdstring("KEROSENE:   Lts     ");
+"189
+[e ( _lcdstring (1 :s 8C ]
+[; ;Main.c: 190: DisplayKerosene(0XDD,User1Kerosene);
+"190
+[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User1Kerosene ]
+[; ;Main.c: 191: break;
 "191
-[e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 192: lcdstring("USER3 AMOUNT:       ");
+[e $U 114  ]
 "192
-[e ( _lcdstring (1 :s 13C ]
-[; ;Main.c: 193: DisplayAmnt(0X8D,User3amt);
+}
+[; ;Main.c: 192: }
+[; ;Main.c: 193: case 2:
 "193
-[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User3amt ]
-[; ;Main.c: 194: lcdcmd(0xC0);
+[e :U 117 ]
+[; ;Main.c: 194: {
 "194
-[e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 195: lcdstring("RISE:   Kg          ");
-"195
-[e ( _lcdstring (1 :s 14C ]
-[; ;Main.c: 196: DisplayRise(0XC5,User3Rise);
-"196
-[e ( _DisplayRise (2 , -> -> 197 `i `uc _User3Rise ]
-[; ;Main.c: 197: lcdcmd(0x94);
-"197
-[e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 198: lcdstring("SUGAR:   Kg         ");
-"198
-[e ( _lcdstring (1 :s 15C ]
-[; ;Main.c: 199: DisplaySugar(0x9A,User3Sugar);
-"199
-[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User3Sugar ]
-[; ;Main.c: 200: lcdcmd(0xD4);
-"200
-[e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 201: lcdstring("KEROSENE:   Lts     ");
-"201
-[e ( _lcdstring (1 :s 16C ]
-[; ;Main.c: 202: DisplayKerosene(0XDD,User3Kerosene);
-"202
-[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User3Kerosene ]
-[; ;Main.c: 203: break;
-"203
-[e $U 87  ]
-"204
-}
-[; ;Main.c: 204: }
-[; ;Main.c: 205: default:
-"205
-[e :U 92 ]
-[; ;Main.c: 206: {
-"206
 {
-[; ;Main.c: 208: lcdcmd(0x80);
-"208
+[; ;Main.c: 195: ReadAmnt();
+"195
+[e ( _ReadAmnt ..  ]
+[; ;Main.c: 196: lcdcmd(0x80);
+"196
 [e ( _lcdcmd (1 -> -> 128 `i `uc ]
-[; ;Main.c: 209: lcdstring("USER NOT AUTHENTICAT");
-"209
-[e ( _lcdstring (1 :s 17C ]
-[; ;Main.c: 210: lcdcmd(0xC0);
-"210
+[; ;Main.c: 197: lcdstring("USER2 AMOUNT:       ");
+"197
+[e ( _lcdstring (1 :s 9C ]
+[; ;Main.c: 198: DisplayAmnt(0X8D,User2amt);
+"198
+[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User2amt ]
+[; ;Main.c: 199: lcdcmd(0xC0);
+"199
 [e ( _lcdcmd (1 -> -> 192 `i `uc ]
-[; ;Main.c: 211: lcdstring(" PLEASE CHECK YOUR  ");
-"211
-[e ( _lcdstring (1 :s 18C ]
-[; ;Main.c: 212: lcdcmd(0x94);
-"212
+[; ;Main.c: 200: lcdstring("RISE:   Kg          ");
+"200
+[e ( _lcdstring (1 :s 10C ]
+[; ;Main.c: 201: DisplayRise(0XC5,User2Rise);
+"201
+[e ( _DisplayRise (2 , -> -> 197 `i `uc _User2Rise ]
+[; ;Main.c: 202: lcdcmd(0x94);
+"202
 [e ( _lcdcmd (1 -> -> 148 `i `uc ]
-[; ;Main.c: 213: lcdstring("       CARD         ");
-"213
-[e ( _lcdstring (1 :s 19C ]
-[; ;Main.c: 214: lcdcmd(0xD4);
-"214
+[; ;Main.c: 203: lcdstring("SUGAR:   Kg         ");
+"203
+[e ( _lcdstring (1 :s 11C ]
+[; ;Main.c: 204: DisplaySugar(0x9A,User2Sugar);
+"204
+[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User2Sugar ]
+[; ;Main.c: 205: lcdcmd(0xD4);
+"205
 [e ( _lcdcmd (1 -> -> 212 `i `uc ]
-[; ;Main.c: 215: lcdstring("                    ");
+[; ;Main.c: 206: lcdstring("KEROSENE:   Lts     ");
+"206
+[e ( _lcdstring (1 :s 12C ]
+[; ;Main.c: 207: DisplayKerosene(0XDD,User2Kerosene);
+"207
+[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User2Kerosene ]
+[; ;Main.c: 208: break;
+"208
+[e $U 114  ]
+"209
+}
+[; ;Main.c: 209: }
+[; ;Main.c: 210: case 3:
+"210
+[e :U 118 ]
+[; ;Main.c: 211: {
+"211
+{
+[; ;Main.c: 212: ReadAmnt();
+"212
+[e ( _ReadAmnt ..  ]
+[; ;Main.c: 213: lcdcmd(0x80);
+"213
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 214: lcdstring("USER3 AMOUNT:       ");
+"214
+[e ( _lcdstring (1 :s 13C ]
+[; ;Main.c: 215: DisplayAmnt(0X8D,User3amt);
 "215
-[e ( _lcdstring (1 :s 20C ]
+[e ( _DisplayAmnt (2 , -> -> 141 `i `uc _User3amt ]
+[; ;Main.c: 216: lcdcmd(0xC0);
+"216
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 217: lcdstring("RISE:   Kg          ");
 "217
-}
+[e ( _lcdstring (1 :s 14C ]
+[; ;Main.c: 218: DisplayRise(0XC5,User3Rise);
 "218
-}
-[; ;Main.c: 217: }
-[; ;Main.c: 218: }
-[e $U 87  ]
-"152
-[e :U 88 ]
-[e [\ _User , $ -> -> 1 `i `ui 89
- , $ -> -> 2 `i `ui 90
- , $ -> -> 3 `i `ui 91
- 92 ]
-"218
-[e :U 87 ]
+[e ( _DisplayRise (2 , -> -> 197 `i `uc _User3Rise ]
+[; ;Main.c: 219: lcdcmd(0x94);
 "219
-}
-[e :U 80 ]
-"141
-[e $U 81  ]
-[e :U 82 ]
-[; ;Main.c: 219: }
-[; ;Main.c: 220: }
+[e ( _lcdcmd (1 -> -> 148 `i `uc ]
+[; ;Main.c: 220: lcdstring("SUGAR:   Kg         ");
 "220
-[e :UE 79 ]
+[e ( _lcdstring (1 :s 15C ]
+[; ;Main.c: 221: DisplaySugar(0x9A,User3Sugar);
+"221
+[e ( _DisplaySugar (2 , -> -> 154 `i `uc _User3Sugar ]
+[; ;Main.c: 222: lcdcmd(0xD4);
+"222
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 223: lcdstring("KEROSENE:   Lts     ");
+"223
+[e ( _lcdstring (1 :s 16C ]
+[; ;Main.c: 224: DisplayKerosene(0XDD,User3Kerosene);
+"224
+[e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User3Kerosene ]
+[; ;Main.c: 225: break;
+"225
+[e $U 114  ]
+"226
+}
+[; ;Main.c: 226: }
+[; ;Main.c: 227: default:
+"227
+[e :U 119 ]
+[; ;Main.c: 228: {
+"228
+{
+[; ;Main.c: 230: lcdcmd(0x80);
+"230
+[e ( _lcdcmd (1 -> -> 128 `i `uc ]
+[; ;Main.c: 231: lcdstring("USER NOT AUTHENTICAT");
+"231
+[e ( _lcdstring (1 :s 17C ]
+[; ;Main.c: 232: lcdcmd(0xC0);
+"232
+[e ( _lcdcmd (1 -> -> 192 `i `uc ]
+[; ;Main.c: 233: lcdstring(" PLEASE CHECK YOUR  ");
+"233
+[e ( _lcdstring (1 :s 18C ]
+[; ;Main.c: 234: lcdcmd(0x94);
+"234
+[e ( _lcdcmd (1 -> -> 148 `i `uc ]
+[; ;Main.c: 235: lcdstring("       CARD         ");
+"235
+[e ( _lcdstring (1 :s 19C ]
+[; ;Main.c: 236: lcdcmd(0xD4);
+"236
+[e ( _lcdcmd (1 -> -> 212 `i `uc ]
+[; ;Main.c: 237: lcdstring("                    ");
+"237
+[e ( _lcdstring (1 :s 20C ]
+"239
+}
+"240
+}
+[; ;Main.c: 239: }
+[; ;Main.c: 240: }
+[e $U 114  ]
+"174
+[e :U 115 ]
+[e [\ _User , $ -> -> 1 `i `ui 116
+ , $ -> -> 2 `i `ui 117
+ , $ -> -> 3 `i `ui 118
+ 119 ]
+"240
+[e :U 114 ]
+"241
+}
+[e :U 104 ]
+"156
+[e $U 105  ]
+[e :U 106 ]
+[; ;Main.c: 241: }
+[; ;Main.c: 242: }
+"242
+[e :UE 103 ]
 }
 [a 17C 85 83 69 82 32 78 79 84 32 65 85 84 72 69 78 84 73 67 65 84 0 ]
 [a 1C 65 85 84 79 77 65 84 73 67 32 82 65 84 73 79 78 32 0 ]

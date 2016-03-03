@@ -13,6 +13,7 @@ __CONFIG(HS &			// External Crystal at High Speed
 		 LVPDIS);		// Disable Low Voltage Programming.
 
 #include "lcd.c"
+#include "softuart.c"
 
 unsigned int c1bal=999,c2bal=999,c1,c2,User=0;
 char j,i,k[15];
@@ -27,14 +28,27 @@ unsigned char User1Rise=0,
 			  User3Sugar=0;
 int User1amt=0,User2amt=0,User3amt=0;
 const char digit[]={"0123456789"};
-unsigned char card1[]={"1C0082CE6939"};
-unsigned char card2[]={"1B003C5BFC80"};
+unsigned char card_store[15];
+bit rfid_flag=0;
+unsigned char User1[]={"1C0082CE6939"};
+unsigned char User2[]={"1B003C5BFC80"};
+unsigned char User3[]={"1B003C5BFC81"};
 __EEPROM_DATA(10,0,50,10,8,0,0,0);
 __EEPROM_DATA(10,0,30,8,6,0,0,0);
 __EEPROM_DATA(10,0,20,4,5,0,0,0);
 
 void interrupt ISR(void)
 {
+}
+
+void RFID_read()
+{
+	if(!rfid_flag)
+	{
+	for(int i=0;i<12;i++)
+		{card_store[i]=softreceive();}
+		rfid_flag=1;
+	}
 }
 
 void ReadAmnt()
@@ -127,28 +141,36 @@ void startup()
 
 void main()
 {
-ANSEL=0x00;
-ANSELH=0x00;
-TRISD=0X00;
-PORTD=0X00;
-TRISC=0X0F;
-PORTC=0X00;
-uart_init();
-lcd_init();
-paramter();
-startup();
-lcdclear();
+	ANSEL=0x00;
+	ANSELH=0x00;
+	TRISD=0X01;
+	PORTD=0X00;
+	TRISC=0X0F;
+	PORTC=0X00;
+	uart_init();
+	lcd_init();
+	paramter();
+	SoftWareUart_Init();
+	startup();
+	lcdclear();
 while(1)
 {
-
-	if(RC0)
-	User=1;
-	if(RC1)
-	User=2;
-	if(RC2)
-	User=3;
-	if(RC3)
-	User=4;
+	if(!RC0)
+	{
+		__delay_ms(200);
+		rfid_flag=0;
+	}
+	RFID_read();
+//	lcdcmd(0xD4);
+//	lcdstring(card_store);
+	if(strcmp(card_store,User1)==0)
+		{User=1;}
+	else if(strcmp(card_store,User2)==0)
+		{User=2;}
+	else if(strcmp(card_store,User3)==0)
+		{User=3;}
+	else
+		{User=8;}
 	switch(User)
 	{
 		case 1:
