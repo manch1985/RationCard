@@ -744,9 +744,6 @@ asm("clrwdt");
 } while(--cnt);
 }
 
-# 8 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-asm("\tpsect config,class=CONFIG,delta=2"); asm("\tdw ""0x3FFA & 0x3FF7 & 0x3FEF & 0x3CFF & 0x3FFF & 0x2FFF");
-
 # 1 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 const char a[]={"0123456789"};
 
@@ -901,8 +898,124 @@ softtransmit(*p++);
 }
 }
 
-# 18 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
-unsigned int c1bal=999,c2bal=999,c1,c2,User=0;
+# 1 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+unsigned char receive()
+{
+while(!RCIF);
+return(RCREG);
+}
+void transmit(unsigned char data)
+{
+while(!TXIF);
+TXREG =data;
+}
+void UARTinit()
+{
+TXSTA = 0x24;
+RCSTA = 0x90;
+SPBRG = 129;
+INTCON = 0xC0;
+RCREG = 0;
+}
+
+void usartstring(const unsigned char *st)
+{
+while(*st)
+transmit(*st++);
+}
+
+
+void gsm_init()
+{
+unsigned char d;
+lcdcmd(0X80);
+lcdstring("GSM INITIALIZING");
+lcdcmd(0XC0);
+lcdstring("PLS WAIT........");
+DelayS(5);
+lcdcmd(0x01);
+
+usartstring("AT\r");
+transmit(0x0D);
+while((d=receive())!='K');
+
+usartstring("AT+CPIN?\r");
+transmit(0x0D);
+while((d=receive())!='K');
+
+usartstring("AT+CSDH=1\r");
+transmit(0x0D);
+while((d=receive())!='K');
+
+usartstring("AT+CMGF=1\r");
+transmit(0x0D);
+while((d=receive())!='K');
+
+usartstring("AT+CNMI=2,2,0,0,0\r");
+transmit(0x0D);
+while((d=receive())!='K');
+lcdcmd(0x80);
+lcdstring("GSM READY");
+DelayS(10);
+lcdcmd(0x01);
+}
+
+void send_moister_message2()
+{
+unsigned char d;
+usartstring("AT+CMGS=\"+919790080510\"");
+transmit(0x0D);
+while((d=receive())!='>');
+usartstring("moister level low moter ON");
+transmit(0x1A);
+while((d=receive())!='K');
+}
+void send_moister_message1()
+{
+unsigned char d;
+usartstring("AT+CMGS=\"+919790080510\"");
+transmit(0x0D);
+while((d=receive())!='>');
+usartstring("moister level high moter OFF");
+transmit(0x1A);
+while((d=receive())!='K');
+}
+void send_stage1_message()
+{
+unsigned char d;
+usartstring("AT+CMGS=\"+919790080510\"");
+transmit(0x0D);
+while((d=receive())!='>');
+usartstring("Crop crossed stage1");
+transmit(0x1A);
+while((d=receive())!='K');
+}
+void send_stage2_message()
+{
+unsigned char d;
+usartstring("AT+CMGS=\"+919790080510\"");
+transmit(0x0D);
+while((d=receive())!='>');
+usartstring("Crop crossed stage2");
+transmit(0x1A);
+while((d=receive())!='K');
+}
+void send_stage3_message()
+{
+unsigned char d;
+usartstring("AT+CMGS=\"+919790080510\"");
+transmit(0x0D);
+while((d=receive())!='>');
+usartstring("Crop crossed stage3");
+transmit(0x1A);
+while((d=receive())!='K');
+}
+
+# 12 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+asm("\tpsect config,class=CONFIG,delta=2"); asm("\tdw ""0x3FFA & 0x3FF7 & 0x3FEF & 0x3CFF & 0x3FFF & 0x2FFF");
+
+# 20
+unsigned int c1bal=999,c2bal=999,c1,c2,User=0,RiseStock=0,SugarStock=0,KeroseneStock=0;
 char j,i,k[15];
 unsigned char User1Rise=0,
 User2Rise=0,
@@ -913,6 +1026,7 @@ User3Kerosene=0,
 User1Sugar=0,
 User2Sugar=0,
 User3Sugar=0;
+
 int User1amt=0,User2amt=0,User3amt=0;
 const char digit[]={"0123456789"};
 unsigned char card_store[15];
@@ -923,6 +1037,9 @@ unsigned char User3[]={"1B003C5BFC81"};
 asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "50" "," "10" "," "8" "," "0" "," "0" "," "0");
 asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "30" "," "8" "," "6" "," "0" "," "0" "," "0");
 asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "20" "," "4" "," "5" "," "0" "," "0" "," "0");
+asm("\tpsect eeprom_data,class=EEDATA,delta=2,space=2"); asm("\tdb\t" "10" "," "0" "," "255" "," "200" "," "200" "," "0" "," "0" "," "0");
+
+
 
 void interrupt ISR(void)
 {
@@ -936,6 +1053,14 @@ for(int i=0;i<12;i++)
 {card_store[i]=softreceive();}
 rfid_flag=1;
 }
+}
+void DisplayAmnt(unsigned char Location, int Amnt)
+{
+lcdcmd(Location);
+lcddata(digit[Amnt/1000]);
+lcddata(digit[Amnt%1000/100]);
+lcddata(digit[Amnt%1000%100/10]);
+lcddata(digit[Amnt%1000%100%10]);
 }
 
 void ReadAmnt()
@@ -953,13 +1078,27 @@ User1Sugar = eeprom_read(3);
 User2Sugar = eeprom_read(11);
 User3Sugar = eeprom_read(19);
 }
-void DisplayAmnt(unsigned char Location, int Amnt)
+
+void ReadStock()
 {
-lcdcmd(Location);
-lcddata(digit[Amnt/1000]);
-lcddata(digit[Amnt%1000/100]);
-lcddata(digit[Amnt%1000%100/10]);
-lcddata(digit[Amnt%1000%100%10]);
+RiseStock=(eeprom_read(24)*100)+eeprom_read(25);
+SugarStock=eeprom_read(26);
+KeroseneStock=eeprom_read(27);
+}
+
+void DisplayStock()
+{
+lcdcmd(0x80);
+lcdstring("    STOCK DETAILS   ");
+lcdcmd(0xC0);
+lcdstring("RISE:      Kg       ");
+DisplayAmnt(0XC5,RiseStock);
+lcdcmd(0x94);
+lcdstring("SUGAR:    Kg         ");
+DisplayAmnt(0x9A,SugarStock);
+lcdcmd(0xD4);
+lcdstring("KEROSENE:     Lts    ");
+DisplayAmnt(0XDD,KeroseneStock);
 }
 void DisplaySugar(unsigned char Location, unsigned char Sugar)
 {
@@ -978,23 +1117,6 @@ void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
 lcdcmd(Location);
 lcddata(digit[Kerosene/10]);
 lcddata(digit[Kerosene%10]);
-}
-unsigned char receive()
-{
-while(!RCIF);
-return(RCREG);
-}
-void transmit(unsigned char data)
-{
-while(!TXIF);
-TXREG=data;
-}
-
-
-void usartstring(const unsigned char *st)
-{
-while(*st)
-transmit(*st++);
 }
 
 void uart_init()
@@ -1017,13 +1139,14 @@ lcdcmd(0x80);
 lcdstring("AUTOMATIC RATION ");
 lcdcmd(0xC0);
 lcdstring("   CARD SYSTEM   ");
-_delay((unsigned long)((5000)*(20000000/4000.0)));
+_delay((unsigned long)((1000)*(20000000/4000.0)));
 lcdcmd(0x01);
 _delay((unsigned long)((500)*(20000000/4000.0)));
 lcdcmd(0x80);
 lcdstring("PLEASE TAP YOUR  ");
 lcdcmd(0xC0);
 lcdstring("SMART CARD       ");
+_delay((unsigned long)((1000)*(20000000/4000.0)));
 }
 
 void main()
@@ -1039,11 +1162,15 @@ lcd_init();
 paramter();
 SoftWareUart_Init();
 startup();
-lcdclear();
+
+
 while(1)
 {
 if(!RC0)
 {
+lcdstring("PLEASE TAP YOUR  ");
+lcdcmd(0xC0);
+lcdstring("SMART CARD       ");
 _delay((unsigned long)((200)*(20000000/4000.0)));
 rfid_flag=0;
 }
@@ -1051,13 +1178,21 @@ RFID_read();
 
 
 if(strcmp(card_store,User1)==0)
-{User=1;}
+{
+User=1;
+card_store[0]=0;
+}
 else if(strcmp(card_store,User2)==0)
-{User=2;}
+{
+User=2;
+card_store[0]=0;
+}
 else if(strcmp(card_store,User3)==0)
-{User=3;}
-else
-{User=8;}
+{
+User=3;
+card_store[0]=0;
+}
+
 switch(User)
 {
 case 1:
@@ -1075,6 +1210,7 @@ DisplaySugar(0x9A,User1Sugar);
 lcdcmd(0xD4);
 lcdstring("KEROSENE:   Lts     ");
 DisplayKerosene(0XDD,User1Kerosene);
+User=0;
 break;
 }
 case 2:
@@ -1092,6 +1228,7 @@ DisplaySugar(0x9A,User2Sugar);
 lcdcmd(0xD4);
 lcdstring("KEROSENE:   Lts     ");
 DisplayKerosene(0XDD,User2Kerosene);
+User=0;
 break;
 }
 case 3:
@@ -1109,22 +1246,16 @@ DisplaySugar(0x9A,User3Sugar);
 lcdcmd(0xD4);
 lcdstring("KEROSENE:   Lts     ");
 DisplayKerosene(0XDD,User3Kerosene);
+User=0;
 break;
 }
-default:
-{
 
-lcdcmd(0x80);
-lcdstring("USER NOT AUTHENTICAT");
-lcdcmd(0xC0);
-lcdstring(" PLEASE CHECK YOUR  ");
-lcdcmd(0x94);
-lcdstring("       CARD         ");
-lcdcmd(0xD4);
-lcdstring("                    ");
-
+# 267
 }
-}
+ReadStock();
+if(RC1)
+DisplayStock();
+_delay((unsigned long)((500)*(20000000/4000.0)));
 }
 }
 

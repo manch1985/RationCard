@@ -2,9 +2,13 @@
 #include <math.h>
 #include<htc.h>
 #include<string.h>
-#include "Delay.c"
-
 #define _XTAL_FREQ 20000000
+#include "Delay.c"
+#include "lcd.c"
+#include "softuart.c"
+#include "UART.C"
+
+
 __CONFIG(HS &			// External Crystal at High Speed
 		 WDTDIS &		// Disable Watchdog Timer.
 		 PWRTEN &		// Enable Power Up Timer.
@@ -12,10 +16,8 @@ __CONFIG(HS &			// External Crystal at High Speed
 		 MCLREN &		// MCLR function is enabled
 		 LVPDIS);		// Disable Low Voltage Programming.
 
-#include "lcd.c"
-#include "softuart.c"
 
-unsigned int c1bal=999,c2bal=999,c1,c2,User=0;
+unsigned int c1bal=999,c2bal=999,c1,c2,User=0,RiseStock=0,SugarStock=0,KeroseneStock=0;
 char j,i,k[15];
 unsigned char User1Rise=0,
 			  User2Rise=0,
@@ -26,6 +28,7 @@ unsigned char User1Rise=0,
 			  User1Sugar=0,
 			  User2Sugar=0,
 			  User3Sugar=0;
+			  
 int User1amt=0,User2amt=0,User3amt=0;
 const char digit[]={"0123456789"};
 unsigned char card_store[15];
@@ -36,6 +39,9 @@ unsigned char User3[]={"1B003C5BFC81"};
 __EEPROM_DATA(10,0,50,10,8,0,0,0);
 __EEPROM_DATA(10,0,30,8,6,0,0,0);
 __EEPROM_DATA(10,0,20,4,5,0,0,0);
+__EEPROM_DATA(10,0,255,200,200,0,0,0);
+
+
 
 void interrupt ISR(void)
 {
@@ -49,6 +55,14 @@ void RFID_read()
 		{card_store[i]=softreceive();}
 		rfid_flag=1;
 	}
+}
+void DisplayAmnt(unsigned char Location, int Amnt)
+{
+	lcdcmd(Location);
+	lcddata(digit[Amnt/1000]);
+	lcddata(digit[Amnt%1000/100]);
+	lcddata(digit[Amnt%1000%100/10]);
+	lcddata(digit[Amnt%1000%100%10]);
 }
 
 void ReadAmnt()
@@ -66,13 +80,27 @@ void ReadAmnt()
 	User2Sugar = eeprom_read(11);
 	User3Sugar = eeprom_read(19);
 }
-void DisplayAmnt(unsigned char Location, int Amnt)
+
+void ReadStock()
 {
-	lcdcmd(Location);
-	lcddata(digit[Amnt/1000]);
-	lcddata(digit[Amnt%1000/100]);
-	lcddata(digit[Amnt%1000%100/10]);
-	lcddata(digit[Amnt%1000%100%10]);
+	RiseStock=(eeprom_read(24)*100)+eeprom_read(25);
+	SugarStock=eeprom_read(26);
+	KeroseneStock=eeprom_read(27);
+}
+
+void DisplayStock()
+{
+			lcdcmd(0x80);
+			lcdstring("    STOCK DETAILS   ");	
+			lcdcmd(0xC0);
+			lcdstring("RISE:      Kg       ");
+			DisplayAmnt(0XC5,RiseStock);
+			lcdcmd(0x94);
+			lcdstring("SUGAR:    Kg         ");
+			DisplayAmnt(0x9A,SugarStock);
+			lcdcmd(0xD4);	
+			lcdstring("KEROSENE:     Lts    ");
+			DisplayAmnt(0XDD,KeroseneStock);
 }
 void DisplaySugar(unsigned char Location, unsigned char Sugar)
 {
@@ -91,23 +119,6 @@ void DisplayKerosene(unsigned char Location, unsigned char Kerosene)
 	lcdcmd(Location);
 	lcddata(digit[Kerosene/10]);
 	lcddata(digit[Kerosene%10]);
-}
-unsigned char receive()
-{
-while(!RCIF);
-return(RCREG);
-}
-void transmit(unsigned char data)
-{
-while(!TXIF);
-TXREG=data;//transmitting the data through TX buffer
-}
-
-
-void usartstring(const unsigned char *st)
-{
-while(*st)
-transmit(*st++);
 }
 
 void uart_init()
@@ -130,13 +141,14 @@ void startup()
 	lcdstring("AUTOMATIC RATION ");
 	lcdcmd(0xC0);
 	lcdstring("   CARD SYSTEM   ");
-	__delay_ms(5000);
+	__delay_ms(1000);
 	lcdcmd(0x01);
 	__delay_ms(500);
 	lcdcmd(0x80);
 	lcdstring("PLEASE TAP YOUR  ");
 	lcdcmd(0xC0);
 	lcdstring("SMART CARD       ");
+	__delay_ms(1000);
 }
 
 void main()
@@ -152,11 +164,15 @@ void main()
 	paramter();
 	SoftWareUart_Init();
 	startup();
-	lcdclear();
+//	gsm_init();
+//	lcdclear();
 while(1)
 {
 	if(!RC0)
-	{
+	{	
+		lcdstring("PLEASE TAP YOUR  ");
+		lcdcmd(0xC0);
+		lcdstring("SMART CARD       ");
 		__delay_ms(200);
 		rfid_flag=0;
 	}
@@ -164,13 +180,21 @@ while(1)
 //	lcdcmd(0xD4);
 //	lcdstring(card_store);
 	if(strcmp(card_store,User1)==0)
-		{User=1;}
+		{
+		  User=1;
+		  card_store[0]=0;
+		}
 	else if(strcmp(card_store,User2)==0)
-		{User=2;}
+		{
+			User=2;
+			card_store[0]=0;
+		}
 	else if(strcmp(card_store,User3)==0)
-		{User=3;}
-	else
-		{User=8;}
+		{
+			User=3;
+			card_store[0]=0;
+		}
+
 	switch(User)
 	{
 		case 1:
@@ -188,6 +212,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User1Kerosene);
+			User=0;
 			break;
 		}
 		case 2:
@@ -205,6 +230,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User2Kerosene);
+			User=0;
 			break;
 		}
 		case 3:
@@ -222,9 +248,10 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User3Kerosene);
+			User=0;
 			break;
 		}
-		default:
+/*		default:
 		{
 			
 			lcdcmd(0x80);	
@@ -236,8 +263,12 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("                    ");
 
-		}
+		} */
 	}
+	ReadStock();
+	if(RC1)
+	DisplayStock();
+	__delay_ms(500);
 }
 }
 /*RD3=1;
