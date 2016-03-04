@@ -62,7 +62,7 @@ void gsm_read_line2(char *buffer)
 void interrupt ISR(void)
 {	
 	if (RCIF==1)
-	{
+	{	sms_indication=0;
 		gsm_read_line2(sms);
 	}	
 }
@@ -88,8 +88,8 @@ void DisplayAmnt(unsigned char Location, int Amnt)
 void ReadAmnt()
 {
 	User1amt=(eeprom_read(0)*100)+eeprom_read(1);
-	User2amt=(eeprom_read(8)*100)+eeprom_read(15);
-	User3amt=(eeprom_read(16)*100)+eeprom_read(23);
+	User2amt=(eeprom_read(8)*100)+eeprom_read(9);
+	User3amt=(eeprom_read(16)*100)+eeprom_read(17);
 	User1Rise = eeprom_read(2);
 	User2Rise = eeprom_read(10);
 	User3Rise = eeprom_read(18);
@@ -178,23 +178,31 @@ void LoadStockToArray()
 	RiseArray[2] = digit[RiseStock%1000%100/10];
 	RiseArray[3] = digit[RiseStock%1000%100%10];
 	SugarArray[0] = digit[SugarStock/100];
-	SugarArray[1] = digit[SugarStock/10];
-	SugarArray[2] = digit[SugarStock%10];
+	SugarArray[1] = digit[SugarStock%100/10];
+	SugarArray[2] = digit[SugarStock%100%10];
 	KeroseneArray[0] = digit[KeroseneStock/100];
-	KeroseneArray[1] = digit[KeroseneStock/10];
-	KeroseneArray[2] = digit[KeroseneStock%10];
+	KeroseneArray[1] = digit[KeroseneStock%100/10];
+	KeroseneArray[2] = digit[KeroseneStock%100%10];
 }
 
-void SendRiseStock()
+void SendStock()
 {
 	unsigned char d;
 	PIE1=0X00;
-	usartstring("AT+CMGS=\"+919790080510\"");
+	usartstring("AT+CMGS=\"+919894748200\"");
 	transmit(0x0D);
 	while((d=receive())!='>');
 	usartstring("Rise Stock:");//message
 	usartstring(RiseArray);
 	usartstring(" Kgs");
+	transmit('\r');
+	usartstring("Sugar Stock:");//message
+	usartstring(SugarArray);
+	usartstring(" Kgs");
+	transmit('\r');
+	usartstring("Kerosene Stock:");//message
+	usartstring(KeroseneArray);
+	usartstring(" Lts");
 	transmit(0x1A);
 	while((d=receive())!='K');
 	PIE1=0X20;
@@ -219,7 +227,7 @@ void main()
 //	lcdclear();
 while(1)
 {
-	
+	ReadStock();
 	if(!RC0)
 	{	
 		lcdstring("PLEASE TAP YOUR  ");
@@ -266,6 +274,23 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User1Kerosene);
+			RiseStock=RiseStock-User1Rise;
+			SugarStock=SugarStock-User1Sugar;
+			KeroseneStock=KeroseneStock-User1Kerosene;
+			eeprom_write(24,RiseStock/100);
+			eeprom_write(25,RiseStock%100);
+			eeprom_write(26,SugarStock);
+			eeprom_write(27,KeroseneStock);
+			User1amt = User1amt-50;
+			//User1Rise = 0;
+			//User1Sugar = 0;
+			//User1Kerosene = 0;
+			eeprom_write(0,User1amt/100);
+			eeprom_write(1,User1amt%100);
+			eeprom_write(2,User1Rise);
+			eeprom_write(3,User1Sugar);
+			eeprom_write(4,User1Kerosene);
+		
 			User=0;
 			break;
 		}
@@ -284,6 +309,22 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User2Kerosene);
+			RiseStock=RiseStock-User2Rise;
+			SugarStock=SugarStock-User2Sugar;
+			KeroseneStock=KeroseneStock-User2Kerosene;
+			eeprom_write(24,RiseStock/100);
+			eeprom_write(25,RiseStock%100);
+			eeprom_write(26,SugarStock);
+			eeprom_write(27,KeroseneStock);
+			User2amt = User2amt-30;
+			//User2Rise = 0;
+			//User2Sugar = 0;
+			//User2Kerosene = 0;
+			eeprom_write(8,User2amt/100);
+			eeprom_write(9,User2amt%100);
+			eeprom_write(10,User2Rise);
+			eeprom_write(11,User2Sugar);
+			eeprom_write(12,User2Kerosene);
 			User=0;
 			break;
 		}
@@ -302,6 +343,22 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User3Kerosene);
+			RiseStock=RiseStock-User3Rise;
+			SugarStock=SugarStock-User3Sugar;
+			KeroseneStock=KeroseneStock-User3Kerosene;
+			eeprom_write(24,RiseStock/100);
+			eeprom_write(25,RiseStock%100);
+			eeprom_write(26,SugarStock);
+			eeprom_write(27,KeroseneStock);
+			User3amt = User3amt-20;
+			//User3Rise = 0;
+			//User3Sugar = 0;
+			//User3Kerosene = 0;
+			eeprom_write(16,User3amt/100);
+			eeprom_write(17,User3amt%100);
+			eeprom_write(18,User3Rise);
+			eeprom_write(19,User3Sugar);
+			eeprom_write(20,User3Kerosene);
 			User=0;
 			break;
 		}
@@ -316,7 +373,7 @@ while(1)
 	{
 		if(!sms_indication)
 		{
-			SendRiseStock();
+			SendStock();
 			sms_indication=1;
 		}
 	}

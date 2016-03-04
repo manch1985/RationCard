@@ -30,6 +30,8 @@
 [v ___awtoft `(f  1 e 3 0 ]
 "3 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\bmul.c
 [v ___bmul `(uc  1 e 1 0 ]
+"8 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eewrite.c
+[v _eeprom_write `(v  1 e 0 0 ]
 "63 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\float.c
 [v ___ftpack `(f  1 e 3 0 ]
 "87 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\ftadd.c
@@ -139,8 +141,8 @@
 "175
 [v _LoadStockToArray `(v  1 e 0 0 ]
 "189
-[v _SendRiseStock `(v  1 e 0 0 ]
-"204
+[v _SendStock `(v  1 e 0 0 ]
+"212
 [v _main `(v  1 e 0 0 ]
 "10 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c
 [v _SoftWareUart_Init `(v  1 e 0 0 ]
@@ -1050,10 +1052,10 @@
 [v _User2 `[13]uc  1 e 13 0 ]
 "38
 [v _User3 `[13]uc  1 e 13 0 ]
-"204
+"212
 [v _main `(v  1 e 0 0 ]
 {
-"325
+"382
 } 0
 "159
 [v _startup `(v  1 e 0 0 ]
@@ -1114,9 +1116,9 @@
 "87
 } 0
 "189 F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c
-[v _SendRiseStock `(v  1 e 0 0 ]
+[v _SendStock `(v  1 e 0 0 ]
 {
-"201
+"209
 } 0
 "71
 [v _RFID_read `(v  1 e 0 0 ]
@@ -1291,6 +1293,14 @@
 [v memcmp@s2 `*.0DCv  1 p 1 2 ]
 [v memcmp@n `ui  1 p 2 3 ]
 "12
+} 0
+"8 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eewrite.c
+[v _eeprom_write `(v  1 e 0 0 ]
+{
+[v eeprom_write@addr `uc  1 a 1 wreg ]
+[v eeprom_write@addr `uc  1 a 1 wreg ]
+[v eeprom_write@value `uc  1 p 1 14 ]
+"10
 } 0
 "34 C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\strcmp.c
 [v _strcmp `(i  1 e 2 0 ]
