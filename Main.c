@@ -33,6 +33,8 @@ int User1amt=0,User2amt=0,User3amt=0;
 const char digit[]={"0123456789"};
 unsigned char card_store[15],sms[20],RiseArray[5],SugarArray[4],KeroseneArray[4];
 bit rfid_flag=0,sms_indication=0;
+#define VOLUE RC4
+#define STOCK RC3
 unsigned char User1[]={"1C0082CE6939"};
 unsigned char User2[]={"1B003C5BFC80"};
 unsigned char User3[]={"1B003C5BFC81"};
@@ -222,7 +224,7 @@ void main()
 	paramter();
 	SoftWareUart_Init();
 	startup();
-	gsm_init();
+//	gsm_init();
 	PIE1=0x20;
 //	lcdclear();
 while(1)
@@ -274,6 +276,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User1Kerosene);
+			__delay_ms(2000);
 			RiseStock=RiseStock-User1Rise;
 			SugarStock=SugarStock-User1Sugar;
 			KeroseneStock=KeroseneStock-User1Kerosene;
@@ -290,7 +293,17 @@ while(1)
 			eeprom_write(2,User1Rise);
 			eeprom_write(3,User1Sugar);
 			eeprom_write(4,User1Kerosene);
-		
+			
+			lcdcmd(0x01);
+			lcdstring(" PLEASE KEEP YOUR");
+			lcdcmd(0xC0);
+			lcdstring(" CAN ON KEROSENE ");
+			lcdcmd(0x94);
+			lcdstring("      VOLUE      ");
+			__delay_ms(200);
+			VOLUE = 0;
+			__delay_ms(5000);
+			VOLUE = 1;
 			User=0;
 			break;
 		}
@@ -309,6 +322,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User2Kerosene);
+			__delay_ms(2000);
 			RiseStock=RiseStock-User2Rise;
 			SugarStock=SugarStock-User2Sugar;
 			KeroseneStock=KeroseneStock-User2Kerosene;
@@ -325,6 +339,17 @@ while(1)
 			eeprom_write(10,User2Rise);
 			eeprom_write(11,User2Sugar);
 			eeprom_write(12,User2Kerosene);
+
+			lcdcmd(0x01);
+			lcdstring(" PLEASE KEEP YOUR");
+			lcdcmd(0xC0);
+			lcdstring(" CAN ON KEROSENE ");
+			lcdcmd(0x94);
+			lcdstring("      VOLUE      ");
+			__delay_ms(200);
+			VOLUE = 0;
+			__delay_ms(8000);
+			VOLUE = 1;
 			User=0;
 			break;
 		}
@@ -343,6 +368,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User3Kerosene);
+			__delay_ms(2000);
 			RiseStock=RiseStock-User3Rise;
 			SugarStock=SugarStock-User3Sugar;
 			KeroseneStock=KeroseneStock-User3Kerosene;
@@ -359,6 +385,18 @@ while(1)
 			eeprom_write(18,User3Rise);
 			eeprom_write(19,User3Sugar);
 			eeprom_write(20,User3Kerosene);
+
+			lcdcmd(0x01);
+			lcdcmd(0x80);
+			lcdstring(" PLEASE KEEP YOUR");
+			lcdcmd(0xC0);
+			lcdstring(" CAN ON KEROSENE ");
+			lcdcmd(0x94);
+			lcdstring("      VOLUE      ");
+			__delay_ms(200);
+			VOLUE = 0;
+			__delay_ms(5000);
+			VOLUE = 1;
 			User=0;
 			break;
 		}
@@ -373,10 +411,21 @@ while(1)
 	{
 		if(!sms_indication)
 		{
-			SendStock();
+		//	SendStock();
 			sms_indication=1;
 		}
 	}
+	if(STOCK==1)
+	{
+		eeprom_write(24,10);
+		eeprom_write(25,0);
+		eeprom_write(26,255);
+		eeprom_write(27,200);
+		ReadStock();
+		//LoadStockToArray();
+		DisplayStock();
+	}while(STOCK);
+
 
 }
 }
