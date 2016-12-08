@@ -191,7 +191,7 @@ void SendStock()
 {
 	unsigned char d;
 	PIE1=0X00;
-	usartstring("AT+CMGS=\"+919894748200\"");
+	usartstring("AT+CMGS=\"+919003831304\"");
 	transmit(0x0D);
 	while((d=receive())!='>');
 	usartstring("Rise Stock:");//message
@@ -224,7 +224,7 @@ void main()
 	paramter();
 	SoftWareUart_Init();
 	startup();
-//	gsm_init();
+	gsm_init();
 	PIE1=0x20;
 //	lcdclear();
 while(1)
@@ -276,7 +276,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User1Kerosene);
-			__delay_ms(2000);
+			__delay_ms(8000);
 			RiseStock=RiseStock-User1Rise;
 			SugarStock=SugarStock-User1Sugar;
 			KeroseneStock=KeroseneStock-User1Kerosene;
@@ -322,7 +322,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User2Kerosene);
-			__delay_ms(2000);
+			__delay_ms(8000);
 			RiseStock=RiseStock-User2Rise;
 			SugarStock=SugarStock-User2Sugar;
 			KeroseneStock=KeroseneStock-User2Kerosene;
@@ -368,7 +368,7 @@ while(1)
 			lcdcmd(0xD4);	
 			lcdstring("KEROSENE:   Lts     ");
 			DisplayKerosene(0XDD,User3Kerosene);
-			__delay_ms(2000);
+			__delay_ms(8000);
 			RiseStock=RiseStock-User3Rise;
 			SugarStock=SugarStock-User3Sugar;
 			KeroseneStock=KeroseneStock-User3Kerosene;
@@ -411,7 +411,7 @@ while(1)
 	{
 		if(!sms_indication)
 		{
-		//	SendStock();
+			SendStock();
 			sms_indication=1;
 		}
 	}

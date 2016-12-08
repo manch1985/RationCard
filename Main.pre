@@ -748,7 +748,7 @@ asm("clrwdt");
 const char a[]={"0123456789"};
 
 # 8
-void enable()
+enable()
 {
 RD3 = 1;
 _delay((unsigned long)((4)*(20000000/4000.0)));
@@ -1190,7 +1190,7 @@ void SendStock()
 {
 unsigned char d;
 PIE1=0X00;
-usartstring("AT+CMGS=\"+919894748200\"");
+usartstring("AT+CMGS=\"+919003831304\"");
 transmit(0x0D);
 while((d=receive())!='>');
 usartstring("Rise Stock:");
@@ -1223,7 +1223,7 @@ lcd_init();
 paramter();
 SoftWareUart_Init();
 startup();
-
+gsm_init();
 PIE1=0x20;
 
 while(1)
@@ -1275,7 +1275,7 @@ DisplaySugar(0x9A,User1Sugar);
 lcdcmd(0xD4);
 lcdstring("KEROSENE:   Lts     ");
 DisplayKerosene(0XDD,User1Kerosene);
-_delay((unsigned long)((2000)*(20000000/4000.0)));
+_delay((unsigned long)((8000)*(20000000/4000.0)));
 RiseStock=RiseStock-User1Rise;
 SugarStock=SugarStock-User1Sugar;
 KeroseneStock=KeroseneStock-User1Kerosene;
@@ -1321,7 +1321,7 @@ DisplaySugar(0x9A,User2Sugar);
 lcdcmd(0xD4);
 lcdstring("KEROSENE:   Lts     ");
 DisplayKerosene(0XDD,User2Kerosene);
-_delay((unsigned long)((2000)*(20000000/4000.0)));
+_delay((unsigned long)((8000)*(20000000/4000.0)));
 RiseStock=RiseStock-User2Rise;
 SugarStock=SugarStock-User2Sugar;
 KeroseneStock=KeroseneStock-User2Kerosene;
@@ -1367,7 +1367,7 @@ DisplaySugar(0x9A,User3Sugar);
 lcdcmd(0xD4);
 lcdstring("KEROSENE:   Lts     ");
 DisplayKerosene(0XDD,User3Kerosene);
-_delay((unsigned long)((2000)*(20000000/4000.0)));
+_delay((unsigned long)((8000)*(20000000/4000.0)));
 RiseStock=RiseStock-User3Rise;
 SugarStock=SugarStock-User3Sugar;
 KeroseneStock=KeroseneStock-User3Kerosene;
@@ -1410,7 +1410,7 @@ if((memcmp("STOCK",&sms,5)==0))
 {
 if(!sms_indication)
 {
-
+SendStock();
 sms_indication=1;
 }
 }

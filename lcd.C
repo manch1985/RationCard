@@ -5,7 +5,7 @@ const char a[]={"0123456789"};
 #define D5 RD5
 #define D6 RD6
 #define D7 RD7
-void enable()
+enable()
 {
 EN  = 1;             // => E = 1
 __delay_ms(4);

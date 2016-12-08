@@ -1,8 +1,8 @@
-opt subtitle "HI-TECH Software Omniscient Code Generator (PRO mode) build 6738"
+opt subtitle "HI-TECH Software Omniscient Code Generator (Lite mode) build 6738"
 
 opt pagewidth 120
 
-	opt pm
+	opt lm
 
 	processor	16F887
 clrc	macro
@@ -64,6 +64,7 @@ pclath	equ	10
 	FNCALL	_main,_paramter
 	FNCALL	_main,_SoftWareUart_Init
 	FNCALL	_main,_startup
+	FNCALL	_main,_gsm_init
 	FNCALL	_main,_ReadStock
 	FNCALL	_main,_lcdstring
 	FNCALL	_main,_lcdcmd
@@ -82,23 +83,30 @@ pclath	equ	10
 	FNCALL	_main,_LoadStockToArray
 	FNCALL	_main,_DisplayStock
 	FNCALL	_main,_memcmp
+	FNCALL	_main,_SendStock
 	FNCALL	_startup,_lcdcmd
 	FNCALL	_startup,_lcdstring
 	FNCALL	_DisplayStock,_lcdcmd
 	FNCALL	_DisplayStock,_lcdstring
 	FNCALL	_DisplayStock,_DisplayAmnt
+	FNCALL	_gsm_init,_lcdcmd
+	FNCALL	_gsm_init,_lcdstring
+	FNCALL	_gsm_init,_DelayS
+	FNCALL	_gsm_init,_usartstring
+	FNCALL	_gsm_init,_transmit
+	FNCALL	_gsm_init,_receive
 	FNCALL	_DisplayKerosene,_lcdcmd
-	FNCALL	_DisplayKerosene,___lbdiv
+	FNCALL	_DisplayKerosene,___awdiv
 	FNCALL	_DisplayKerosene,_lcddata
-	FNCALL	_DisplayKerosene,___lbmod
+	FNCALL	_DisplayKerosene,___awmod
 	FNCALL	_DisplayRise,_lcdcmd
-	FNCALL	_DisplayRise,___lbdiv
+	FNCALL	_DisplayRise,___awdiv
 	FNCALL	_DisplayRise,_lcddata
-	FNCALL	_DisplayRise,___lbmod
+	FNCALL	_DisplayRise,___awmod
 	FNCALL	_DisplaySugar,_lcdcmd
-	FNCALL	_DisplaySugar,___lbdiv
+	FNCALL	_DisplaySugar,___awdiv
 	FNCALL	_DisplaySugar,_lcddata
-	FNCALL	_DisplaySugar,___lbmod
+	FNCALL	_DisplaySugar,___awmod
 	FNCALL	_DisplayAmnt,_lcdcmd
 	FNCALL	_DisplayAmnt,___awdiv
 	FNCALL	_DisplayAmnt,_lcddata
@@ -106,6 +114,9 @@ pclath	equ	10
 	FNCALL	_lcdstring,_lcddata
 	FNCALL	_lcd_init,_lcdport
 	FNCALL	_lcd_init,_lcdcmd
+	FNCALL	_SendStock,_usartstring
+	FNCALL	_SendStock,_transmit
+	FNCALL	_SendStock,_receive
 	FNCALL	_RFID_read,_softreceive
 	FNCALL	_lcddata,_lcdport
 	FNCALL	_lcddata,_enable
@@ -119,19 +130,38 @@ pclath	equ	10
 	FNCALL	_ReadStock,___wmul
 	FNCALL	_ReadAmnt,_eeprom_read
 	FNCALL	_ReadAmnt,___wmul
+	FNCALL	_usartstring,_transmit
+	FNCALL	_DelayS,_DelayMs
 	FNROOT	_main
 	FNCALL	_ISR,_gsm_read_line2
-	FNCALL	_gsm_read_line2,_receive
+	FNCALL	_gsm_read_line2,i1_receive
 	FNCALL	intlevel1,_ISR
 	global	intlevel1
 	FNROOT	intlevel1
+	global	_c2bal
+	global	_c1bal
 	global	_User1
 	global	_User2
 	global	_User3
-psect	idataBANK1,class=CODE,space=0,delta=2
-global __pidataBANK1
-__pidataBANK1:
+psect	idataBANK0,class=CODE,space=0,delta=2
+global __pidataBANK0
+__pidataBANK0:
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	20
+
+;initializer for _c2bal
+	retlw	0E7h
+	retlw	03h
+
+
+;initializer for _c1bal
+psect	idataCOMMON,class=CODE,space=0,delta=2
+global __pidataCOMMON
+__pidataCOMMON:
+	retlw	0E7h
+	retlw	03h
+
+psect	idataBANK0
 	line	38
 
 ;initializer for _User1
@@ -148,6 +178,9 @@ __pidataBANK1:
 	retlw	033h
 	retlw	039h
 	retlw	0
+psect	idataBANK1,class=CODE,space=0,delta=2
+global __pidataBANK1
+__pidataBANK1:
 	line	39
 
 ;initializer for _User2
@@ -180,7 +213,7 @@ __pidataBANK1:
 	retlw	038h
 	retlw	031h
 	retlw	0
-	global	_digit
+	global	_a
 psect	stringtext,class=STRCODE,delta=2,reloc=256
 global __pstringtext
 __pstringtext:
@@ -207,6 +240,22 @@ skipnz
 incf btemp+1
 	movwf pc
 __stringbase:
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
+	line	1
+_a:
+	retlw	030h
+	retlw	031h
+	retlw	032h
+	retlw	033h
+	retlw	034h
+	retlw	035h
+	retlw	036h
+	retlw	037h
+	retlw	038h
+	retlw	039h
+	retlw	0
+	global	_digit
+psect	stringtext
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	33
 _digit:
@@ -221,6 +270,7 @@ _digit:
 	retlw	038h
 	retlw	039h
 	retlw	0
+	global	_a
 	global	_digit
 	global	_KeroseneStock
 	global	_RiseStock
@@ -229,6 +279,8 @@ _digit:
 	global	_User1amt
 	global	_User2amt
 	global	_User3amt
+	global	_c1
+	global	_c2
 	global	_User1Kerosene
 	global	_User1Rise
 	global	_User1Sugar
@@ -239,13 +291,16 @@ _digit:
 	global	_User3Rise
 	global	_User3Sugar
 	global	_delayus_variable
+	global	_i
+	global	_j
 	global	_rfid_flag
 	global	_sms_indication
-	global	_card_store
+	global	_k
 	global	_RiseArray
 	global	_KeroseneArray
 	global	_SugarArray
 	global	_sms
+	global	_card_store
 	global	_INTCON
 _INTCON	set	11
 	global	_PORTC
@@ -256,6 +311,8 @@ _PORTD	set	8
 _RCREG	set	26
 	global	_RCSTA
 _RCSTA	set	24
+	global	_TXREG
+_TXREG	set	25
 	global	_CARRY
 _CARRY	set	24
 	global	_CREN
@@ -290,6 +347,8 @@ _RD5	set	69
 _RD6	set	70
 	global	_RD7
 _RD7	set	71
+	global	_TXIF
+_TXIF	set	100
 	global	_PIE1
 _PIE1	set	140
 	global	_SPBRG
@@ -385,33 +444,6 @@ STR_10:
 	retlw	0
 psect	stringtext
 	
-STR_27:	
-	retlw	65	;'A'
-	retlw	84	;'T'
-	retlw	43	;'+'
-	retlw	67	;'C'
-	retlw	77	;'M'
-	retlw	71	;'G'
-	retlw	83	;'S'
-	retlw	61	;'='
-	retlw	34	;'"'
-	retlw	43	;'+'
-	retlw	57	;'9'
-	retlw	49	;'1'
-	retlw	57	;'9'
-	retlw	56	;'8'
-	retlw	57	;'9'
-	retlw	52	;'4'
-	retlw	55	;'7'
-	retlw	52	;'4'
-	retlw	56	;'8'
-	retlw	50	;'2'
-	retlw	48	;'0'
-	retlw	48	;'0'
-	retlw	34	;'"'
-	retlw	0
-psect	stringtext
-	
 STR_9:	
 	retlw	65	;'A'
 	retlw	84	;'T'
@@ -435,6 +467,33 @@ STR_9:
 	retlw	53	;'5'
 	retlw	49	;'1'
 	retlw	48	;'0'
+	retlw	34	;'"'
+	retlw	0
+psect	stringtext
+	
+STR_27:	
+	retlw	65	;'A'
+	retlw	84	;'T'
+	retlw	43	;'+'
+	retlw	67	;'C'
+	retlw	77	;'M'
+	retlw	71	;'G'
+	retlw	83	;'S'
+	retlw	61	;'='
+	retlw	34	;'"'
+	retlw	43	;'+'
+	retlw	57	;'9'
+	retlw	49	;'1'
+	retlw	57	;'9'
+	retlw	48	;'0'
+	retlw	48	;'0'
+	retlw	51	;'3'
+	retlw	56	;'8'
+	retlw	51	;'3'
+	retlw	49	;'1'
+	retlw	51	;'3'
+	retlw	48	;'0'
+	retlw	52	;'4'
 	retlw	34	;'"'
 	retlw	0
 psect	stringtext
@@ -1134,6 +1193,20 @@ __pbssCOMMON:
 _delayus_variable:
        ds      1
 
+_i:
+       ds      1
+
+_j:
+       ds      1
+
+psect	dataCOMMON,class=COMMON,space=1
+global __pdataCOMMON
+__pdataCOMMON:
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	20
+_c1bal:
+       ds      2
+
 psect	bssBANK0,class=BANK0,space=1
 global __pbssBANK0
 __pbssBANK0:
@@ -1156,6 +1229,12 @@ _User2amt:
        ds      2
 
 _User3amt:
+       ds      2
+
+_c1:
+       ds      2
+
+_c2:
        ds      2
 
 _User1Kerosene:
@@ -1185,9 +1264,6 @@ _User3Rise:
 _User3Sugar:
        ds      1
 
-_card_store:
-       ds      15
-
 _RiseArray:
        ds      5
 
@@ -1197,21 +1273,34 @@ _KeroseneArray:
 _SugarArray:
        ds      4
 
-psect	bssBANK1,class=BANK1,space=1
-global __pbssBANK1
-__pbssBANK1:
-_sms:
-       ds      20
+psect	dataBANK0,class=BANK0,space=1
+global __pdataBANK0
+__pdataBANK0:
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+_c2bal:
+       ds      2
 
-psect	dataBANK1,class=BANK1,space=1
-global __pdataBANK1
-__pdataBANK1:
+psect	dataBANK0
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	38
 _User1:
        ds      13
 
-psect	dataBANK1
+psect	bssBANK1,class=BANK1,space=1
+global __pbssBANK1
+__pbssBANK1:
+_k:
+       ds      15
+
+_sms:
+       ds      20
+
+_card_store:
+       ds      15
+
+psect	dataBANK1,class=BANK1,space=1
+global __pdataBANK1
+__pdataBANK1:
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	39
 _User2:
@@ -1244,18 +1333,20 @@ psect cinit,class=CODE,delta=2
 ; Clear objects allocated to COMMON
 psect cinit,class=CODE,delta=2
 	clrf	((__pbssCOMMON)+0)&07Fh
+	clrf	((__pbssCOMMON)+1)&07Fh
+	clrf	((__pbssCOMMON)+2)&07Fh
 ; Clear objects allocated to BANK0
 psect cinit,class=CODE,delta=2
 	bcf	status, 7	;select IRP bank0
 	movlw	low(__pbssBANK0)
 	movwf	fsr
-	movlw	low((__pbssBANK0)+033h)
+	movlw	low((__pbssBANK0)+028h)
 	fcall	clear_ram
 ; Clear objects allocated to BANK1
 psect cinit,class=CODE,delta=2
 	movlw	low(__pbssBANK1)
 	movwf	fsr
-	movlw	low((__pbssBANK1)+014h)
+	movlw	low((__pbssBANK1)+032h)
 	fcall	clear_ram
 global btemp
 psect inittext,class=CODE,delta=2
@@ -1287,7 +1378,7 @@ init_ram:
 ; Initialize objects allocated to BANK1
 psect cinit,class=CODE,delta=2
 global init_ram, __pidataBANK1
-	movlw low(__pdataBANK1+39)
+	movlw low(__pdataBANK1+26)
 	movwf btemp-1,f
 	movlw high(__pidataBANK1)
 	movwf btemp,f
@@ -1296,6 +1387,25 @@ global init_ram, __pidataBANK1
 	movlw low(__pdataBANK1)
 	movwf fsr,f
 	fcall init_ram
+; Initialize objects allocated to BANK0
+psect cinit,class=CODE,delta=2
+global init_ram, __pidataBANK0
+	movlw low(__pdataBANK0+15)
+	movwf btemp-1,f
+	movlw high(__pidataBANK0)
+	movwf btemp,f
+	movlw low(__pidataBANK0)
+	movwf btemp+1,f
+	movlw low(__pdataBANK0)
+	movwf fsr,f
+	fcall init_ram
+; Initialize objects allocated to COMMON
+	global __pidataCOMMON
+psect cinit,class=CODE,delta=2
+	fcall	__pidataCOMMON+0		;fetch initializer
+	movwf	__pdataCOMMON+0&07fh		
+	fcall	__pidataCOMMON+1		;fetch initializer
+	movwf	__pdataCOMMON+1&07fh		
 psect cinit,class=CODE,delta=2
 global end_of_initialization
 
@@ -1307,8 +1417,10 @@ ljmp _main	;jump to C main() function
 psect	cstackCOMMON,class=COMMON,space=1
 global __pcstackCOMMON
 __pcstackCOMMON:
-	global	?_enable
-?_enable:	; 0 bytes @ 0x0
+	global	?_DelayMs
+?_DelayMs:	; 0 bytes @ 0x0
+	global	?_DelayS
+?_DelayS:	; 0 bytes @ 0x0
 	global	?_lcdport
 ?_lcdport:	; 0 bytes @ 0x0
 	global	?_lcdcmd
@@ -1319,8 +1431,10 @@ __pcstackCOMMON:
 ?_lcd_init:	; 0 bytes @ 0x0
 	global	?_SoftWareUart_Init
 ?_SoftWareUart_Init:	; 0 bytes @ 0x0
-	global	??_receive
-??_receive:	; 0 bytes @ 0x0
+	global	?_transmit
+?_transmit:	; 0 bytes @ 0x0
+	global	?_gsm_init
+?_gsm_init:	; 0 bytes @ 0x0
 	global	?_gsm_read_line2
 ?_gsm_read_line2:	; 0 bytes @ 0x0
 	global	??_gsm_read_line2
@@ -1343,85 +1457,56 @@ __pcstackCOMMON:
 ?_startup:	; 0 bytes @ 0x0
 	global	?_LoadStockToArray
 ?_LoadStockToArray:	; 0 bytes @ 0x0
+	global	?_SendStock
+?_SendStock:	; 0 bytes @ 0x0
 	global	?_main
 ?_main:	; 0 bytes @ 0x0
+	global	??i1_receive
+??i1_receive:	; 0 bytes @ 0x0
 	global	?_eeprom_read
 ?_eeprom_read:	; 1 bytes @ 0x0
 	global	?_softreceive
 ?_softreceive:	; 1 bytes @ 0x0
 	global	?_receive
 ?_receive:	; 1 bytes @ 0x0
+	global	?i1_receive
+?i1_receive:	; 1 bytes @ 0x0
+	global	?_enable
+?_enable:	; 2 bytes @ 0x0
+	ds	1
 	global	gsm_read_line2@flag
-gsm_read_line2@flag:	; 1 bytes @ 0x0
+gsm_read_line2@flag:	; 1 bytes @ 0x1
 	ds	1
 	global	gsm_read_line2@buffer
-gsm_read_line2@buffer:	; 1 bytes @ 0x1
+gsm_read_line2@buffer:	; 1 bytes @ 0x2
 	ds	1
 	global	gsm_read_line2@rec_data
-gsm_read_line2@rec_data:	; 1 bytes @ 0x2
+gsm_read_line2@rec_data:	; 1 bytes @ 0x3
 	ds	1
 	global	??_ISR
-??_ISR:	; 0 bytes @ 0x3
-	ds	3
-	global	??_eeprom_write
-??_eeprom_write:	; 0 bytes @ 0x6
-	global	??_lcdport
-??_lcdport:	; 0 bytes @ 0x6
-	global	??_lcdcmd
-??_lcdcmd:	; 0 bytes @ 0x6
-	global	??_lcddata
-??_lcddata:	; 0 bytes @ 0x6
-	global	??_lcdstring
-??_lcdstring:	; 0 bytes @ 0x6
-	global	??_RFID_read
-??_RFID_read:	; 0 bytes @ 0x6
-	global	??_DisplayAmnt
-??_DisplayAmnt:	; 0 bytes @ 0x6
-	global	??_ReadAmnt
-??_ReadAmnt:	; 0 bytes @ 0x6
-	global	??_ReadStock
-??_ReadStock:	; 0 bytes @ 0x6
-	global	??_DisplayStock
-??_DisplayStock:	; 0 bytes @ 0x6
-	global	??_DisplaySugar
-??_DisplaySugar:	; 0 bytes @ 0x6
-	global	??_DisplayRise
-??_DisplayRise:	; 0 bytes @ 0x6
-	global	??_DisplayKerosene
-??_DisplayKerosene:	; 0 bytes @ 0x6
-	global	??_uart_init
-??_uart_init:	; 0 bytes @ 0x6
-	global	??_paramter
-??_paramter:	; 0 bytes @ 0x6
-	global	??_LoadStockToArray
-??_LoadStockToArray:	; 0 bytes @ 0x6
-	global	??___wmul
-??___wmul:	; 0 bytes @ 0x6
-	global	??___lwdiv
-??___lwdiv:	; 0 bytes @ 0x6
-	global	??___lwmod
-??___lwmod:	; 0 bytes @ 0x6
-	global	??___lbdiv
-??___lbdiv:	; 0 bytes @ 0x6
-	global	??___awdiv
-??___awdiv:	; 0 bytes @ 0x6
-	global	??___awmod
-??___awmod:	; 0 bytes @ 0x6
+??_ISR:	; 0 bytes @ 0x4
+	ds	4
 psect	cstackBANK0,class=BANK0,space=1
 global __pcstackBANK0
 __pcstackBANK0:
 	global	??_eeprom_read
 ??_eeprom_read:	; 0 bytes @ 0x0
+	global	??_DelayMs
+??_DelayMs:	; 0 bytes @ 0x0
 	global	??_enable
 ??_enable:	; 0 bytes @ 0x0
+	global	??_lcdport
+??_lcdport:	; 0 bytes @ 0x0
 	global	??_SoftWareUart_Init
 ??_SoftWareUart_Init:	; 0 bytes @ 0x0
 	global	??_softreceive
 ??_softreceive:	; 0 bytes @ 0x0
-	global	?___lbdiv
-?___lbdiv:	; 1 bytes @ 0x0
-	global	?___lbmod
-?___lbmod:	; 1 bytes @ 0x0
+	global	??_receive
+??_receive:	; 0 bytes @ 0x0
+	global	??_transmit
+??_transmit:	; 0 bytes @ 0x0
+	global	??_uart_init
+??_uart_init:	; 0 bytes @ 0x0
 	global	?_strcmp
 ?_strcmp:	; 2 bytes @ 0x0
 	global	?_memcmp
@@ -1432,12 +1517,10 @@ __pcstackBANK0:
 ?___awmod:	; 2 bytes @ 0x0
 	global	lcdport@a
 lcdport@a:	; 1 bytes @ 0x0
+	global	transmit@data
+transmit@data:	; 1 bytes @ 0x0
 	global	strcmp@s2
 strcmp@s2:	; 1 bytes @ 0x0
-	global	___lbdiv@divisor
-___lbdiv@divisor:	; 1 bytes @ 0x0
-	global	___lbmod@divisor
-___lbmod@divisor:	; 1 bytes @ 0x0
 	global	memcmp@s1
 memcmp@s1:	; 2 bytes @ 0x0
 	global	___lwmod@divisor
@@ -1445,158 +1528,210 @@ ___lwmod@divisor:	; 2 bytes @ 0x0
 	global	___awmod@divisor
 ___awmod@divisor:	; 2 bytes @ 0x0
 	ds	1
-	global	??___lbmod
-??___lbmod:	; 0 bytes @ 0x1
-	global	softreceive@Data
-softreceive@Data:	; 1 bytes @ 0x1
-	global	___lbdiv@dividend
-___lbdiv@dividend:	; 1 bytes @ 0x1
+	global	?_usartstring
+?_usartstring:	; 0 bytes @ 0x1
+	global	DelayMs@cnt
+DelayMs@cnt:	; 1 bytes @ 0x1
+	global	usartstring@st
+usartstring@st:	; 2 bytes @ 0x1
 	ds	1
 	global	??_strcmp
 ??_strcmp:	; 0 bytes @ 0x2
-	global	lcdcmd@y
-lcdcmd@y:	; 1 bytes @ 0x2
-	global	lcddata@y
-lcddata@y:	; 1 bytes @ 0x2
-	global	softreceive@mask
-softreceive@mask:	; 1 bytes @ 0x2
-	global	eeprom_read@addr
-eeprom_read@addr:	; 1 bytes @ 0x2
+	global	??_lcdcmd
+??_lcdcmd:	; 0 bytes @ 0x2
+	global	??_lcddata
+??_lcddata:	; 0 bytes @ 0x2
+	global	DelayMs@i
+DelayMs@i:	; 1 bytes @ 0x2
+	global	softreceive@Data
+softreceive@Data:	; 1 bytes @ 0x2
 	global	memcmp@s2
 memcmp@s2:	; 1 bytes @ 0x2
-	global	___lbdiv@counter
-___lbdiv@counter:	; 1 bytes @ 0x2
-	global	___lbmod@dividend
-___lbmod@dividend:	; 1 bytes @ 0x2
 	global	___lwmod@dividend
 ___lwmod@dividend:	; 2 bytes @ 0x2
 	global	___awmod@dividend
 ___awmod@dividend:	; 2 bytes @ 0x2
 	ds	1
-	global	?___wmul
-?___wmul:	; 2 bytes @ 0x3
-	global	lcdcmd@z
-lcdcmd@z:	; 1 bytes @ 0x3
-	global	lcddata@z
-lcddata@z:	; 1 bytes @ 0x3
-	global	___lbdiv@quotient
-___lbdiv@quotient:	; 1 bytes @ 0x3
-	global	___lbmod@counter
-___lbmod@counter:	; 1 bytes @ 0x3
-	global	RFID_read@i
-RFID_read@i:	; 2 bytes @ 0x3
+	global	??_DelayS
+??_DelayS:	; 0 bytes @ 0x3
+	global	??_usartstring
+??_usartstring:	; 0 bytes @ 0x3
+	global	??_SendStock
+??_SendStock:	; 0 bytes @ 0x3
+	global	softreceive@mask
+softreceive@mask:	; 1 bytes @ 0x3
+	global	SendStock@d
+SendStock@d:	; 1 bytes @ 0x3
+	global	eeprom_read@addr
+eeprom_read@addr:	; 1 bytes @ 0x3
 	global	memcmp@n
 memcmp@n:	; 2 bytes @ 0x3
-	global	___wmul@multiplier
-___wmul@multiplier:	; 2 bytes @ 0x3
 	ds	1
-	global	lcdcmd@a
-lcdcmd@a:	; 1 bytes @ 0x4
-	global	lcddata@a
-lcddata@a:	; 1 bytes @ 0x4
+	global	??_RFID_read
+??_RFID_read:	; 0 bytes @ 0x4
+	global	??___lwmod
+??___lwmod:	; 0 bytes @ 0x4
+	global	??___awmod
+??___awmod:	; 0 bytes @ 0x4
+	global	?___wmul
+?___wmul:	; 2 bytes @ 0x4
+	global	DelayS@cnt
+DelayS@cnt:	; 1 bytes @ 0x4
+	global	lcdcmd@y
+lcdcmd@y:	; 1 bytes @ 0x4
+	global	lcddata@y
+lcddata@y:	; 1 bytes @ 0x4
 	global	strcmp@r
 strcmp@r:	; 1 bytes @ 0x4
-	global	___lwmod@counter
-___lwmod@counter:	; 1 bytes @ 0x4
-	global	___lbmod@rem
-___lbmod@rem:	; 1 bytes @ 0x4
-	global	___awmod@counter
-___awmod@counter:	; 1 bytes @ 0x4
+	global	___wmul@multiplier
+___wmul@multiplier:	; 2 bytes @ 0x4
 	ds	1
 	global	??_memcmp
 ??_memcmp:	; 0 bytes @ 0x5
-	global	??_lcd_init
-??_lcd_init:	; 0 bytes @ 0x5
-	global	?_lcdstring
-?_lcdstring:	; 0 bytes @ 0x5
-	global	?_DisplaySugar
-?_DisplaySugar:	; 0 bytes @ 0x5
-	global	?_DisplayRise
-?_DisplayRise:	; 0 bytes @ 0x5
-	global	?_DisplayKerosene
-?_DisplayKerosene:	; 0 bytes @ 0x5
-	global	?___lwdiv
-?___lwdiv:	; 2 bytes @ 0x5
-	global	DisplaySugar@Sugar
-DisplaySugar@Sugar:	; 1 bytes @ 0x5
-	global	DisplayRise@Rise
-DisplayRise@Rise:	; 1 bytes @ 0x5
-	global	DisplayKerosene@Kerosene
-DisplayKerosene@Kerosene:	; 1 bytes @ 0x5
+	global	DelayS@i
+DelayS@i:	; 1 bytes @ 0x5
+	global	lcdcmd@z
+lcdcmd@z:	; 1 bytes @ 0x5
+	global	lcddata@z
+lcddata@z:	; 1 bytes @ 0x5
 	global	strcmp@s1
 strcmp@s1:	; 1 bytes @ 0x5
+	global	___lwmod@counter
+___lwmod@counter:	; 1 bytes @ 0x5
+	global	___awmod@counter
+___awmod@counter:	; 1 bytes @ 0x5
+	global	RFID_read@i
+RFID_read@i:	; 2 bytes @ 0x5
+	ds	1
+	global	?___lwdiv
+?___lwdiv:	; 2 bytes @ 0x6
+	global	lcdcmd@a
+lcdcmd@a:	; 1 bytes @ 0x6
+	global	lcddata@a
+lcddata@a:	; 1 bytes @ 0x6
 	global	___awmod@sign
-___awmod@sign:	; 1 bytes @ 0x5
-	global	lcdstring@a
-lcdstring@a:	; 2 bytes @ 0x5
+___awmod@sign:	; 1 bytes @ 0x6
 	global	___wmul@multiplicand
-___wmul@multiplicand:	; 2 bytes @ 0x5
+___wmul@multiplicand:	; 2 bytes @ 0x6
 	global	___lwdiv@divisor
-___lwdiv@divisor:	; 2 bytes @ 0x5
+___lwdiv@divisor:	; 2 bytes @ 0x6
 	ds	1
+	global	??_lcd_init
+??_lcd_init:	; 0 bytes @ 0x7
+	global	?_lcdstring
+?_lcdstring:	; 0 bytes @ 0x7
 	global	?___awdiv
-?___awdiv:	; 2 bytes @ 0x6
-	global	DisplaySugar@Location
-DisplaySugar@Location:	; 1 bytes @ 0x6
-	global	DisplayRise@Location
-DisplayRise@Location:	; 1 bytes @ 0x6
-	global	DisplayKerosene@Location
-DisplayKerosene@Location:	; 1 bytes @ 0x6
+?___awdiv:	; 2 bytes @ 0x7
+	global	lcdstring@a
+lcdstring@a:	; 2 bytes @ 0x7
 	global	___awdiv@divisor
-___awdiv@divisor:	; 2 bytes @ 0x6
+___awdiv@divisor:	; 2 bytes @ 0x7
 	ds	1
-	global	??_startup
-??_startup:	; 0 bytes @ 0x7
+	global	??___wmul
+??___wmul:	; 0 bytes @ 0x8
 	global	___wmul@product
-___wmul@product:	; 2 bytes @ 0x7
+___wmul@product:	; 2 bytes @ 0x8
 	global	___lwdiv@dividend
-___lwdiv@dividend:	; 2 bytes @ 0x7
+___lwdiv@dividend:	; 2 bytes @ 0x8
 	ds	1
+	global	??_lcdstring
+??_lcdstring:	; 0 bytes @ 0x9
+	global	??_gsm_init
+??_gsm_init:	; 0 bytes @ 0x9
+	global	??_startup
+??_startup:	; 0 bytes @ 0x9
+	global	gsm_init@d
+gsm_init@d:	; 1 bytes @ 0x9
 	global	___awdiv@dividend
-___awdiv@dividend:	; 2 bytes @ 0x8
+___awdiv@dividend:	; 2 bytes @ 0x9
 	ds	1
+	global	??_ReadAmnt
+??_ReadAmnt:	; 0 bytes @ 0xA
+	global	??_ReadStock
+??_ReadStock:	; 0 bytes @ 0xA
+	global	??_paramter
+??_paramter:	; 0 bytes @ 0xA
+	global	??___lwdiv
+??___lwdiv:	; 0 bytes @ 0xA
+	ds	1
+	global	??___awdiv
+??___awdiv:	; 0 bytes @ 0xB
 	global	___lwdiv@quotient
-___lwdiv@quotient:	; 2 bytes @ 0x9
+___lwdiv@quotient:	; 2 bytes @ 0xB
 	ds	1
 	global	___awdiv@counter
-___awdiv@counter:	; 1 bytes @ 0xA
+___awdiv@counter:	; 1 bytes @ 0xC
 	ds	1
 	global	___lwdiv@counter
-___lwdiv@counter:	; 1 bytes @ 0xB
+___lwdiv@counter:	; 1 bytes @ 0xD
 	global	___awdiv@sign
-___awdiv@sign:	; 1 bytes @ 0xB
+___awdiv@sign:	; 1 bytes @ 0xD
 	ds	1
+	global	??_LoadStockToArray
+??_LoadStockToArray:	; 0 bytes @ 0xE
 	global	___awdiv@quotient
-___awdiv@quotient:	; 2 bytes @ 0xC
-	global	_LoadStockToArray$1137
-_LoadStockToArray$1137:	; 2 bytes @ 0xC
-	ds	2
-	global	?_eeprom_write
-?_eeprom_write:	; 0 bytes @ 0xE
-	global	?_DisplayAmnt
-?_DisplayAmnt:	; 0 bytes @ 0xE
-	global	eeprom_write@value
-eeprom_write@value:	; 1 bytes @ 0xE
-	global	DisplayAmnt@Amnt
-DisplayAmnt@Amnt:	; 2 bytes @ 0xE
+___awdiv@quotient:	; 2 bytes @ 0xE
 	ds	1
+	global	_LoadStockToArray$1138
+_LoadStockToArray$1138:	; 2 bytes @ 0xF
+	ds	1
+	global	?_eeprom_write
+?_eeprom_write:	; 0 bytes @ 0x10
+	global	?_DisplayAmnt
+?_DisplayAmnt:	; 0 bytes @ 0x10
+	global	?_DisplaySugar
+?_DisplaySugar:	; 0 bytes @ 0x10
+	global	?_DisplayRise
+?_DisplayRise:	; 0 bytes @ 0x10
+	global	?_DisplayKerosene
+?_DisplayKerosene:	; 0 bytes @ 0x10
+	global	DisplaySugar@Sugar
+DisplaySugar@Sugar:	; 1 bytes @ 0x10
+	global	DisplayRise@Rise
+DisplayRise@Rise:	; 1 bytes @ 0x10
+	global	DisplayKerosene@Kerosene
+DisplayKerosene@Kerosene:	; 1 bytes @ 0x10
+	global	eeprom_write@value
+eeprom_write@value:	; 1 bytes @ 0x10
+	global	DisplayAmnt@Amnt
+DisplayAmnt@Amnt:	; 2 bytes @ 0x10
+	ds	1
+	global	??_eeprom_write
+??_eeprom_write:	; 0 bytes @ 0x11
+	global	??_DisplaySugar
+??_DisplaySugar:	; 0 bytes @ 0x11
+	global	??_DisplayRise
+??_DisplayRise:	; 0 bytes @ 0x11
+	global	??_DisplayKerosene
+??_DisplayKerosene:	; 0 bytes @ 0x11
+	ds	1
+	global	??_DisplayAmnt
+??_DisplayAmnt:	; 0 bytes @ 0x12
 	global	eeprom_write@addr
-eeprom_write@addr:	; 1 bytes @ 0xF
+eeprom_write@addr:	; 1 bytes @ 0x12
+	global	_DisplayAmnt$1137
+_DisplayAmnt$1137:	; 2 bytes @ 0x12
+	ds	1
+	global	DisplaySugar@Location
+DisplaySugar@Location:	; 1 bytes @ 0x13
+	global	DisplayRise@Location
+DisplayRise@Location:	; 1 bytes @ 0x13
+	global	DisplayKerosene@Location
+DisplayKerosene@Location:	; 1 bytes @ 0x13
 	ds	1
 	global	DisplayAmnt@Location
-DisplayAmnt@Location:	; 1 bytes @ 0x10
+DisplayAmnt@Location:	; 1 bytes @ 0x14
 	ds	1
-	global	_DisplayAmnt$1136
-_DisplayAmnt$1136:	; 2 bytes @ 0x11
-	ds	2
+	global	??_DisplayStock
+??_DisplayStock:	; 0 bytes @ 0x15
 	global	??_main
-??_main:	; 0 bytes @ 0x13
+??_main:	; 0 bytes @ 0x15
 	ds	3
-;;Data sizes: Strings 658, constant 11, data 39, bss 72, persistent 0 stack 0
+;;Data sizes: Strings 658, constant 22, data 43, bss 93, persistent 0 stack 0
 ;;Auto spaces:   Size  Autos    Used
-;; COMMON          14      6       8
-;; BANK0           80     22      73
-;; BANK1           80      0      59
+;; COMMON          14      8      14
+;; BANK0           80     24      79
+;; BANK1           80      0      76
 ;; BANK3           96      0       0
 ;; BANK2           96      0       0
 
@@ -1618,10 +1753,10 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;; ?___awdiv	int  size(1) Largest target is 0
 ;;
 ;; strcmp@s2	PTR const unsigned char  size(1) Largest target is 13
-;;		 -> User3(BANK1[13]), User2(BANK1[13]), User1(BANK1[13]), 
+;;		 -> User3(BANK1[13]), User2(BANK1[13]), User1(BANK0[13]), 
 ;;
 ;; strcmp@s1	PTR const unsigned char  size(1) Largest target is 15
-;;		 -> card_store(BANK0[15]), 
+;;		 -> card_store(BANK1[15]), 
 ;;
 ;; memcmp@s2	PTR const void  size(1) Largest target is 20
 ;;		 -> sms(BANK1[20]), 
@@ -1631,6 +1766,15 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;
 ;; gsm_read_line2@buffer	PTR unsigned char  size(1) Largest target is 20
 ;;		 -> sms(BANK1[20]), 
+;;
+;; usartstring@st	PTR const unsigned char  size(2) Largest target is 29
+;;		 -> STR_33(CODE[5]), STR_32(CODE[16]), STR_31(CODE[5]), STR_30(CODE[13]), 
+;;		 -> STR_29(CODE[5]), STR_28(CODE[12]), STR_27(CODE[24]), KeroseneArray(BANK0[4]), 
+;;		 -> SugarArray(BANK0[4]), RiseArray(BANK0[5]), STR_18(CODE[20]), STR_17(CODE[24]), 
+;;		 -> STR_16(CODE[20]), STR_15(CODE[24]), STR_14(CODE[20]), STR_13(CODE[24]), 
+;;		 -> STR_12(CODE[29]), STR_11(CODE[24]), STR_10(CODE[27]), STR_9(CODE[24]), 
+;;		 -> STR_7(CODE[19]), STR_6(CODE[11]), STR_5(CODE[11]), STR_4(CODE[10]), 
+;;		 -> STR_3(CODE[4]), 
 ;;
 ;; lcdstring@a	PTR const unsigned char  size(2) Largest target is 22
 ;;		 -> STR_56(CODE[18]), STR_55(CODE[18]), STR_54(CODE[18]), STR_53(CODE[21]), 
@@ -1659,18 +1803,14 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;   _main->_DisplayAmnt
 ;;   _startup->_lcdstring
 ;;   _DisplayStock->_DisplayAmnt
-;;   _DisplayKerosene->_lcdcmd
-;;   _DisplayKerosene->_lcddata
-;;   _DisplayKerosene->___lbmod
-;;   _DisplayRise->_lcdcmd
-;;   _DisplayRise->_lcddata
-;;   _DisplayRise->___lbmod
-;;   _DisplaySugar->_lcdcmd
-;;   _DisplaySugar->_lcddata
-;;   _DisplaySugar->___lbmod
+;;   _gsm_init->_lcdstring
+;;   _DisplayKerosene->___awdiv
+;;   _DisplayRise->___awdiv
+;;   _DisplaySugar->___awdiv
 ;;   _DisplayAmnt->___awdiv
 ;;   _lcdstring->_lcddata
 ;;   _lcd_init->_lcdcmd
+;;   _SendStock->_usartstring
 ;;   _RFID_read->_softreceive
 ;;   _lcddata->_enable
 ;;   _lcdcmd->_enable
@@ -1678,6 +1818,8 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;   _paramter->___wmul
 ;;   _ReadStock->___wmul
 ;;   _ReadAmnt->___wmul
+;;   _usartstring->_transmit
+;;   _DelayS->_DelayMs
 ;;   ___awdiv->___awmod
 ;;   ___lwdiv->___lwmod
 ;;   ___wmul->_eeprom_read
@@ -1721,13 +1863,14 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;; ---------------------------------------------------------------------------------
 ;; (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;; ---------------------------------------------------------------------------------
-;; (0) _main                                                 3     3      0   11051
-;;                                             19 BANK0      3     3      0
+;; (0) _main                                                 3     3      0    9611
+;;                                             21 BANK0      3     3      0
 ;;                          _uart_init
 ;;                           _lcd_init
 ;;                           _paramter
 ;;                  _SoftWareUart_Init
 ;;                            _startup
+;;                           _gsm_init
 ;;                          _ReadStock
 ;;                          _lcdstring
 ;;                             _lcdcmd
@@ -1746,87 +1889,110 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;                   _LoadStockToArray
 ;;                       _DisplayStock
 ;;                             _memcmp
+;;                          _SendStock
 ;; ---------------------------------------------------------------------------------
-;; (1) _startup                                              3     3      0     585
-;;                                              7 BANK0      3     3      0
+;; (1) _startup                                              3     3      0     401
+;;                                              9 BANK0      3     3      0
 ;;                             _lcdcmd
 ;;                          _lcdstring
 ;; ---------------------------------------------------------------------------------
-;; (1) _DisplayStock                                         0     0      0    2027
+;; (1) _DisplayStock                                         0     0      0    1486
 ;;                             _lcdcmd
 ;;                          _lcdstring
 ;;                        _DisplayAmnt
 ;; ---------------------------------------------------------------------------------
-;; (1) _DisplayKerosene                                      2     1      1    1086
-;;                                              5 BANK0      2     1      1
+;; (1) _gsm_init                                             1     1      0     585
+;;                                              9 BANK0      1     1      0
 ;;                             _lcdcmd
-;;                            ___lbdiv
-;;                            _lcddata
-;;                            ___lbmod
+;;                          _lcdstring
+;;                             _DelayS
+;;                        _usartstring
+;;                           _transmit
+;;                            _receive
 ;; ---------------------------------------------------------------------------------
-;; (1) _DisplayRise                                          2     1      1    1086
-;;                                              5 BANK0      2     1      1
-;;                             _lcdcmd
-;;                            ___lbdiv
-;;                            _lcddata
-;;                            ___lbmod
-;; ---------------------------------------------------------------------------------
-;; (1) _DisplaySugar                                         2     1      1    1086
-;;                                              5 BANK0      2     1      1
-;;                             _lcdcmd
-;;                            ___lbdiv
-;;                            _lcddata
-;;                            ___lbmod
-;; ---------------------------------------------------------------------------------
-;; (2) _DisplayAmnt                                          5     3      2    1442
-;;                                             14 BANK0      5     3      2
+;; (1) _DisplayKerosene                                      4     3      1    1018
+;;                                             16 BANK0      4     3      1
 ;;                             _lcdcmd
 ;;                            ___awdiv
 ;;                            _lcddata
 ;;                            ___awmod
 ;; ---------------------------------------------------------------------------------
-;; (2) _lcdstring                                            2     0      2     325
-;;                                              5 BANK0      2     0      2
+;; (1) _DisplayRise                                          4     3      1    1018
+;;                                             16 BANK0      4     3      1
+;;                             _lcdcmd
+;;                            ___awdiv
+;;                            _lcddata
+;;                            ___awmod
+;; ---------------------------------------------------------------------------------
+;; (1) _DisplaySugar                                         4     3      1    1018
+;;                                             16 BANK0      4     3      1
+;;                             _lcdcmd
+;;                            ___awdiv
+;;                            _lcddata
+;;                            ___awmod
+;; ---------------------------------------------------------------------------------
+;; (2) _DisplayAmnt                                          5     3      2    1085
+;;                                             16 BANK0      5     3      2
+;;                             _lcdcmd
+;;                            ___awdiv
+;;                            _lcddata
+;;                            ___awmod
+;; ---------------------------------------------------------------------------------
+;; (2) _lcdstring                                            2     0      2     223
+;;                                              7 BANK0      2     0      2
 ;;                            _lcddata
 ;; ---------------------------------------------------------------------------------
-;; (1) _lcd_init                                             2     2      0     384
-;;                                              5 BANK0      2     2      0
+;; (1) _lcd_init                                             2     2      0     266
+;;                                              7 BANK0      2     2      0
 ;;                            _lcdport
 ;;                             _lcdcmd
 ;; ---------------------------------------------------------------------------------
-;; (1) _RFID_read                                            2     2      0     235
-;;                                              3 BANK0      2     2      0
+;; (1) _SendStock                                            1     1      0      91
+;;                                              3 BANK0      1     1      0
+;;                        _usartstring
+;;                           _transmit
+;;                            _receive
+;; ---------------------------------------------------------------------------------
+;; (1) _RFID_read                                            3     3      0     204
+;;                                              4 BANK0      3     3      0
 ;;                        _softreceive
 ;; ---------------------------------------------------------------------------------
-;; (3) _lcddata                                              3     3      0     260
-;;                                              2 BANK0      3     3      0
+;; (3) _lcddata                                              5     5      0     178
+;;                                              2 BANK0      5     5      0
 ;;                            _lcdport
 ;;                             _enable
 ;; ---------------------------------------------------------------------------------
-;; (3) _lcdcmd                                               3     3      0     260
-;;                                              2 BANK0      3     3      0
+;; (3) _lcdcmd                                               5     5      0     178
+;;                                              2 BANK0      5     5      0
 ;;                            _lcdport
 ;;                             _enable
 ;; ---------------------------------------------------------------------------------
-;; (1) _LoadStockToArray                                     6     6      0     700
-;;                                             12 BANK0      2     2      0
+;; (1) _LoadStockToArray                                     7     7      0     528
+;;                                             14 BANK0      3     3      0
 ;;                            ___lwdiv
 ;;                            ___lwmod
 ;; ---------------------------------------------------------------------------------
-;; (1) _paramter                                             0     0      0     123
+;; (1) _paramter                                             3     3      0     114
+;;                                             10 BANK0      3     3      0
 ;;                        _eeprom_read
 ;;                             ___wmul
 ;; ---------------------------------------------------------------------------------
-;; (1) _ReadStock                                            0     0      0     123
+;; (1) _ReadStock                                            3     3      0     114
+;;                                             10 BANK0      3     3      0
 ;;                        _eeprom_read
 ;;                             ___wmul
 ;; ---------------------------------------------------------------------------------
-;; (1) _ReadAmnt                                             0     0      0     123
+;; (1) _ReadAmnt                                             3     3      0     114
+;;                                             10 BANK0      3     3      0
 ;;                        _eeprom_read
 ;;                             ___wmul
 ;; ---------------------------------------------------------------------------------
-;; (2) _softreceive                                          3     3      0     136
-;;                                              0 BANK0      3     3      0
+;; (2) _usartstring                                          2     0      2      67
+;;                                              1 BANK0      2     0      2
+;;                           _transmit
+;; ---------------------------------------------------------------------------------
+;; (2) _softreceive                                          4     4      0     136
+;;                                              0 BANK0      4     4      0
 ;; ---------------------------------------------------------------------------------
 ;; (1) _SoftWareUart_Init                                    1     1      0       0
 ;;                                              0 BANK0      1     1      0
@@ -1834,64 +2000,70 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;; (4) _enable                                               2     2      0       0
 ;;                                              0 BANK0      2     2      0
 ;; ---------------------------------------------------------------------------------
-;; (3) ___awmod                                              6     2      4     433
-;;                                              0 BANK0      6     2      4
+;; (2) _DelayS                                               3     3      0      90
+;;                                              3 BANK0      3     3      0
+;;                            _DelayMs
 ;; ---------------------------------------------------------------------------------
-;; (3) ___awdiv                                              8     4      4     300
-;;                                              6 BANK0      8     4      4
+;; (3) ___awmod                                              7     3      4     296
+;;                                              0 BANK0      7     3      4
+;; ---------------------------------------------------------------------------------
+;; (3) ___awdiv                                              9     5      4     300
+;;                                              7 BANK0      9     5      4
 ;;                            ___awmod (ARG)
 ;; ---------------------------------------------------------------------------------
-;; (2) ___lbmod                                              5     4      1     232
-;;                                              0 BANK0      5     4      1
+;; (2) ___lwmod                                              6     2      4     159
+;;                                              0 BANK0      6     2      4
 ;; ---------------------------------------------------------------------------------
-;; (2) ___lbdiv                                              4     3      1     241
-;;                                              0 BANK0      4     3      1
-;; ---------------------------------------------------------------------------------
-;; (2) ___lwmod                                              5     1      4     232
-;;                                              0 BANK0      5     1      4
-;; ---------------------------------------------------------------------------------
-;; (2) ___lwdiv                                              7     3      4     162
-;;                                              5 BANK0      7     3      4
+;; (2) ___lwdiv                                              8     4      4     162
+;;                                              6 BANK0      8     4      4
 ;;                            ___lwmod (ARG)
 ;; ---------------------------------------------------------------------------------
 ;; (2) ___wmul                                               6     2      4      92
-;;                                              3 BANK0      6     2      4
+;;                                              4 BANK0      6     2      4
 ;;                        _eeprom_read (ARG)
 ;; ---------------------------------------------------------------------------------
-;; (1) _memcmp                                               6     1      5     168
-;;                                              0 BANK0      6     1      5
+;; (1) _memcmp                                               7     2      5     118
+;;                                              0 BANK0      7     2      5
 ;; ---------------------------------------------------------------------------------
-;; (1) _eeprom_write                                         2     1      1      44
-;;                                             14 BANK0      2     1      1
+;; (1) _eeprom_write                                         3     2      1      44
+;;                                             16 BANK0      3     2      1
 ;;                            ___lwdiv (ARG)
 ;;                            ___lwmod (ARG)
 ;;                            ___awdiv (ARG)
 ;;                            ___awmod (ARG)
 ;; ---------------------------------------------------------------------------------
-;; (1) _strcmp                                               6     4      2     127
+;; (1) _strcmp                                               6     4      2      89
 ;;                                              0 BANK0      6     4      2
 ;; ---------------------------------------------------------------------------------
 ;; (1) _uart_init                                            0     0      0       0
 ;; ---------------------------------------------------------------------------------
-;; (2) _eeprom_read                                          3     3      0      31
-;;                                              0 BANK0      3     3      0
+;; (2) _eeprom_read                                          4     4      0      22
+;;                                              0 BANK0      4     4      0
 ;; ---------------------------------------------------------------------------------
-;; (4) _lcdport                                              1     1      0     124
+;; (2) _transmit                                             1     1      0      22
 ;;                                              0 BANK0      1     1      0
+;; ---------------------------------------------------------------------------------
+;; (2) _receive                                              0     0      0       0
+;; ---------------------------------------------------------------------------------
+;; (4) _lcdport                                              1     1      0      88
+;;                                              0 BANK0      1     1      0
+;; ---------------------------------------------------------------------------------
+;; (3) _DelayMs                                              3     3      0      45
+;;                                              0 BANK0      3     3      0
 ;; ---------------------------------------------------------------------------------
 ;; Estimated maximum stack depth 4
 ;; ---------------------------------------------------------------------------------
 ;; (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;; ---------------------------------------------------------------------------------
-;; (5) _ISR                                                  3     3      0     138
-;;                                              3 COMMON     3     3      0
+;; (5) _ISR                                                  4     4      0     138
+;;                                              4 COMMON     4     4      0
 ;;                     _gsm_read_line2
 ;; ---------------------------------------------------------------------------------
-;; (6) _gsm_read_line2                                       3     3      0     138
-;;                                              0 COMMON     3     3      0
-;;                            _receive
+;; (6) _gsm_read_line2                                       4     4      0     138
+;;                                              0 COMMON     4     4      0
+;;                          i1_receive
 ;; ---------------------------------------------------------------------------------
-;; (7) _receive                                              0     0      0       0
+;; (7) i1_receive                                            0     0      0       0
 ;; ---------------------------------------------------------------------------------
 ;; Estimated maximum stack depth 7
 ;; ---------------------------------------------------------------------------------
@@ -1918,6 +2090,20 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;       _lcddata
 ;;         _lcdport
 ;;         _enable
+;;   _gsm_init
+;;     _lcdcmd
+;;       _lcdport
+;;       _enable
+;;     _lcdstring
+;;       _lcddata
+;;         _lcdport
+;;         _enable
+;;     _DelayS
+;;       _DelayMs
+;;     _usartstring
+;;       _transmit
+;;     _transmit
+;;     _receive
 ;;   _ReadStock
 ;;     _eeprom_read
 ;;     ___wmul
@@ -1950,29 +2136,32 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;     _lcdcmd
 ;;       _lcdport
 ;;       _enable
-;;     ___lbdiv
+;;     ___awdiv
+;;       ___awmod (ARG)
 ;;     _lcddata
 ;;       _lcdport
 ;;       _enable
-;;     ___lbmod
+;;     ___awmod
 ;;   _DisplaySugar
 ;;     _lcdcmd
 ;;       _lcdport
 ;;       _enable
-;;     ___lbdiv
+;;     ___awdiv
+;;       ___awmod (ARG)
 ;;     _lcddata
 ;;       _lcdport
 ;;       _enable
-;;     ___lbmod
+;;     ___awmod
 ;;   _DisplayKerosene
 ;;     _lcdcmd
 ;;       _lcdport
 ;;       _enable
-;;     ___lbdiv
+;;     ___awdiv
+;;       ___awmod (ARG)
 ;;     _lcddata
 ;;       _lcdport
 ;;       _enable
-;;     ___lbmod
+;;     ___awmod
 ;;   ___lwdiv
 ;;     ___lwmod (ARG)
 ;;   _eeprom_write
@@ -2009,10 +2198,15 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;         _enable
 ;;       ___awmod
 ;;   _memcmp
+;;   _SendStock
+;;     _usartstring
+;;       _transmit
+;;     _transmit
+;;     _receive
 ;;
 ;; _ISR (ROOT)
 ;;   _gsm_read_line2
-;;     _receive
+;;     i1_receive
 ;;
 
 ;; Address spaces:
@@ -2028,18 +2222,18 @@ _DisplayAmnt$1136:	; 2 bytes @ 0x11
 ;;BITSFR2              0      0       0       5        0.0%
 ;;SFR1                 0      0       0       2        0.0%
 ;;BITSFR1              0      0       0       2        0.0%
-;;BANK1               50      0      3B       7       73.8%
+;;BANK1               50      0      4C       7       95.0%
 ;;BITBANK1            50      0       0       6        0.0%
 ;;CODE                 0      0       0       0        0.0%
-;;DATA                 0      0      96      12        0.0%
-;;ABS                  0      0      8C       3        0.0%
+;;DATA                 0      0      B3      12        0.0%
+;;ABS                  0      0      A9       3        0.0%
 ;;NULL                 0      0       0       0        0.0%
 ;;STACK                0      0       A       2        0.0%
-;;BANK0               50     16      49       5       91.3%
+;;BANK0               50     18      4F       5       98.8%
 ;;BITBANK0            50      0       0       4        0.0%
 ;;SFR0                 0      0       0       1        0.0%
 ;;BITSFR0              0      0       0       1        0.0%
-;;COMMON               E      6       8       1       57.1%
+;;COMMON               E      8       E       1      100.0%
 ;;BITCOMMON            E      0       1       0        7.1%
 ;;EEDATA             100      0       0       0        0.0%
 
@@ -2061,7 +2255,7 @@ __pmaintext:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
 ;;		On entry : 17F/0
-;;		On exit  : 60/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
@@ -2076,6 +2270,7 @@ __pmaintext:
 ;;		_paramter
 ;;		_SoftWareUart_Init
 ;;		_startup
+;;		_gsm_init
 ;;		_ReadStock
 ;;		_lcdstring
 ;;		_lcdcmd
@@ -2094,6 +2289,7 @@ __pmaintext:
 ;;		_LoadStockToArray
 ;;		_DisplayStock
 ;;		_memcmp
+;;		_SendStock
 ;; This function is called by:
 ;;		Startup code after reset
 ;; This function uses a non-reentrant model
@@ -2109,7 +2305,7 @@ _main:
 ; Regs used in _main: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	215
 	
-l4380:	
+l4748:	
 ;Main.c: 215: ANSEL=0x00;
 	bsf	status, 5	;RP0=1, select bank3
 	bsf	status, 6	;RP1=1, select bank3
@@ -2119,86 +2315,102 @@ l4380:
 	clrf	(393)^0180h	;volatile
 	line	217
 	
-l4382:	
+l4750:	
 ;Main.c: 217: TRISD=0X01;
 	movlw	(01h)
+	bsf	status, 5	;RP0=1, select bank1
 	bcf	status, 6	;RP1=0, select bank1
 	movwf	(136)^080h	;volatile
 	line	218
 	
-l4384:	
+l4752:	
 ;Main.c: 218: PORTD=0X00;
 	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	clrf	(8)	;volatile
 	line	219
 ;Main.c: 219: TRISC=0X8F;
 	movlw	(08Fh)
 	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
 	movwf	(135)^080h	;volatile
 	line	220
 	
-l4386:	
+l4754:	
 ;Main.c: 220: PORTC=0X00;
 	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	clrf	(7)	;volatile
 	line	221
 	
-l4388:	
+l4756:	
 ;Main.c: 221: INTCON=0xC0;
 	movlw	(0C0h)
 	movwf	(11)	;volatile
 	line	222
 	
-l4390:	
+l4758:	
 ;Main.c: 222: uart_init();
 	fcall	_uart_init
 	line	223
 	
-l4392:	
+l4760:	
 ;Main.c: 223: lcd_init();
 	fcall	_lcd_init
 	line	224
 	
-l4394:	
+l4762:	
 ;Main.c: 224: paramter();
 	fcall	_paramter
 	line	225
 	
-l4396:	
+l4764:	
 ;Main.c: 225: SoftWareUart_Init();
 	fcall	_SoftWareUart_Init
 	line	226
 	
-l4398:	
+l4766:	
 ;Main.c: 226: startup();
 	fcall	_startup
+	line	227
+	
+l4768:	
+;Main.c: 227: gsm_init();
+	fcall	_gsm_init
 	line	228
 	
-l4400:	
+l4770:	
 ;Main.c: 228: PIE1=0x20;
 	movlw	(020h)
 	bsf	status, 5	;RP0=1, select bank1
 	bcf	status, 6	;RP1=0, select bank1
 	movwf	(140)^080h	;volatile
+	goto	l4772
+	line	230
+;Main.c: 230: while(1)
+	
+l1158:	
 	line	232
 	
-l4402:	
+l4772:	
 ;Main.c: 231: {
 ;Main.c: 232: ReadStock();
 	fcall	_ReadStock
 	line	233
 	
-l4404:	
+l4774:	
 ;Main.c: 233: if(!RC0)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	btfsc	(56/8),(56)&7
-	goto	u1621
-	goto	u1620
-u1621:
-	goto	l4416
-u1620:
+	goto	u3771
+	goto	u3770
+u3771:
+	goto	l4786
+u3770:
 	line	235
 	
-l4406:	
+l4776:	
 ;Main.c: 234: {
 ;Main.c: 235: lcdstring("PLEASE TAP YOUR  ");
 	movlw	low(STR_34|8000h)
@@ -2208,156 +2420,231 @@ l4406:
 	fcall	_lcdstring
 	line	236
 	
-l4408:	
+l4778:	
 ;Main.c: 236: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	237
 	
-l4410:	
+l4780:	
 ;Main.c: 237: lcdstring("SMART CARD       ");
 	movlw	low(STR_35|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_35|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	238
 	
-l4412:	
+l4782:	
 ;Main.c: 238: _delay((unsigned long)((200)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  6
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
 movlw	14
 movwf	((??_main+0)+0+1),f
 	movlw	176
 movwf	((??_main+0)+0),f
-u1717:
+u3867:
 	decfsz	((??_main+0)+0),f
-	goto	u1717
+	goto	u3867
 	decfsz	((??_main+0)+0+1),f
-	goto	u1717
+	goto	u3867
 	decfsz	((??_main+0)+0+2),f
-	goto	u1717
+	goto	u3867
 opt asmopt_on
 
 	line	239
 	
-l4414:	
+l4784:	
 ;Main.c: 239: rfid_flag=0;
 	bcf	(_rfid_flag/8),(_rfid_flag)&7
+	goto	l4786
+	line	240
+	
+l1159:	
 	line	241
 	
-l4416:	
+l4786:	
 ;Main.c: 240: }
 ;Main.c: 241: RFID_read();
 	fcall	_RFID_read
 	line	242
 	
-l4418:	
+l4788:	
 ;Main.c: 242: lcdcmd(0xD4);
 	movlw	(0D4h)
 	fcall	_lcdcmd
 	line	243
 	
-l4420:	
+l4790:	
 ;Main.c: 243: lcdstring(sms);
 	movlw	(_sms&0ffh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	(0x1/2)
 	movwf	(?_lcdstring+1)
 	fcall	_lcdstring
 	line	246
 	
-l4422:	
+l4792:	
 ;Main.c: 246: if(strcmp(card_store,User1)==0)
 	movlw	(_User1)&0ffh
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_strcmp)
 	movlw	(_card_store)&0ffh
 	fcall	_strcmp
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	((1+(?_strcmp))),w
 	iorwf	((0+(?_strcmp))),w
 	skipz
-	goto	u1631
-	goto	u1630
-u1631:
-	goto	l4428
-u1630:
+	goto	u3781
+	goto	u3780
+u3781:
+	goto	l4798
+u3780:
 	line	248
 	
-l4424:	
+l4794:	
 ;Main.c: 247: {
 ;Main.c: 248: User=1;
-	clrf	(_User)
-	incf	(_User),f
-	clrf	(_User+1)
+	movlw	low(01h)
+	movwf	(_User)
+	movlw	high(01h)
+	movwf	((_User))+1
 	line	249
 	
-l4426:	
+l4796:	
 ;Main.c: 249: card_store[0]=0;
-	clrf	(_card_store)
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
+	movwf	(_card_store)^080h
 	line	250
 ;Main.c: 250: }
-	goto	l4624
+	goto	l5018
 	line	251
 	
-l4428:	
+l1160:	
+	
+l4798:	
 ;Main.c: 251: else if(strcmp(card_store,User2)==0)
 	movlw	(_User2)&0ffh
+	bcf	status, 5	;RP0=0, select bank0
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_strcmp)
 	movlw	(_card_store)&0ffh
 	fcall	_strcmp
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	((1+(?_strcmp))),w
 	iorwf	((0+(?_strcmp))),w
 	skipz
-	goto	u1641
-	goto	u1640
-u1641:
-	goto	l4434
-u1640:
+	goto	u3791
+	goto	u3790
+u3791:
+	goto	l4804
+u3790:
 	line	253
 	
-l4430:	
+l4800:	
 ;Main.c: 252: {
 ;Main.c: 253: User=2;
-	movlw	02h
+	movlw	low(02h)
 	movwf	(_User)
-	clrf	(_User+1)
-	goto	l4426
+	movlw	high(02h)
+	movwf	((_User))+1
+	line	254
+	
+l4802:	
+;Main.c: 254: card_store[0]=0;
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
+	movwf	(_card_store)^080h
+	line	255
+;Main.c: 255: }
+	goto	l5018
 	line	256
 	
-l4434:	
+l1162:	
+	
+l4804:	
 ;Main.c: 256: else if(strcmp(card_store,User3)==0)
 	movlw	(_User3)&0ffh
+	bcf	status, 5	;RP0=0, select bank0
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_strcmp)
 	movlw	(_card_store)&0ffh
 	fcall	_strcmp
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	((1+(?_strcmp))),w
 	iorwf	((0+(?_strcmp))),w
 	skipz
-	goto	u1651
-	goto	u1650
-u1651:
-	goto	l1161
-u1650:
+	goto	u3801
+	goto	u3800
+u3801:
+	goto	l5018
+u3800:
 	line	258
 	
-l4436:	
+l4806:	
 ;Main.c: 257: {
 ;Main.c: 258: User=3;
-	movlw	03h
+	movlw	low(03h)
 	movwf	(_User)
-	clrf	(_User+1)
-	goto	l4426
+	movlw	high(03h)
+	movwf	((_User))+1
+	line	259
+	
+l4808:	
+;Main.c: 259: card_store[0]=0;
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
+	movwf	(_card_store)^080h
+	goto	l5018
+	line	260
+	
+l1164:	
+	goto	l5018
 	line	262
+	
+l1163:	
+	goto	l5018
 	
 l1161:	
 ;Main.c: 260: }
 ;Main.c: 262: switch(User)
-	goto	l4624
+	goto	l5018
+	line	264
+;Main.c: 263: {
+;Main.c: 264: case 1:
+	
+l1166:	
 	line	266
 	
-l4440:	
+l4810:	
 ;Main.c: 265: {
 ;Main.c: 266: ReadAmnt();
 	fcall	_ReadAmnt
@@ -2367,21 +2654,28 @@ l4440:
 	fcall	_lcdcmd
 	line	268
 	
-l4442:	
+l4812:	
 ;Main.c: 268: lcdstring("USER1 AMOUNT:       ");
 	movlw	low(STR_36|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_36|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	269
 	
-l4444:	
+l4814:	
 ;Main.c: 269: DisplayAmnt(0X8D,User1amt);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1amt+1),w
-	movwf	(?_DisplayAmnt+1)
+	clrf	(?_DisplayAmnt+1)
+	addwf	(?_DisplayAmnt+1)
 	movf	(_User1amt),w
-	movwf	(?_DisplayAmnt)
+	clrf	(?_DisplayAmnt)
+	addwf	(?_DisplayAmnt)
+
 	movlw	(08Dh)
 	fcall	_DisplayAmnt
 	line	270
@@ -2390,18 +2684,24 @@ l4444:
 	fcall	_lcdcmd
 	line	271
 	
-l4446:	
+l4816:	
 ;Main.c: 271: lcdstring("RISE:   Kg          ");
 	movlw	low(STR_37|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_37|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	272
 	
-l4448:	
+l4818:	
 ;Main.c: 272: DisplayRise(0XC5,User1Rise);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Rise),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplayRise)
 	movlw	(0C5h)
 	fcall	_DisplayRise
@@ -2411,18 +2711,24 @@ l4448:
 	fcall	_lcdcmd
 	line	274
 	
-l4450:	
+l4820:	
 ;Main.c: 274: lcdstring("SUGAR:   Kg         ");
 	movlw	low(STR_38|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_38|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	275
 	
-l4452:	
+l4822:	
 ;Main.c: 275: DisplaySugar(0x9A,User1Sugar);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Sugar),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplaySugar)
 	movlw	(09Ah)
 	fcall	_DisplaySugar
@@ -2432,262 +2738,369 @@ l4452:
 	fcall	_lcdcmd
 	line	277
 	
-l4454:	
+l4824:	
 ;Main.c: 277: lcdstring("KEROSENE:   Lts     ");
 	movlw	low(STR_39|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_39|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	278
 	
-l4456:	
+l4826:	
 ;Main.c: 278: DisplayKerosene(0XDD,User1Kerosene);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Kerosene),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplayKerosene)
 	movlw	(0DDh)
 	fcall	_DisplayKerosene
 	line	279
 	
-l4458:	
-;Main.c: 279: _delay((unsigned long)((2000)*(20000000/4000.0)));
+l4828:	
+;Main.c: 279: _delay((unsigned long)((8000)*(20000000/4000.0)));
 	opt asmopt_off
-movlw  51
+movlw  203
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
-movlw	137
+movlw	35
 movwf	((??_main+0)+0+1),f
-	movlw	256
+	movlw	9
 movwf	((??_main+0)+0),f
-u1727:
+u3877:
 	decfsz	((??_main+0)+0),f
-	goto	u1727
+	goto	u3877
 	decfsz	((??_main+0)+0+1),f
-	goto	u1727
+	goto	u3877
 	decfsz	((??_main+0)+0+2),f
-	goto	u1727
+	goto	u3877
+	clrwdt
 opt asmopt_on
 
 	line	280
 	
-l4460:	
+l4830:	
 ;Main.c: 280: RiseStock=RiseStock-User1Rise;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Rise),w
-	subwf	(_RiseStock),f
-	skipc
-	decf	(_RiseStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_RiseStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_RiseStock)
+	movf	(_RiseStock+1),w
+	skipnc
+	incf	(_RiseStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_RiseStock)
 	line	281
 	
-l4462:	
+l4832:	
 ;Main.c: 281: SugarStock=SugarStock-User1Sugar;
 	movf	(_User1Sugar),w
-	subwf	(_SugarStock),f
-	skipc
-	decf	(_SugarStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_SugarStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_SugarStock)
+	movf	(_SugarStock+1),w
+	skipnc
+	incf	(_SugarStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_SugarStock)
 	line	282
 	
-l4464:	
+l4834:	
 ;Main.c: 282: KeroseneStock=KeroseneStock-User1Kerosene;
 	movf	(_User1Kerosene),w
-	subwf	(_KeroseneStock),f
-	skipc
-	decf	(_KeroseneStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_KeroseneStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_KeroseneStock)
+	movf	(_KeroseneStock+1),w
+	skipnc
+	incf	(_KeroseneStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_KeroseneStock)
 	line	283
+	
+l4836:	
 ;Main.c: 283: eeprom_write(24,RiseStock/100);
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(064h)
+	movwf	((?___lwdiv))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(018h)
 	fcall	_eeprom_write
 	line	284
+	
+l4838:	
 ;Main.c: 284: eeprom_write(25,RiseStock%100);
-	movlw	064h
+	movlw	low(064h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwmod)+02h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwmod)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(019h)
 	fcall	_eeprom_write
 	line	285
+	
+l4840:	
 ;Main.c: 285: eeprom_write(26,SugarStock);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_SugarStock),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Ah)
 	fcall	_eeprom_write
 	line	286
+	
+l4842:	
 ;Main.c: 286: eeprom_write(27,KeroseneStock);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_KeroseneStock),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Bh)
 	fcall	_eeprom_write
 	line	287
 	
-l4466:	
+l4844:	
 ;Main.c: 287: User1amt = User1amt-50;
-	movlw	-50
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_User1amt),f
-	skipc
-	decf	(_User1amt+1),f
+	movf	(_User1amt),w
+	addlw	low(-50)
+	movwf	(_User1amt)
+	movf	(_User1amt+1),w
+	skipnc
+	addlw	1
+	addlw	high(-50)
+	movwf	1+(_User1amt)
 	line	291
 	
-l4468:	
+l4846:	
 ;Main.c: 291: eeprom_write(0,User1amt/100);
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___awdiv)
-	clrf	(?___awdiv+1)
+	movlw	high(064h)
+	movwf	((?___awdiv))+1
 	movf	(_User1amt+1),w
-	movwf	1+(?___awdiv)+02h
+	clrf	1+(?___awdiv)+02h
+	addwf	1+(?___awdiv)+02h
 	movf	(_User1amt),w
-	movwf	0+(?___awdiv)+02h
+	clrf	0+(?___awdiv)+02h
+	addwf	0+(?___awdiv)+02h
+
 	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awdiv)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(0)
 	fcall	_eeprom_write
 	line	292
 	
-l4470:	
+l4848:	
 ;Main.c: 292: eeprom_write(1,User1amt%100);
-	movlw	064h
+	movlw	low(064h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___awmod)
-	clrf	(?___awmod+1)
+	movlw	high(064h)
+	movwf	((?___awmod))+1
 	movf	(_User1amt+1),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(_User1amt),w
-	movwf	0+(?___awmod)+02h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awmod)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01h)
 	fcall	_eeprom_write
 	line	293
 	
-l4472:	
+l4850:	
 ;Main.c: 293: eeprom_write(2,User1Rise);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Rise),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(02h)
 	fcall	_eeprom_write
 	line	294
 	
-l4474:	
+l4852:	
 ;Main.c: 294: eeprom_write(3,User1Sugar);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Sugar),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(03h)
 	fcall	_eeprom_write
 	line	295
 	
-l4476:	
+l4854:	
 ;Main.c: 295: eeprom_write(4,User1Kerosene);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User1Kerosene),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(04h)
 	fcall	_eeprom_write
 	line	297
 	
-l4478:	
+l4856:	
 ;Main.c: 297: lcdcmd(0x01);
 	movlw	(01h)
 	fcall	_lcdcmd
 	line	298
 	
-l4480:	
+l4858:	
 ;Main.c: 298: lcdstring(" PLEASE KEEP YOUR");
 	movlw	low(STR_40|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_40|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	299
 	
-l4482:	
+l4860:	
 ;Main.c: 299: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	300
 	
-l4484:	
+l4862:	
 ;Main.c: 300: lcdstring(" CAN ON KEROSENE ");
 	movlw	low(STR_41|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_41|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	301
 	
-l4486:	
+l4864:	
 ;Main.c: 301: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
 	line	302
 	
-l4488:	
+l4866:	
 ;Main.c: 302: lcdstring("      VOLUE      ");
 	movlw	low(STR_42|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_42|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	303
 	
-l4490:	
+l4868:	
 ;Main.c: 303: _delay((unsigned long)((200)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  6
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
 movlw	14
 movwf	((??_main+0)+0+1),f
 	movlw	176
 movwf	((??_main+0)+0),f
-u1737:
+u3887:
 	decfsz	((??_main+0)+0),f
-	goto	u1737
+	goto	u3887
 	decfsz	((??_main+0)+0+1),f
-	goto	u1737
+	goto	u3887
 	decfsz	((??_main+0)+0+2),f
-	goto	u1737
+	goto	u3887
 opt asmopt_on
 
 	line	304
 	
-l4492:	
+l4870:	
 ;Main.c: 304: RC4 = 0;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bcf	(60/8),(60)&7
 	line	305
 	
-l4494:	
+l4872:	
 ;Main.c: 305: _delay((unsigned long)((5000)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  127
@@ -2696,35 +3109,42 @@ movlw	86
 movwf	((??_main+0)+0+1),f
 	movlw	132
 movwf	((??_main+0)+0),f
-u1747:
+u3897:
 	decfsz	((??_main+0)+0),f
-	goto	u1747
+	goto	u3897
 	decfsz	((??_main+0)+0+1),f
-	goto	u1747
+	goto	u3897
 	decfsz	((??_main+0)+0+2),f
-	goto	u1747
+	goto	u3897
 	nop2
 opt asmopt_on
 
 	line	306
 	
-l4496:	
+l4874:	
 ;Main.c: 306: RC4 = 1;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bsf	(60/8),(60)&7
 	line	307
 	
-l4498:	
+l4876:	
 ;Main.c: 307: User=0;
-	clrf	(_User)
-	clrf	(_User+1)
+	movlw	low(0)
+	movwf	(_User)
+	movlw	high(0)
+	movwf	((_User))+1
 	line	308
 ;Main.c: 308: break;
-	goto	l4626
+	goto	l5020
+	line	310
+;Main.c: 309: }
+;Main.c: 310: case 2:
+	
+l1168:	
 	line	312
 	
-l4500:	
+l4878:	
 ;Main.c: 311: {
 ;Main.c: 312: ReadAmnt();
 	fcall	_ReadAmnt
@@ -2734,21 +3154,28 @@ l4500:
 	fcall	_lcdcmd
 	line	314
 	
-l4502:	
+l4880:	
 ;Main.c: 314: lcdstring("USER2 AMOUNT:       ");
 	movlw	low(STR_43|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_43|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	315
 	
-l4504:	
+l4882:	
 ;Main.c: 315: DisplayAmnt(0X8D,User2amt);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2amt+1),w
-	movwf	(?_DisplayAmnt+1)
+	clrf	(?_DisplayAmnt+1)
+	addwf	(?_DisplayAmnt+1)
 	movf	(_User2amt),w
-	movwf	(?_DisplayAmnt)
+	clrf	(?_DisplayAmnt)
+	addwf	(?_DisplayAmnt)
+
 	movlw	(08Dh)
 	fcall	_DisplayAmnt
 	line	316
@@ -2757,18 +3184,24 @@ l4504:
 	fcall	_lcdcmd
 	line	317
 	
-l4506:	
+l4884:	
 ;Main.c: 317: lcdstring("RISE:   Kg          ");
 	movlw	low(STR_44|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_44|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	318
 	
-l4508:	
+l4886:	
 ;Main.c: 318: DisplayRise(0XC5,User2Rise);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Rise),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplayRise)
 	movlw	(0C5h)
 	fcall	_DisplayRise
@@ -2778,18 +3211,24 @@ l4508:
 	fcall	_lcdcmd
 	line	320
 	
-l4510:	
+l4888:	
 ;Main.c: 320: lcdstring("SUGAR:   Kg         ");
 	movlw	low(STR_45|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_45|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	321
 	
-l4512:	
+l4890:	
 ;Main.c: 321: DisplaySugar(0x9A,User2Sugar);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Sugar),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplaySugar)
 	movlw	(09Ah)
 	fcall	_DisplaySugar
@@ -2799,262 +3238,369 @@ l4512:
 	fcall	_lcdcmd
 	line	323
 	
-l4514:	
+l4892:	
 ;Main.c: 323: lcdstring("KEROSENE:   Lts     ");
 	movlw	low(STR_46|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_46|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	324
 	
-l4516:	
+l4894:	
 ;Main.c: 324: DisplayKerosene(0XDD,User2Kerosene);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Kerosene),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplayKerosene)
 	movlw	(0DDh)
 	fcall	_DisplayKerosene
 	line	325
 	
-l4518:	
-;Main.c: 325: _delay((unsigned long)((2000)*(20000000/4000.0)));
+l4896:	
+;Main.c: 325: _delay((unsigned long)((8000)*(20000000/4000.0)));
 	opt asmopt_off
-movlw  51
+movlw  203
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
-movlw	137
+movlw	35
 movwf	((??_main+0)+0+1),f
-	movlw	256
+	movlw	9
 movwf	((??_main+0)+0),f
-u1757:
+u3907:
 	decfsz	((??_main+0)+0),f
-	goto	u1757
+	goto	u3907
 	decfsz	((??_main+0)+0+1),f
-	goto	u1757
+	goto	u3907
 	decfsz	((??_main+0)+0+2),f
-	goto	u1757
+	goto	u3907
+	clrwdt
 opt asmopt_on
 
 	line	326
 	
-l4520:	
+l4898:	
 ;Main.c: 326: RiseStock=RiseStock-User2Rise;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Rise),w
-	subwf	(_RiseStock),f
-	skipc
-	decf	(_RiseStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_RiseStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_RiseStock)
+	movf	(_RiseStock+1),w
+	skipnc
+	incf	(_RiseStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_RiseStock)
 	line	327
 	
-l4522:	
+l4900:	
 ;Main.c: 327: SugarStock=SugarStock-User2Sugar;
 	movf	(_User2Sugar),w
-	subwf	(_SugarStock),f
-	skipc
-	decf	(_SugarStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_SugarStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_SugarStock)
+	movf	(_SugarStock+1),w
+	skipnc
+	incf	(_SugarStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_SugarStock)
 	line	328
 	
-l4524:	
+l4902:	
 ;Main.c: 328: KeroseneStock=KeroseneStock-User2Kerosene;
 	movf	(_User2Kerosene),w
-	subwf	(_KeroseneStock),f
-	skipc
-	decf	(_KeroseneStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_KeroseneStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_KeroseneStock)
+	movf	(_KeroseneStock+1),w
+	skipnc
+	incf	(_KeroseneStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_KeroseneStock)
 	line	329
+	
+l4904:	
 ;Main.c: 329: eeprom_write(24,RiseStock/100);
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(064h)
+	movwf	((?___lwdiv))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(018h)
 	fcall	_eeprom_write
 	line	330
+	
+l4906:	
 ;Main.c: 330: eeprom_write(25,RiseStock%100);
-	movlw	064h
+	movlw	low(064h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwmod)+02h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwmod)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(019h)
 	fcall	_eeprom_write
 	line	331
+	
+l4908:	
 ;Main.c: 331: eeprom_write(26,SugarStock);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_SugarStock),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Ah)
 	fcall	_eeprom_write
 	line	332
+	
+l4910:	
 ;Main.c: 332: eeprom_write(27,KeroseneStock);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_KeroseneStock),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Bh)
 	fcall	_eeprom_write
 	line	333
 	
-l4526:	
+l4912:	
 ;Main.c: 333: User2amt = User2amt-30;
-	movlw	-30
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_User2amt),f
-	skipc
-	decf	(_User2amt+1),f
+	movf	(_User2amt),w
+	addlw	low(-30)
+	movwf	(_User2amt)
+	movf	(_User2amt+1),w
+	skipnc
+	addlw	1
+	addlw	high(-30)
+	movwf	1+(_User2amt)
 	line	337
 	
-l4528:	
+l4914:	
 ;Main.c: 337: eeprom_write(8,User2amt/100);
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___awdiv)
-	clrf	(?___awdiv+1)
+	movlw	high(064h)
+	movwf	((?___awdiv))+1
 	movf	(_User2amt+1),w
-	movwf	1+(?___awdiv)+02h
+	clrf	1+(?___awdiv)+02h
+	addwf	1+(?___awdiv)+02h
 	movf	(_User2amt),w
-	movwf	0+(?___awdiv)+02h
+	clrf	0+(?___awdiv)+02h
+	addwf	0+(?___awdiv)+02h
+
 	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awdiv)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(08h)
 	fcall	_eeprom_write
 	line	338
 	
-l4530:	
+l4916:	
 ;Main.c: 338: eeprom_write(9,User2amt%100);
-	movlw	064h
+	movlw	low(064h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___awmod)
-	clrf	(?___awmod+1)
+	movlw	high(064h)
+	movwf	((?___awmod))+1
 	movf	(_User2amt+1),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(_User2amt),w
-	movwf	0+(?___awmod)+02h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awmod)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(09h)
 	fcall	_eeprom_write
 	line	339
 	
-l4532:	
+l4918:	
 ;Main.c: 339: eeprom_write(10,User2Rise);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Rise),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(0Ah)
 	fcall	_eeprom_write
 	line	340
 	
-l4534:	
+l4920:	
 ;Main.c: 340: eeprom_write(11,User2Sugar);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Sugar),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(0Bh)
 	fcall	_eeprom_write
 	line	341
 	
-l4536:	
+l4922:	
 ;Main.c: 341: eeprom_write(12,User2Kerosene);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User2Kerosene),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(0Ch)
 	fcall	_eeprom_write
 	line	343
 	
-l4538:	
+l4924:	
 ;Main.c: 343: lcdcmd(0x01);
 	movlw	(01h)
 	fcall	_lcdcmd
 	line	344
 	
-l4540:	
+l4926:	
 ;Main.c: 344: lcdstring(" PLEASE KEEP YOUR");
 	movlw	low(STR_47|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_47|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	345
 	
-l4542:	
+l4928:	
 ;Main.c: 345: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	346
 	
-l4544:	
+l4930:	
 ;Main.c: 346: lcdstring(" CAN ON KEROSENE ");
 	movlw	low(STR_48|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_48|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	347
 	
-l4546:	
+l4932:	
 ;Main.c: 347: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
 	line	348
 	
-l4548:	
+l4934:	
 ;Main.c: 348: lcdstring("      VOLUE      ");
 	movlw	low(STR_49|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_49|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	349
 	
-l4550:	
+l4936:	
 ;Main.c: 349: _delay((unsigned long)((200)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  6
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
 movlw	14
 movwf	((??_main+0)+0+1),f
 	movlw	176
 movwf	((??_main+0)+0),f
-u1767:
+u3917:
 	decfsz	((??_main+0)+0),f
-	goto	u1767
+	goto	u3917
 	decfsz	((??_main+0)+0+1),f
-	goto	u1767
+	goto	u3917
 	decfsz	((??_main+0)+0+2),f
-	goto	u1767
+	goto	u3917
 opt asmopt_on
 
 	line	350
 	
-l4552:	
+l4938:	
 ;Main.c: 350: RC4 = 0;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bcf	(60/8),(60)&7
 	line	351
 	
-l4554:	
+l4940:	
 ;Main.c: 351: _delay((unsigned long)((8000)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  203
@@ -3063,20 +3609,42 @@ movlw	35
 movwf	((??_main+0)+0+1),f
 	movlw	9
 movwf	((??_main+0)+0),f
-u1777:
+u3927:
 	decfsz	((??_main+0)+0),f
-	goto	u1777
+	goto	u3927
 	decfsz	((??_main+0)+0+1),f
-	goto	u1777
+	goto	u3927
 	decfsz	((??_main+0)+0+2),f
-	goto	u1777
+	goto	u3927
 	clrwdt
 opt asmopt_on
 
-	goto	l4496
+	line	352
+	
+l4942:	
+;Main.c: 352: RC4 = 1;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	bsf	(60/8),(60)&7
+	line	353
+	
+l4944:	
+;Main.c: 353: User=0;
+	movlw	low(0)
+	movwf	(_User)
+	movlw	high(0)
+	movwf	((_User))+1
+	line	354
+;Main.c: 354: break;
+	goto	l5020
+	line	356
+;Main.c: 355: }
+;Main.c: 356: case 3:
+	
+l1169:	
 	line	358
 	
-l4560:	
+l4946:	
 ;Main.c: 357: {
 ;Main.c: 358: ReadAmnt();
 	fcall	_ReadAmnt
@@ -3086,21 +3654,28 @@ l4560:
 	fcall	_lcdcmd
 	line	360
 	
-l4562:	
+l4948:	
 ;Main.c: 360: lcdstring("USER3 AMOUNT:       ");
 	movlw	low(STR_50|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_50|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	361
 	
-l4564:	
+l4950:	
 ;Main.c: 361: DisplayAmnt(0X8D,User3amt);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3amt+1),w
-	movwf	(?_DisplayAmnt+1)
+	clrf	(?_DisplayAmnt+1)
+	addwf	(?_DisplayAmnt+1)
 	movf	(_User3amt),w
-	movwf	(?_DisplayAmnt)
+	clrf	(?_DisplayAmnt)
+	addwf	(?_DisplayAmnt)
+
 	movlw	(08Dh)
 	fcall	_DisplayAmnt
 	line	362
@@ -3109,18 +3684,24 @@ l4564:
 	fcall	_lcdcmd
 	line	363
 	
-l4566:	
+l4952:	
 ;Main.c: 363: lcdstring("RISE:   Kg          ");
 	movlw	low(STR_51|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_51|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	364
 	
-l4568:	
+l4954:	
 ;Main.c: 364: DisplayRise(0XC5,User3Rise);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Rise),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplayRise)
 	movlw	(0C5h)
 	fcall	_DisplayRise
@@ -3130,18 +3711,24 @@ l4568:
 	fcall	_lcdcmd
 	line	366
 	
-l4570:	
+l4956:	
 ;Main.c: 366: lcdstring("SUGAR:   Kg         ");
 	movlw	low(STR_52|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_52|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	367
 	
-l4572:	
+l4958:	
 ;Main.c: 367: DisplaySugar(0x9A,User3Sugar);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Sugar),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplaySugar)
 	movlw	(09Ah)
 	fcall	_DisplaySugar
@@ -3151,242 +3738,422 @@ l4572:
 	fcall	_lcdcmd
 	line	369
 	
-l4574:	
+l4960:	
 ;Main.c: 369: lcdstring("KEROSENE:   Lts     ");
 	movlw	low(STR_53|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_53|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	370
 	
-l4576:	
+l4962:	
 ;Main.c: 370: DisplayKerosene(0XDD,User3Kerosene);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Kerosene),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_DisplayKerosene)
 	movlw	(0DDh)
 	fcall	_DisplayKerosene
 	line	371
 	
-l4578:	
-;Main.c: 371: _delay((unsigned long)((2000)*(20000000/4000.0)));
+l4964:	
+;Main.c: 371: _delay((unsigned long)((8000)*(20000000/4000.0)));
 	opt asmopt_off
-movlw  51
+movlw  203
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
-movlw	137
+movlw	35
 movwf	((??_main+0)+0+1),f
-	movlw	256
+	movlw	9
 movwf	((??_main+0)+0),f
-u1787:
+u3937:
 	decfsz	((??_main+0)+0),f
-	goto	u1787
+	goto	u3937
 	decfsz	((??_main+0)+0+1),f
-	goto	u1787
+	goto	u3937
 	decfsz	((??_main+0)+0+2),f
-	goto	u1787
+	goto	u3937
+	clrwdt
 opt asmopt_on
 
 	line	372
 	
-l4580:	
+l4966:	
 ;Main.c: 372: RiseStock=RiseStock-User3Rise;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Rise),w
-	subwf	(_RiseStock),f
-	skipc
-	decf	(_RiseStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_RiseStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_RiseStock)
+	movf	(_RiseStock+1),w
+	skipnc
+	incf	(_RiseStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_RiseStock)
 	line	373
 	
-l4582:	
+l4968:	
 ;Main.c: 373: SugarStock=SugarStock-User3Sugar;
 	movf	(_User3Sugar),w
-	subwf	(_SugarStock),f
-	skipc
-	decf	(_SugarStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_SugarStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_SugarStock)
+	movf	(_SugarStock+1),w
+	skipnc
+	incf	(_SugarStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_SugarStock)
 	line	374
 	
-l4584:	
+l4970:	
 ;Main.c: 374: KeroseneStock=KeroseneStock-User3Kerosene;
 	movf	(_User3Kerosene),w
-	subwf	(_KeroseneStock),f
-	skipc
-	decf	(_KeroseneStock+1),f
+	movwf	(??_main+0)+0
+	clrf	(??_main+0)+0+1
+	comf	(??_main+0)+0,f
+	comf	(??_main+0)+1,f
+	incf	(??_main+0)+0,f
+	skipnz
+	incf	(??_main+0)+1,f
+	movf	(_KeroseneStock),w
+	addwf	0+(??_main+0)+0,w
+	movwf	(_KeroseneStock)
+	movf	(_KeroseneStock+1),w
+	skipnc
+	incf	(_KeroseneStock+1),w
+	addwf	1+(??_main+0)+0,w
+	movwf	1+(_KeroseneStock)
 	line	375
+	
+l4972:	
 ;Main.c: 375: eeprom_write(24,RiseStock/100);
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(064h)
+	movwf	((?___lwdiv))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(018h)
 	fcall	_eeprom_write
 	line	376
+	
+l4974:	
 ;Main.c: 376: eeprom_write(25,RiseStock%100);
-	movlw	064h
+	movlw	low(064h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwmod)+02h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwmod)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(019h)
 	fcall	_eeprom_write
 	line	377
+	
+l4976:	
 ;Main.c: 377: eeprom_write(26,SugarStock);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_SugarStock),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Ah)
 	fcall	_eeprom_write
 	line	378
+	
+l4978:	
 ;Main.c: 378: eeprom_write(27,KeroseneStock);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_KeroseneStock),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Bh)
 	fcall	_eeprom_write
 	line	379
 	
-l4586:	
+l4980:	
 ;Main.c: 379: User3amt = User3amt-20;
-	movlw	-20
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_User3amt),f
-	skipc
-	decf	(_User3amt+1),f
+	movf	(_User3amt),w
+	addlw	low(-20)
+	movwf	(_User3amt)
+	movf	(_User3amt+1),w
+	skipnc
+	addlw	1
+	addlw	high(-20)
+	movwf	1+(_User3amt)
 	line	383
 	
-l4588:	
+l4982:	
 ;Main.c: 383: eeprom_write(16,User3amt/100);
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___awdiv)
-	clrf	(?___awdiv+1)
+	movlw	high(064h)
+	movwf	((?___awdiv))+1
 	movf	(_User3amt+1),w
-	movwf	1+(?___awdiv)+02h
+	clrf	1+(?___awdiv)+02h
+	addwf	1+(?___awdiv)+02h
 	movf	(_User3amt),w
-	movwf	0+(?___awdiv)+02h
+	clrf	0+(?___awdiv)+02h
+	addwf	0+(?___awdiv)+02h
+
 	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awdiv)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(010h)
 	fcall	_eeprom_write
 	line	384
 	
-l4590:	
+l4984:	
 ;Main.c: 384: eeprom_write(17,User3amt%100);
-	movlw	064h
+	movlw	low(064h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___awmod)
-	clrf	(?___awmod+1)
+	movlw	high(064h)
+	movwf	((?___awmod))+1
 	movf	(_User3amt+1),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(_User3amt),w
-	movwf	0+(?___awmod)+02h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awmod)),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(011h)
 	fcall	_eeprom_write
 	line	385
 	
-l4592:	
+l4986:	
 ;Main.c: 385: eeprom_write(18,User3Rise);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Rise),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(012h)
 	fcall	_eeprom_write
 	line	386
 	
-l4594:	
+l4988:	
 ;Main.c: 386: eeprom_write(19,User3Sugar);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Sugar),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(013h)
 	fcall	_eeprom_write
 	line	387
 	
-l4596:	
+l4990:	
 ;Main.c: 387: eeprom_write(20,User3Kerosene);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(_User3Kerosene),w
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(014h)
 	fcall	_eeprom_write
 	line	389
 	
-l4598:	
+l4992:	
 ;Main.c: 389: lcdcmd(0x01);
 	movlw	(01h)
 	fcall	_lcdcmd
 	line	390
 	
-l4600:	
+l4994:	
 ;Main.c: 390: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
 	line	391
 	
-l4602:	
+l4996:	
 ;Main.c: 391: lcdstring(" PLEASE KEEP YOUR");
 	movlw	low(STR_54|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_54|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	392
 	
-l4604:	
+l4998:	
 ;Main.c: 392: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	393
 	
-l4606:	
+l5000:	
 ;Main.c: 393: lcdstring(" CAN ON KEROSENE ");
 	movlw	low(STR_55|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_55|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	394
 	
-l4608:	
+l5002:	
 ;Main.c: 394: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
 	line	395
 	
-l4610:	
+l5004:	
 ;Main.c: 395: lcdstring("      VOLUE      ");
 	movlw	low(STR_56|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_56|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
-	goto	l4490
+	line	396
+	
+l5006:	
+;Main.c: 396: _delay((unsigned long)((200)*(20000000/4000.0)));
+	opt asmopt_off
+movlw  6
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+movwf	((??_main+0)+0+2),f
+movlw	14
+movwf	((??_main+0)+0+1),f
+	movlw	176
+movwf	((??_main+0)+0),f
+u3947:
+	decfsz	((??_main+0)+0),f
+	goto	u3947
+	decfsz	((??_main+0)+0+1),f
+	goto	u3947
+	decfsz	((??_main+0)+0+2),f
+	goto	u3947
+opt asmopt_on
+
+	line	397
+	
+l5008:	
+;Main.c: 397: RC4 = 0;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	bcf	(60/8),(60)&7
+	line	398
+	
+l5010:	
+;Main.c: 398: _delay((unsigned long)((5000)*(20000000/4000.0)));
+	opt asmopt_off
+movlw  127
+movwf	((??_main+0)+0+2),f
+movlw	86
+movwf	((??_main+0)+0+1),f
+	movlw	132
+movwf	((??_main+0)+0),f
+u3957:
+	decfsz	((??_main+0)+0),f
+	goto	u3957
+	decfsz	((??_main+0)+0+1),f
+	goto	u3957
+	decfsz	((??_main+0)+0+2),f
+	goto	u3957
+	nop2
+opt asmopt_on
+
+	line	399
+	
+l5012:	
+;Main.c: 399: RC4 = 1;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	bsf	(60/8),(60)&7
+	line	400
+	
+l5014:	
+;Main.c: 400: User=0;
+	movlw	low(0)
+	movwf	(_User)
+	movlw	high(0)
+	movwf	((_User))+1
+	line	401
+;Main.c: 401: break;
+	goto	l5020
+	line	403
+	
+l5016:	
+;Main.c: 402: }
+;Main.c: 403: }
+	goto	l5020
 	line	262
 	
-l4624:	
+l1165:	
+	
+l5018:	
 	; Switch on 2 bytes has been partitioned into a top level switch of size 1, and 1 sub-switches
 ; Switch size 1, requested type "space"
 ; Number of cases is 1, Range of values is 0 to 0
@@ -3396,13 +4163,14 @@ l4624:
 ; direct_byte    22    19 (fixed)
 ;	Chosen strategy is simple_byte
 
+	bcf	status, 5	;RP0=0, select bank0
 	movf (_User+1),w
 	xorlw	0^0	; case 0
 	skipnz
-	goto	l4670
-	goto	l4626
+	goto	l5068
+	goto	l5020
 	
-l4670:	
+l5068:	
 ; Switch size 1, requested type "space"
 ; Number of cases is 3, Range of values is 1 to 3
 ; switch strategies available:
@@ -3414,64 +4182,74 @@ l4670:
 	movf (_User),w
 	xorlw	1^0	; case 1
 	skipnz
-	goto	l4440
+	goto	l4810
 	xorlw	2^1	; case 2
 	skipnz
-	goto	l4500
+	goto	l4878
 	xorlw	3^2	; case 3
 	skipnz
-	goto	l4560
-	goto	l4626
+	goto	l4946
+	goto	l5020
 
+	line	403
+	
+l1167:	
 	line	404
 	
-l4626:	
+l5020:	
 ;Main.c: 404: ReadStock();
 	fcall	_ReadStock
 	line	405
 	
-l4628:	
+l5022:	
 ;Main.c: 405: LoadStockToArray();
 	fcall	_LoadStockToArray
 	line	406
 	
-l4630:	
+l5024:	
 ;Main.c: 406: if(RC1)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	btfss	(57/8),(57)&7
-	goto	u1661
-	goto	u1660
-u1661:
-	goto	l4634
-u1660:
+	goto	u3811
+	goto	u3810
+u3811:
+	goto	l5028
+u3810:
 	line	407
 	
-l4632:	
+l5026:	
 ;Main.c: 407: DisplayStock();
 	fcall	_DisplayStock
+	goto	l5028
+	
+l1170:	
 	line	408
 	
-l4634:	
+l5028:	
 ;Main.c: 408: _delay((unsigned long)((500)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  13
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_main+0)+0+2),f
 movlw	163
 movwf	((??_main+0)+0+1),f
 	movlw	189
 movwf	((??_main+0)+0),f
-u1797:
+u3967:
 	decfsz	((??_main+0)+0),f
-	goto	u1797
+	goto	u3967
 	decfsz	((??_main+0)+0+1),f
-	goto	u1797
+	goto	u3967
 	decfsz	((??_main+0)+0+2),f
-	goto	u1797
+	goto	u3967
 	clrwdt
 opt asmopt_on
 
 	line	410
 	
-l4636:	
+l5030:	
 ;Main.c: 410: if((memcmp("STOCK",&sms,5)==0))
 	movlw	low(STR_57|8000h)
 	bcf	status, 5	;RP0=0, select bank0
@@ -3480,63 +4258,88 @@ l4636:
 	movlw	high(STR_57|8000h)
 	movwf	((?_memcmp))+1
 	movlw	(_sms)&0ffh
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(0+?_memcmp+02h)
-	movlw	05h
+	movlw	low(05h)
 	movwf	0+(?_memcmp)+03h
-	clrf	1+(?_memcmp)+03h
+	movlw	high(05h)
+	movwf	(0+(?_memcmp)+03h)+1
 	fcall	_memcmp
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	((1+(?_memcmp))),w
 	iorwf	((0+(?_memcmp))),w
 	skipz
-	goto	u1671
-	goto	u1670
-u1671:
-	goto	l1171
-u1670:
+	goto	u3821
+	goto	u3820
+u3821:
+	goto	l5038
+u3820:
 	line	412
 	
-l4638:	
+l5032:	
 ;Main.c: 411: {
 ;Main.c: 412: if(!sms_indication)
 	btfsc	(_sms_indication/8),(_sms_indication)&7
-	goto	u1681
-	goto	u1680
-u1681:
-	goto	l1171
-u1680:
+	goto	u3831
+	goto	u3830
+u3831:
+	goto	l5038
+u3830:
+	line	414
+	
+l5034:	
+;Main.c: 413: {
+;Main.c: 414: SendStock();
+	fcall	_SendStock
 	line	415
 	
-l4640:	
-;Main.c: 413: {
+l5036:	
 ;Main.c: 415: sms_indication=1;
 	bsf	(_sms_indication/8),(_sms_indication)&7
+	goto	l5038
+	line	416
+	
+l1172:	
+	goto	l5038
 	line	417
 	
 l1171:	
 	line	418
+	
+l5038:	
 ;Main.c: 416: }
 ;Main.c: 417: }
 ;Main.c: 418: if(RC3==1)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	btfss	(59/8),(59)&7
-	goto	u1691
-	goto	u1690
-u1691:
+	goto	u3841
+	goto	u3840
+u3841:
 	goto	l1174
-u1690:
+u3840:
 	line	420
 	
-l4642:	
+l5040:	
 ;Main.c: 419: {
 ;Main.c: 420: eeprom_write(24,10);
 	movlw	(0Ah)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(018h)
 	fcall	_eeprom_write
 	line	421
 ;Main.c: 421: eeprom_write(25,0);
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	clrf	(?_eeprom_write)
+	movwf	(?_eeprom_write)
 	movlw	(019h)
 	fcall	_eeprom_write
 	line	422
@@ -3544,6 +4347,8 @@ l4642:
 	movlw	(0FFh)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Ah)
 	fcall	_eeprom_write
@@ -3552,6 +4357,8 @@ l4642:
 	movlw	(0C8h)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
 	movwf	(?_eeprom_write)
 	movlw	(01Bh)
 	fcall	_eeprom_write
@@ -3560,33 +4367,53 @@ l4642:
 	fcall	_ReadStock
 	line	426
 	
-l4644:	
+l5042:	
 ;Main.c: 426: DisplayStock();
 	fcall	_DisplayStock
+	goto	l1174
 	line	427
 	
-l1174:	
-	btfsc	(59/8),(59)&7
-	goto	u1701
-	goto	u1700
-u1701:
+l1173:	
+;Main.c: 427: }while(RC3);
 	goto	l1174
-u1700:
-	goto	l4402
+	
+l1175:	
+	
+l1174:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	btfsc	(59/8),(59)&7
+	goto	u3851
+	goto	u3850
+u3851:
+	goto	l1174
+u3850:
+	goto	l4772
+	
+l1176:	
+	goto	l4772
+	line	430
+	
+l1177:	
+	line	230
+	goto	l4772
+	
+l1178:	
+	line	431
+	
+l1179:	
 	global	start
 	ljmp	start
 	opt stack 0
-psect	maintext
-	line	431
 GLOBAL	__end_of_main
 	__end_of_main:
 ;; =============== function _main ends ============
 
 	signat	_main,88
 	global	_startup
-psect	text966,local,class=CODE,delta=2
-global __ptext966
-__ptext966:
+psect	text896,local,class=CODE,delta=2
+global __ptext896
+__ptext896:
 
 ;; *************** function _startup *****************
 ;; Defined at:
@@ -3600,7 +4427,7 @@ __ptext966:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 0/40
+;;		On entry : 0/0
 ;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
@@ -3618,7 +4445,7 @@ __ptext966:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text966
+psect	text896
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	161
 	global	__size_of_startup
@@ -3629,125 +4456,139 @@ _startup:
 ; Regs used in _startup: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	162
 	
-l4360:	
+l4728:	
 ;Main.c: 162: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
 	line	163
 	
-l4362:	
+l4730:	
 ;Main.c: 163: lcdstring("AUTOMATIC RATION ");
 	movlw	low(STR_23|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_23|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	164
 	
-l4364:	
+l4732:	
 ;Main.c: 164: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	165
 ;Main.c: 165: lcdstring("   CARD SYSTEM   ");
 	movlw	low(STR_24|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_24|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	166
 	
-l4366:	
+l4734:	
 ;Main.c: 166: _delay((unsigned long)((1000)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  26
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_startup+0)+0+2),f
 movlw	69
 movwf	((??_startup+0)+0+1),f
 	movlw	126
 movwf	((??_startup+0)+0),f
-u1807:
+u3977:
 	decfsz	((??_startup+0)+0),f
-	goto	u1807
+	goto	u3977
 	decfsz	((??_startup+0)+0+1),f
-	goto	u1807
+	goto	u3977
 	decfsz	((??_startup+0)+0+2),f
-	goto	u1807
+	goto	u3977
 opt asmopt_on
 
 	line	167
 	
-l4368:	
+l4736:	
 ;Main.c: 167: lcdcmd(0x01);
 	movlw	(01h)
 	fcall	_lcdcmd
 	line	168
 	
-l4370:	
+l4738:	
 ;Main.c: 168: _delay((unsigned long)((500)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  13
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_startup+0)+0+2),f
 movlw	163
 movwf	((??_startup+0)+0+1),f
 	movlw	189
 movwf	((??_startup+0)+0),f
-u1817:
+u3987:
 	decfsz	((??_startup+0)+0),f
-	goto	u1817
+	goto	u3987
 	decfsz	((??_startup+0)+0+1),f
-	goto	u1817
+	goto	u3987
 	decfsz	((??_startup+0)+0+2),f
-	goto	u1817
+	goto	u3987
 	clrwdt
 opt asmopt_on
 
 	line	169
 	
-l4372:	
+l4740:	
 ;Main.c: 169: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
 	line	170
 ;Main.c: 170: lcdstring("PLEASE TAP YOUR  ");
 	movlw	low(STR_25|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_25|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	171
 	
-l4374:	
+l4742:	
 ;Main.c: 171: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	172
 	
-l4376:	
+l4744:	
 ;Main.c: 172: lcdstring("SMART CARD       ");
 	movlw	low(STR_26|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_26|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	173
 	
-l4378:	
+l4746:	
 ;Main.c: 173: _delay((unsigned long)((1000)*(20000000/4000.0)));
 	opt asmopt_off
 movlw  26
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_startup+0)+0+2),f
 movlw	69
 movwf	((??_startup+0)+0+1),f
 	movlw	126
 movwf	((??_startup+0)+0),f
-u1827:
+u3997:
 	decfsz	((??_startup+0)+0),f
-	goto	u1827
+	goto	u3997
 	decfsz	((??_startup+0)+0+1),f
-	goto	u1827
+	goto	u3997
 	decfsz	((??_startup+0)+0+2),f
-	goto	u1827
+	goto	u3997
 opt asmopt_on
 
 	line	174
@@ -3761,9 +4602,9 @@ GLOBAL	__end_of_startup
 
 	signat	_startup,88
 	global	_DisplayStock
-psect	text967,local,class=CODE,delta=2
-global __ptext967
-__ptext967:
+psect	text897,local,class=CODE,delta=2
+global __ptext897
+__ptext897:
 
 ;; *************** function _DisplayStock *****************
 ;; Defined at:
@@ -3777,8 +4618,8 @@ __ptext967:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
@@ -3796,7 +4637,7 @@ __ptext967:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text967
+psect	text897
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	114
 	global	__size_of_DisplayStock
@@ -3807,84 +4648,107 @@ _DisplayStock:
 ; Regs used in _DisplayStock: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	115
 	
-l4346:	
+l4714:	
 ;Main.c: 115: lcdcmd(0x80);
 	movlw	(080h)
 	fcall	_lcdcmd
 	line	116
 	
-l4348:	
+l4716:	
 ;Main.c: 116: lcdstring("    STOCK DETAILS   ");
 	movlw	low(STR_19|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_19|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	117
 	
-l4350:	
+l4718:	
 ;Main.c: 117: lcdcmd(0xC0);
 	movlw	(0C0h)
 	fcall	_lcdcmd
 	line	118
 ;Main.c: 118: lcdstring("RISE:      Kg       ");
 	movlw	low(STR_20|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_20|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	119
 ;Main.c: 119: DisplayAmnt(0XC5,RiseStock);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_RiseStock+1),w
-	movwf	(?_DisplayAmnt+1)
+	clrf	(?_DisplayAmnt+1)
+	addwf	(?_DisplayAmnt+1)
 	movf	(_RiseStock),w
-	movwf	(?_DisplayAmnt)
+	clrf	(?_DisplayAmnt)
+	addwf	(?_DisplayAmnt)
+
 	movlw	(0C5h)
 	fcall	_DisplayAmnt
 	line	120
 	
-l4352:	
+l4720:	
 ;Main.c: 120: lcdcmd(0x94);
 	movlw	(094h)
 	fcall	_lcdcmd
 	line	121
 	
-l4354:	
+l4722:	
 ;Main.c: 121: lcdstring("SUGAR:    Kg         ");
 	movlw	low(STR_21|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_21|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	122
 	
-l4356:	
+l4724:	
 ;Main.c: 122: DisplayAmnt(0x9A,SugarStock);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_SugarStock+1),w
-	movwf	(?_DisplayAmnt+1)
+	clrf	(?_DisplayAmnt+1)
+	addwf	(?_DisplayAmnt+1)
 	movf	(_SugarStock),w
-	movwf	(?_DisplayAmnt)
+	clrf	(?_DisplayAmnt)
+	addwf	(?_DisplayAmnt)
+
 	movlw	(09Ah)
 	fcall	_DisplayAmnt
 	line	123
 	
-l4358:	
+l4726:	
 ;Main.c: 123: lcdcmd(0xD4);
 	movlw	(0D4h)
 	fcall	_lcdcmd
 	line	124
 ;Main.c: 124: lcdstring("KEROSENE:     Lts    ");
 	movlw	low(STR_22|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?_lcdstring)
 	movlw	high(STR_22|8000h)
 	movwf	((?_lcdstring))+1
 	fcall	_lcdstring
 	line	125
 ;Main.c: 125: DisplayAmnt(0XDD,KeroseneStock);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(_KeroseneStock+1),w
-	movwf	(?_DisplayAmnt+1)
+	clrf	(?_DisplayAmnt+1)
+	addwf	(?_DisplayAmnt+1)
 	movf	(_KeroseneStock),w
-	movwf	(?_DisplayAmnt)
+	clrf	(?_DisplayAmnt)
+	addwf	(?_DisplayAmnt)
+
 	movlw	(0DDh)
 	fcall	_DisplayAmnt
 	line	126
@@ -3897,45 +4761,372 @@ GLOBAL	__end_of_DisplayStock
 ;; =============== function _DisplayStock ends ============
 
 	signat	_DisplayStock,88
+	global	_gsm_init
+psect	text898,local,class=CODE,delta=2
+global __ptext898
+__ptext898:
+
+;; *************** function _gsm_init *****************
+;; Defined at:
+;;		line 29 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;  d               1    9[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       1       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       1       0       0       0
+;;Total ram usage:        1 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    6
+;; This function calls:
+;;		_lcdcmd
+;;		_lcdstring
+;;		_DelayS
+;;		_usartstring
+;;		_transmit
+;;		_receive
+;; This function is called by:
+;;		_main
+;; This function uses a non-reentrant model
+;;
+psect	text898
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+	line	29
+	global	__size_of_gsm_init
+	__size_of_gsm_init	equ	__end_of_gsm_init-_gsm_init
+	
+_gsm_init:	
+	opt	stack 1
+; Regs used in _gsm_init: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
+	line	31
+	
+l4668:	
+;UART.C: 30: unsigned char d;
+;UART.C: 31: lcdcmd(0X80);
+	movlw	(080h)
+	fcall	_lcdcmd
+	line	32
+	
+l4670:	
+;UART.C: 32: lcdstring("GSM INITIALIZING");
+	movlw	low(STR_1|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_lcdstring)
+	movlw	high(STR_1|8000h)
+	movwf	((?_lcdstring))+1
+	fcall	_lcdstring
+	line	33
+	
+l4672:	
+;UART.C: 33: lcdcmd(0XC0);
+	movlw	(0C0h)
+	fcall	_lcdcmd
+	line	34
+;UART.C: 34: lcdstring("PLS WAIT........");
+	movlw	low(STR_2|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_lcdstring)
+	movlw	high(STR_2|8000h)
+	movwf	((?_lcdstring))+1
+	fcall	_lcdstring
+	line	35
+	
+l4674:	
+;UART.C: 35: DelayS(5);
+	movlw	(05h)
+	fcall	_DelayS
+	line	36
+	
+l4676:	
+;UART.C: 36: lcdcmd(0x01);
+	movlw	(01h)
+	fcall	_lcdcmd
+	line	38
+;UART.C: 38: usartstring("AT\r");
+	movlw	low(STR_3|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_3|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	39
+	
+l4678:	
+;UART.C: 39: transmit(0x0D);
+	movlw	(0Dh)
+	fcall	_transmit
+	line	40
+;UART.C: 40: while((d=receive())!='K');
+	goto	l4680
+	
+l1037:	
+	goto	l4680
+	
+l1036:	
+	
+l4680:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(gsm_init@d)
+	xorlw	04Bh
+	skipz
+	goto	u3721
+	goto	u3720
+u3721:
+	goto	l4680
+u3720:
+	goto	l4682
+	
+l1038:	
+	line	42
+	
+l4682:	
+;UART.C: 42: usartstring("AT+CPIN?\r");
+	movlw	low(STR_4|8000h)
+	movwf	(?_usartstring)
+	movlw	high(STR_4|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	43
+	
+l4684:	
+;UART.C: 43: transmit(0x0D);
+	movlw	(0Dh)
+	fcall	_transmit
+	line	44
+;UART.C: 44: while((d=receive())!='K');
+	goto	l4686
+	
+l1040:	
+	goto	l4686
+	
+l1039:	
+	
+l4686:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(gsm_init@d)
+	xorlw	04Bh
+	skipz
+	goto	u3731
+	goto	u3730
+u3731:
+	goto	l4686
+u3730:
+	goto	l4688
+	
+l1041:	
+	line	46
+	
+l4688:	
+;UART.C: 46: usartstring("AT+CSDH=1\r");
+	movlw	low(STR_5|8000h)
+	movwf	(?_usartstring)
+	movlw	high(STR_5|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	47
+	
+l4690:	
+;UART.C: 47: transmit(0x0D);
+	movlw	(0Dh)
+	fcall	_transmit
+	line	48
+;UART.C: 48: while((d=receive())!='K');
+	goto	l4692
+	
+l1043:	
+	goto	l4692
+	
+l1042:	
+	
+l4692:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(gsm_init@d)
+	xorlw	04Bh
+	skipz
+	goto	u3741
+	goto	u3740
+u3741:
+	goto	l4692
+u3740:
+	goto	l4694
+	
+l1044:	
+	line	50
+	
+l4694:	
+;UART.C: 50: usartstring("AT+CMGF=1\r");
+	movlw	low(STR_6|8000h)
+	movwf	(?_usartstring)
+	movlw	high(STR_6|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	51
+	
+l4696:	
+;UART.C: 51: transmit(0x0D);
+	movlw	(0Dh)
+	fcall	_transmit
+	line	52
+;UART.C: 52: while((d=receive())!='K');
+	goto	l4698
+	
+l1046:	
+	goto	l4698
+	
+l1045:	
+	
+l4698:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(gsm_init@d)
+	xorlw	04Bh
+	skipz
+	goto	u3751
+	goto	u3750
+u3751:
+	goto	l4698
+u3750:
+	goto	l4700
+	
+l1047:	
+	line	54
+	
+l4700:	
+;UART.C: 54: usartstring("AT+CNMI=2,2,0,0,0\r");
+	movlw	low(STR_7|8000h)
+	movwf	(?_usartstring)
+	movlw	high(STR_7|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	55
+	
+l4702:	
+;UART.C: 55: transmit(0x0D);
+	movlw	(0Dh)
+	fcall	_transmit
+	line	56
+;UART.C: 56: while((d=receive())!='K');
+	goto	l4704
+	
+l1049:	
+	goto	l4704
+	
+l1048:	
+	
+l4704:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(gsm_init@d)
+	xorlw	04Bh
+	skipz
+	goto	u3761
+	goto	u3760
+u3761:
+	goto	l4704
+u3760:
+	goto	l4706
+	
+l1050:	
+	line	57
+	
+l4706:	
+;UART.C: 57: lcdcmd(0x80);
+	movlw	(080h)
+	fcall	_lcdcmd
+	line	58
+	
+l4708:	
+;UART.C: 58: lcdstring("GSM READY");
+	movlw	low(STR_8|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_lcdstring)
+	movlw	high(STR_8|8000h)
+	movwf	((?_lcdstring))+1
+	fcall	_lcdstring
+	line	59
+	
+l4710:	
+;UART.C: 59: DelayS(10);
+	movlw	(0Ah)
+	fcall	_DelayS
+	line	60
+	
+l4712:	
+;UART.C: 60: lcdcmd(0x01);
+	movlw	(01h)
+	fcall	_lcdcmd
+	line	61
+	
+l1051:	
+	return
+	opt stack 0
+GLOBAL	__end_of_gsm_init
+	__end_of_gsm_init:
+;; =============== function _gsm_init ends ============
+
+	signat	_gsm_init,88
 	global	_DisplayKerosene
-psect	text968,local,class=CODE,delta=2
-global __ptext968
-__ptext968:
+psect	text899,local,class=CODE,delta=2
+global __ptext899
+__ptext899:
 
 ;; *************** function _DisplayKerosene *****************
 ;; Defined at:
 ;;		line 140 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
-;;  Kerosene        1    5[BANK0 ] unsigned char 
+;;  Kerosene        1   16[BANK0 ] unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  Location        1    6[BANK0 ] unsigned char 
+;;  Location        1   19[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       1       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    5
 ;; This function calls:
 ;;		_lcdcmd
-;;		___lbdiv
+;;		___awdiv
 ;;		_lcddata
-;;		___lbmod
+;;		___awmod
 ;; This function is called by:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text968
+psect	text899
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	140
 	global	__size_of_DisplayKerosene
@@ -3945,21 +5136,36 @@ _DisplayKerosene:
 	opt	stack 2
 ; Regs used in _DisplayKerosene: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplayKerosene@Location stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(DisplayKerosene@Location)
 	line	141
 	
-l4340:	
+l4662:	
 ;Main.c: 141: lcdcmd(Location);
 	movf	(DisplayKerosene@Location),w
 	fcall	_lcdcmd
 	line	142
 	
-l4342:	
+l4664:	
 ;Main.c: 142: lcddata(digit[Kerosene/10]);
-	movlw	(0Ah)
-	movwf	(?___lbdiv)
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?___awdiv)
+	movlw	high(0Ah)
+	movwf	((?___awdiv))+1
 	movf	(DisplayKerosene@Kerosene),w
-	fcall	___lbdiv
+	movwf	(??_DisplayKerosene+0)+0
+	clrf	(??_DisplayKerosene+0)+0+1
+	movf	0+(??_DisplayKerosene+0)+0,w
+	movwf	0+(?___awdiv)+02h
+	movf	1+(??_DisplayKerosene+0)+0,w
+	movwf	1+(?___awdiv)+02h
+	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(0+(?___awdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
 	movlw	high(_digit|8000h)
@@ -3970,12 +5176,25 @@ l4342:
 	fcall	_lcddata
 	line	143
 	
-l4344:	
+l4666:	
 ;Main.c: 143: lcddata(digit[Kerosene%10]);
-	movlw	(0Ah)
-	movwf	(?___lbmod)
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?___awmod)
+	movlw	high(0Ah)
+	movwf	((?___awmod))+1
 	movf	(DisplayKerosene@Kerosene),w
-	fcall	___lbmod
+	movwf	(??_DisplayKerosene+0)+0
+	clrf	(??_DisplayKerosene+0)+0+1
+	movf	0+(??_DisplayKerosene+0)+0,w
+	movwf	0+(?___awmod)+02h
+	movf	1+(??_DisplayKerosene+0)+0,w
+	movwf	1+(?___awmod)+02h
+	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(0+(?___awmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
 	movlw	high(_digit|8000h)
@@ -3995,44 +5214,44 @@ GLOBAL	__end_of_DisplayKerosene
 
 	signat	_DisplayKerosene,8312
 	global	_DisplayRise
-psect	text969,local,class=CODE,delta=2
-global __ptext969
-__ptext969:
+psect	text900,local,class=CODE,delta=2
+global __ptext900
+__ptext900:
 
 ;; *************** function _DisplayRise *****************
 ;; Defined at:
 ;;		line 134 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
-;;  Rise            1    5[BANK0 ] unsigned char 
+;;  Rise            1   16[BANK0 ] unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  Location        1    6[BANK0 ] unsigned char 
+;;  Location        1   19[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       1       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    5
 ;; This function calls:
 ;;		_lcdcmd
-;;		___lbdiv
+;;		___awdiv
 ;;		_lcddata
-;;		___lbmod
+;;		___awmod
 ;; This function is called by:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text969
+psect	text900
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	134
 	global	__size_of_DisplayRise
@@ -4042,21 +5261,36 @@ _DisplayRise:
 	opt	stack 2
 ; Regs used in _DisplayRise: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplayRise@Location stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(DisplayRise@Location)
 	line	135
 	
-l4334:	
+l4656:	
 ;Main.c: 135: lcdcmd(Location);
 	movf	(DisplayRise@Location),w
 	fcall	_lcdcmd
 	line	136
 	
-l4336:	
+l4658:	
 ;Main.c: 136: lcddata(digit[Rise/10]);
-	movlw	(0Ah)
-	movwf	(?___lbdiv)
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?___awdiv)
+	movlw	high(0Ah)
+	movwf	((?___awdiv))+1
 	movf	(DisplayRise@Rise),w
-	fcall	___lbdiv
+	movwf	(??_DisplayRise+0)+0
+	clrf	(??_DisplayRise+0)+0+1
+	movf	0+(??_DisplayRise+0)+0,w
+	movwf	0+(?___awdiv)+02h
+	movf	1+(??_DisplayRise+0)+0,w
+	movwf	1+(?___awdiv)+02h
+	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(0+(?___awdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
 	movlw	high(_digit|8000h)
@@ -4067,12 +5301,25 @@ l4336:
 	fcall	_lcddata
 	line	137
 	
-l4338:	
+l4660:	
 ;Main.c: 137: lcddata(digit[Rise%10]);
-	movlw	(0Ah)
-	movwf	(?___lbmod)
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?___awmod)
+	movlw	high(0Ah)
+	movwf	((?___awmod))+1
 	movf	(DisplayRise@Rise),w
-	fcall	___lbmod
+	movwf	(??_DisplayRise+0)+0
+	clrf	(??_DisplayRise+0)+0+1
+	movf	0+(??_DisplayRise+0)+0,w
+	movwf	0+(?___awmod)+02h
+	movf	1+(??_DisplayRise+0)+0,w
+	movwf	1+(?___awmod)+02h
+	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(0+(?___awmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
 	movlw	high(_digit|8000h)
@@ -4092,44 +5339,44 @@ GLOBAL	__end_of_DisplayRise
 
 	signat	_DisplayRise,8312
 	global	_DisplaySugar
-psect	text970,local,class=CODE,delta=2
-global __ptext970
-__ptext970:
+psect	text901,local,class=CODE,delta=2
+global __ptext901
+__ptext901:
 
 ;; *************** function _DisplaySugar *****************
 ;; Defined at:
 ;;		line 128 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
-;;  Sugar           1    5[BANK0 ] unsigned char 
+;;  Sugar           1   16[BANK0 ] unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  Location        1    6[BANK0 ] unsigned char 
+;;  Location        1   19[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       1       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    5
 ;; This function calls:
 ;;		_lcdcmd
-;;		___lbdiv
+;;		___awdiv
 ;;		_lcddata
-;;		___lbmod
+;;		___awmod
 ;; This function is called by:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text970
+psect	text901
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	128
 	global	__size_of_DisplaySugar
@@ -4139,21 +5386,36 @@ _DisplaySugar:
 	opt	stack 2
 ; Regs used in _DisplaySugar: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplaySugar@Location stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(DisplaySugar@Location)
 	line	129
 	
-l4328:	
+l4650:	
 ;Main.c: 129: lcdcmd(Location);
 	movf	(DisplaySugar@Location),w
 	fcall	_lcdcmd
 	line	130
 	
-l4330:	
+l4652:	
 ;Main.c: 130: lcddata(digit[Sugar/10]);
-	movlw	(0Ah)
-	movwf	(?___lbdiv)
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?___awdiv)
+	movlw	high(0Ah)
+	movwf	((?___awdiv))+1
 	movf	(DisplaySugar@Sugar),w
-	fcall	___lbdiv
+	movwf	(??_DisplaySugar+0)+0
+	clrf	(??_DisplaySugar+0)+0+1
+	movf	0+(??_DisplaySugar+0)+0,w
+	movwf	0+(?___awdiv)+02h
+	movf	1+(??_DisplaySugar+0)+0,w
+	movwf	1+(?___awdiv)+02h
+	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(0+(?___awdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
 	movlw	high(_digit|8000h)
@@ -4164,12 +5426,25 @@ l4330:
 	fcall	_lcddata
 	line	131
 	
-l4332:	
+l4654:	
 ;Main.c: 131: lcddata(digit[Sugar%10]);
-	movlw	(0Ah)
-	movwf	(?___lbmod)
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?___awmod)
+	movlw	high(0Ah)
+	movwf	((?___awmod))+1
 	movf	(DisplaySugar@Sugar),w
-	fcall	___lbmod
+	movwf	(??_DisplaySugar+0)+0
+	clrf	(??_DisplaySugar+0)+0+1
+	movf	0+(??_DisplaySugar+0)+0,w
+	movwf	0+(?___awmod)+02h
+	movf	1+(??_DisplaySugar+0)+0,w
+	movwf	1+(?___awmod)+02h
+	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(0+(?___awmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
 	movlw	high(_digit|8000h)
@@ -4189,25 +5464,25 @@ GLOBAL	__end_of_DisplaySugar
 
 	signat	_DisplaySugar,8312
 	global	_DisplayAmnt
-psect	text971,local,class=CODE,delta=2
-global __ptext971
-__ptext971:
+psect	text902,local,class=CODE,delta=2
+global __ptext902
+__ptext902:
 
 ;; *************** function _DisplayAmnt *****************
 ;; Defined at:
 ;;		line 82 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 ;; Parameters:    Size  Location     Type
 ;;  Location        1    wreg     unsigned char 
-;;  Amnt            2   14[BANK0 ] int 
+;;  Amnt            2   16[BANK0 ] int 
 ;; Auto vars:     Size  Location     Type
-;;  Location        1   16[BANK0 ] unsigned char 
+;;  Location        1   20[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       2       0       0       0
@@ -4227,7 +5502,7 @@ __ptext971:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text971
+psect	text902
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	82
 	global	__size_of_DisplayAmnt
@@ -4237,26 +5512,35 @@ _DisplayAmnt:
 	opt	stack 1
 ; Regs used in _DisplayAmnt: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 ;DisplayAmnt@Location stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(DisplayAmnt@Location)
 	line	83
 	
-l4318:	
+l4640:	
 ;Main.c: 83: lcdcmd(Location);
 	movf	(DisplayAmnt@Location),w
 	fcall	_lcdcmd
 	line	84
 	
-l4320:	
+l4642:	
 ;Main.c: 84: lcddata(digit[Amnt/1000]);
 	movlw	low(03E8h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___awdiv)
 	movlw	high(03E8h)
 	movwf	((?___awdiv))+1
 	movf	(DisplayAmnt@Amnt+1),w
-	movwf	1+(?___awdiv)+02h
+	clrf	1+(?___awdiv)+02h
+	addwf	1+(?___awdiv)+02h
 	movf	(DisplayAmnt@Amnt),w
-	movwf	0+(?___awdiv)+02h
+	clrf	0+(?___awdiv)+02h
+	addwf	0+(?___awdiv)+02h
+
 	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -4268,25 +5552,38 @@ l4320:
 	fcall	_lcddata
 	line	85
 	
-l4322:	
+l4644:	
 ;Main.c: 85: lcddata(digit[Amnt%1000/100]);
-	movlw	064h
+	movlw	low(064h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___awdiv)
-	clrf	(?___awdiv+1)
+	movlw	high(064h)
+	movwf	((?___awdiv))+1
 	movf	(DisplayAmnt@Amnt+1),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(DisplayAmnt@Amnt),w
-	movwf	0+(?___awmod)+02h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	movlw	low(03E8h)
 	movwf	(?___awmod)
 	movlw	high(03E8h)
 	movwf	((?___awmod))+1
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___awmod)),w
-	movwf	1+(?___awdiv)+02h
+	clrf	1+(?___awdiv)+02h
+	addwf	1+(?___awdiv)+02h
 	movf	(0+(?___awmod)),w
-	movwf	0+(?___awdiv)+02h
+	clrf	0+(?___awdiv)+02h
+	addwf	0+(?___awdiv)+02h
+
 	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -4298,33 +5595,52 @@ l4322:
 	fcall	_lcddata
 	line	86
 	
-l4324:	
+l4646:	
 ;Main.c: 86: lcddata(digit[Amnt%1000%100/10]);
-	movlw	0Ah
+	movlw	low(0Ah)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___awdiv)
-	clrf	(?___awdiv+1)
+	movlw	high(0Ah)
+	movwf	((?___awdiv))+1
 	movf	(DisplayAmnt@Amnt+1),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(DisplayAmnt@Amnt),w
-	movwf	0+(?___awmod)+02h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	movlw	low(03E8h)
 	movwf	(?___awmod)
 	movlw	high(03E8h)
 	movwf	((?___awmod))+1
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___awmod)),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(0+(?___awmod)),w
-	movwf	0+(?___awmod)+02h
-	movlw	064h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___awmod)
-	clrf	(?___awmod+1)
+	movlw	high(064h)
+	movwf	((?___awmod))+1
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___awmod)),w
-	movwf	1+(?___awdiv)+02h
+	clrf	1+(?___awdiv)+02h
+	addwf	1+(?___awdiv)+02h
 	movf	(0+(?___awmod)),w
-	movwf	0+(?___awdiv)+02h
+	clrf	0+(?___awdiv)+02h
+	addwf	0+(?___awdiv)+02h
+
 	fcall	___awdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -4336,38 +5652,60 @@ l4324:
 	fcall	_lcddata
 	line	87
 	
-l4326:	
+l4648:	
 ;Main.c: 87: lcddata(digit[Amnt%1000%100%10]);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(DisplayAmnt@Amnt+1),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(DisplayAmnt@Amnt),w
-	movwf	0+(?___awmod)+02h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	movlw	low(03E8h)
 	movwf	(?___awmod)
 	movlw	high(03E8h)
 	movwf	((?___awmod))+1
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___awmod)),w
-	movwf	1+(?___awmod)+02h
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
 	movf	(0+(?___awmod)),w
-	movwf	0+(?___awmod)+02h
-	movlw	064h
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___awmod)
-	clrf	(?___awmod+1)
+	movlw	high(064h)
+	movwf	((?___awmod))+1
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___awmod)),w
-	movwf	(_DisplayAmnt$1136+1)
+	clrf	(_DisplayAmnt$1137+1)
+	addwf	(_DisplayAmnt$1137+1)
 	movf	(0+(?___awmod)),w
-	movwf	(_DisplayAmnt$1136)
+	clrf	(_DisplayAmnt$1137)
+	addwf	(_DisplayAmnt$1137)
+
 ;Main.c: 87: lcddata(digit[Amnt%1000%100%10]);
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___awmod)
-	clrf	(?___awmod+1)
-	movf	(_DisplayAmnt$1136+1),w
-	movwf	1+(?___awmod)+02h
-	movf	(_DisplayAmnt$1136),w
-	movwf	0+(?___awmod)+02h
+	movlw	high(0Ah)
+	movwf	((?___awmod))+1
+	movf	(_DisplayAmnt$1137+1),w
+	clrf	1+(?___awmod)+02h
+	addwf	1+(?___awmod)+02h
+	movf	(_DisplayAmnt$1137),w
+	clrf	0+(?___awmod)+02h
+	addwf	0+(?___awmod)+02h
+
 	fcall	___awmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___awmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -4388,15 +5726,15 @@ GLOBAL	__end_of_DisplayAmnt
 
 	signat	_DisplayAmnt,8312
 	global	_lcdstring
-psect	text972,local,class=CODE,delta=2
-global __ptext972
-__ptext972:
+psect	text903,local,class=CODE,delta=2
+global __ptext903
+__ptext903:
 
 ;; *************** function _lcdstring *****************
 ;; Defined at:
 ;;		line 90 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 ;; Parameters:    Size  Location     Type
-;;  a               2    5[BANK0 ] PTR const unsigned char 
+;;  a               2    7[BANK0 ] PTR const unsigned char 
 ;;		 -> STR_56(18), STR_55(18), STR_54(18), STR_53(21), 
 ;;		 -> STR_52(21), STR_51(21), STR_50(21), STR_49(18), 
 ;;		 -> STR_48(18), STR_47(18), STR_46(21), STR_45(21), 
@@ -4413,8 +5751,8 @@ __ptext972:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       2       0       0       0
@@ -4427,12 +5765,13 @@ __ptext972:
 ;; This function calls:
 ;;		_lcddata
 ;; This function is called by:
+;;		_gsm_init
 ;;		_DisplayStock
 ;;		_startup
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text972
+psect	text903
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	90
 	global	__size_of_lcdstring
@@ -4443,14 +5782,18 @@ _lcdstring:
 ; Regs used in _lcdstring: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	91
 	
-l4310:	
+l4632:	
 ;lcd.c: 91: while(*a)
-	goto	l4316
+	goto	l4638
+	
+l978:	
 	line	93
 	
-l4312:	
+l4634:	
 ;lcd.c: 92: {
 ;lcd.c: 93: lcddata(*a++);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(lcdstring@a+1),w
 	movwf	btemp+1
 	movf	(lcdstring@a),w
@@ -4458,13 +5801,24 @@ l4312:
 	fcall	stringtab
 	fcall	_lcddata
 	
-l4314:	
-	incf	(lcdstring@a),f
-	skipnz
+l4636:	
+	movlw	low(01h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	addwf	(lcdstring@a),f
+	skipnc
 	incf	(lcdstring@a+1),f
+	movlw	high(01h)
+	addwf	(lcdstring@a+1),f
+	goto	l4638
+	line	94
+	
+l977:	
 	line	91
 	
-l4316:	
+l4638:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(lcdstring@a+1),w
 	movwf	btemp+1
 	movf	(lcdstring@a),w
@@ -4472,11 +5826,14 @@ l4316:
 	fcall	stringtab
 	iorlw	0
 	skipz
-	goto	u1611
-	goto	u1610
-u1611:
-	goto	l4312
-u1610:
+	goto	u3711
+	goto	u3710
+u3711:
+	goto	l4634
+u3710:
+	goto	l980
+	
+l979:	
 	line	95
 	
 l980:	
@@ -4488,9 +5845,9 @@ GLOBAL	__end_of_lcdstring
 
 	signat	_lcdstring,4216
 	global	_lcd_init
-psect	text973,local,class=CODE,delta=2
-global __ptext973
-__ptext973:
+psect	text904,local,class=CODE,delta=2
+global __ptext904
+__ptext904:
 
 ;; *************** function _lcd_init *****************
 ;; Defined at:
@@ -4504,8 +5861,8 @@ __ptext973:
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 17F/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
@@ -4522,7 +5879,7 @@ __ptext973:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text973
+psect	text904
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	71
 	global	__size_of_lcd_init
@@ -4533,30 +5890,32 @@ _lcd_init:
 ; Regs used in _lcd_init: [wreg+status,2+status,0+pclath+cstack]
 	line	72
 	
-l4300:	
+l4622:	
 ;lcd.c: 72: lcdport(0x00);
 	movlw	(0)
 	fcall	_lcdport
 	line	73
 	
-l4302:	
+l4624:	
 ;lcd.c: 73: _delay((unsigned long)((20)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	130
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_lcd_init+0)+0+1),f
 	movlw	221
 movwf	((??_lcd_init+0)+0),f
-u1837:
+u4007:
 	decfsz	((??_lcd_init+0)+0),f
-	goto	u1837
+	goto	u4007
 	decfsz	((??_lcd_init+0)+0+1),f
-	goto	u1837
+	goto	u4007
 	nop2
 opt asmopt_on
 
 	line	74
 	
-l4304:	
+l4626:	
 ;lcd.c: 74: lcdcmd(0x03);
 	movlw	(03h)
 	fcall	_lcdcmd
@@ -4564,37 +5923,41 @@ l4304:
 ;lcd.c: 75: _delay((unsigned long)((5)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	33
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_lcd_init+0)+0+1),f
 	movlw	118
 movwf	((??_lcd_init+0)+0),f
-u1847:
+u4017:
 	decfsz	((??_lcd_init+0)+0),f
-	goto	u1847
+	goto	u4017
 	decfsz	((??_lcd_init+0)+0+1),f
-	goto	u1847
+	goto	u4017
 	clrwdt
 opt asmopt_on
 
 	line	76
 	
-l4306:	
+l4628:	
 ;lcd.c: 76: lcdcmd(0x03);
 	movlw	(03h)
 	fcall	_lcdcmd
 	line	77
 	
-l4308:	
+l4630:	
 ;lcd.c: 77: _delay((unsigned long)((11)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	72
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 movwf	((??_lcd_init+0)+0+1),f
 	movlw	108
 movwf	((??_lcd_init+0)+0),f
-u1857:
+u4027:
 	decfsz	((??_lcd_init+0)+0),f
-	goto	u1857
+	goto	u4027
 	decfsz	((??_lcd_init+0)+0+1),f
-	goto	u1857
+	goto	u4027
 	clrwdt
 opt asmopt_on
 
@@ -4640,10 +6003,255 @@ GLOBAL	__end_of_lcd_init
 ;; =============== function _lcd_init ends ============
 
 	signat	_lcd_init,88
+	global	_SendStock
+psect	text905,local,class=CODE,delta=2
+global __ptext905
+__ptext905:
+
+;; *************** function _SendStock *****************
+;; Defined at:
+;;		line 191 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;  d               1    3[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       1       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       1       0       0       0
+;;Total ram usage:        1 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    5
+;; This function calls:
+;;		_usartstring
+;;		_transmit
+;;		_receive
+;; This function is called by:
+;;		_main
+;; This function uses a non-reentrant model
+;;
+psect	text905
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
+	line	191
+	global	__size_of_SendStock
+	__size_of_SendStock	equ	__end_of_SendStock-_SendStock
+	
+_SendStock:	
+	opt	stack 2
+; Regs used in _SendStock: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
+	line	193
+	
+l4592:	
+;Main.c: 192: unsigned char d;
+;Main.c: 193: PIE1=0X00;
+	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
+	clrf	(140)^080h	;volatile
+	line	194
+	
+l4594:	
+;Main.c: 194: usartstring("AT+CMGS=\"+919003831304\"");
+	movlw	low(STR_27|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_27|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	195
+	
+l4596:	
+;Main.c: 195: transmit(0x0D);
+	movlw	(0Dh)
+	fcall	_transmit
+	line	196
+;Main.c: 196: while((d=receive())!='>');
+	goto	l4598
+	
+l1150:	
+	goto	l4598
+	
+l1149:	
+	
+l4598:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(SendStock@d)
+	xorlw	03Eh
+	skipz
+	goto	u3691
+	goto	u3690
+u3691:
+	goto	l4598
+u3690:
+	goto	l4600
+	
+l1151:	
+	line	197
+	
+l4600:	
+;Main.c: 197: usartstring("Rise Stock:");
+	movlw	low(STR_28|8000h)
+	movwf	(?_usartstring)
+	movlw	high(STR_28|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	198
+;Main.c: 198: usartstring(RiseArray);
+	movlw	(_RiseArray&0ffh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	(0x0/2)
+	movwf	(?_usartstring+1)
+	fcall	_usartstring
+	line	199
+;Main.c: 199: usartstring(" Kgs");
+	movlw	low(STR_29|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_29|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	200
+	
+l4602:	
+;Main.c: 200: transmit('\r');
+	movlw	(0Dh)
+	fcall	_transmit
+	line	201
+	
+l4604:	
+;Main.c: 201: usartstring("Sugar Stock:");
+	movlw	low(STR_30|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_30|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	202
+	
+l4606:	
+;Main.c: 202: usartstring(SugarArray);
+	movlw	(_SugarArray&0ffh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	(0x0/2)
+	movwf	(?_usartstring+1)
+	fcall	_usartstring
+	line	203
+	
+l4608:	
+;Main.c: 203: usartstring(" Kgs");
+	movlw	low(STR_31|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_31|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	204
+;Main.c: 204: transmit('\r');
+	movlw	(0Dh)
+	fcall	_transmit
+	line	205
+	
+l4610:	
+;Main.c: 205: usartstring("Kerosene Stock:");
+	movlw	low(STR_32|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_32|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	206
+	
+l4612:	
+;Main.c: 206: usartstring(KeroseneArray);
+	movlw	(_KeroseneArray&0ffh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	(0x0/2)
+	movwf	(?_usartstring+1)
+	fcall	_usartstring
+	line	207
+	
+l4614:	
+;Main.c: 207: usartstring(" Lts");
+	movlw	low(STR_33|8000h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(?_usartstring)
+	movlw	high(STR_33|8000h)
+	movwf	((?_usartstring))+1
+	fcall	_usartstring
+	line	208
+	
+l4616:	
+;Main.c: 208: transmit(0x1A);
+	movlw	(01Ah)
+	fcall	_transmit
+	line	209
+;Main.c: 209: while((d=receive())!='K');
+	goto	l4618
+	
+l1153:	
+	goto	l4618
+	
+l1152:	
+	
+l4618:	
+	fcall	_receive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(SendStock@d)
+	xorlw	04Bh
+	skipz
+	goto	u3701
+	goto	u3700
+u3701:
+	goto	l4618
+u3700:
+	goto	l4620
+	
+l1154:	
+	line	210
+	
+l4620:	
+;Main.c: 210: PIE1=0X20;
+	movlw	(020h)
+	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
+	movwf	(140)^080h	;volatile
+	line	211
+	
+l1155:	
+	return
+	opt stack 0
+GLOBAL	__end_of_SendStock
+	__end_of_SendStock:
+;; =============== function _SendStock ends ============
+
+	signat	_SendStock,88
 	global	_RFID_read
-psect	text974,local,class=CODE,delta=2
-global __ptext974
-__ptext974:
+psect	text906,local,class=CODE,delta=2
+global __ptext906
+__ptext906:
 
 ;; *************** function _RFID_read *****************
 ;; Defined at:
@@ -4651,7 +6259,7 @@ __ptext974:
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
-;;  i               2    3[BANK0 ] int 
+;;  i               2    5[BANK0 ] int 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
@@ -4663,9 +6271,9 @@ __ptext974:
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       2       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -4674,7 +6282,7 @@ __ptext974:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text974
+psect	text906
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	73
 	global	__size_of_RFID_read
@@ -4685,65 +6293,101 @@ _RFID_read:
 ; Regs used in _RFID_read: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	74
 	
-l4286:	
+l4578:	
 ;Main.c: 74: if(!rfid_flag)
 	btfsc	(_rfid_flag/8),(_rfid_flag)&7
-	goto	u1591
-	goto	u1590
-u1591:
+	goto	u3661
+	goto	u3660
+u3661:
 	goto	l1113
-u1590:
+u3660:
 	line	76
 	
-l4288:	
+l4580:	
 ;Main.c: 75: {
 ;Main.c: 76: for(int i=0;i<12;i++)
+	movlw	low(0)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	clrf	(RFID_read@i)
-	clrf	(RFID_read@i+1)
-	line	77
+	movwf	(RFID_read@i)
+	movlw	high(0)
+	movwf	((RFID_read@i))+1
 	
-l4294:	
-;Main.c: 77: {card_store[i]=softreceive();}
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	movf	(RFID_read@i),w
-	addlw	_card_store&0ffh
-	movwf	fsr0
-	fcall	_softreceive
-	bcf	status, 7	;select IRP bank0
-	movwf	indf
-	line	76
-	
-l4296:	
-	incf	(RFID_read@i),f
-	skipnz
-	incf	(RFID_read@i+1),f
-	
-l4298:	
+l4582:	
 	movf	(RFID_read@i+1),w
 	xorlw	80h
 	movwf	btemp+1
 	movlw	(high(0Ch))^80h
 	subwf	btemp+1,w
 	skipz
-	goto	u1605
+	goto	u3675
 	movlw	low(0Ch)
 	subwf	(RFID_read@i),w
-u1605:
+u3675:
 
 	skipc
-	goto	u1601
-	goto	u1600
-u1601:
-	goto	l4294
-u1600:
+	goto	u3671
+	goto	u3670
+u3671:
+	goto	l4586
+u3670:
+	goto	l1112
+	
+l4584:	
+	goto	l1112
+	line	77
+	
+l1111:	
+	
+l4586:	
+;Main.c: 77: {card_store[i]=softreceive();}
+	fcall	_softreceive
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_RFID_read+0)+0
+	movf	(RFID_read@i),w
+	addlw	_card_store&0ffh
+	movwf	fsr0
+	movf	(??_RFID_read+0)+0,w
+	bcf	status, 7	;select IRP bank1
+	movwf	indf
+	line	76
+	
+l4588:	
+	movlw	low(01h)
+	addwf	(RFID_read@i),f
+	skipnc
+	incf	(RFID_read@i+1),f
+	movlw	high(01h)
+	addwf	(RFID_read@i+1),f
+	
+l4590:	
+	movf	(RFID_read@i+1),w
+	xorlw	80h
+	movwf	btemp+1
+	movlw	(high(0Ch))^80h
+	subwf	btemp+1,w
+	skipz
+	goto	u3685
+	movlw	low(0Ch)
+	subwf	(RFID_read@i),w
+u3685:
+
+	skipc
+	goto	u3681
+	goto	u3680
+u3681:
+	goto	l4586
+u3680:
 	
 l1112:	
 	line	78
 ;Main.c: 78: rfid_flag=1;
 	bsf	(_rfid_flag/8),(_rfid_flag)&7
+	goto	l1113
+	line	79
+	
+l1110:	
 	line	80
 	
 l1113:	
@@ -4755,9 +6399,9 @@ GLOBAL	__end_of_RFID_read
 
 	signat	_RFID_read,88
 	global	_lcddata
-psect	text975,local,class=CODE,delta=2
-global __ptext975
-__ptext975:
+psect	text907,local,class=CODE,delta=2
+global __ptext907
+__ptext907:
 
 ;; *************** function _lcddata *****************
 ;; Defined at:
@@ -4765,23 +6409,23 @@ __ptext975:
 ;; Parameters:    Size  Location     Type
 ;;  a               1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  a               1    4[BANK0 ] unsigned char 
-;;  z               1    3[BANK0 ] unsigned char 
-;;  y               1    2[BANK0 ] unsigned char 
+;;  a               1    6[BANK0 ] unsigned char 
+;;  z               1    5[BANK0 ] unsigned char 
+;;  y               1    4[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       3       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       3       0       0       0
-;;Total ram usage:        3 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       5       0       0       0
+;;Total ram usage:        5 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -4795,7 +6439,7 @@ __ptext975:
 ;;		_DisplayKerosene
 ;; This function uses a non-reentrant model
 ;;
-psect	text975
+psect	text907
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	51
 	global	__size_of_lcddata
@@ -4806,57 +6450,71 @@ _lcddata:
 ; Regs used in _lcddata: [wreg+status,2+status,0+pclath+cstack]
 ;lcddata@a stored from wreg
 	line	53
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(lcddata@a)
 	
-l4268:	
+l4562:	
 ;lcd.c: 52: unsigned char y,z;
 ;lcd.c: 53: z=a>>4&0x0F;
-	swapf	(lcddata@a),w
-	andlw	(0ffh shr 4) & 0ffh
+	movf	(lcddata@a),w
+	movwf	(??_lcddata+0)+0
+	movlw	04h
+u3655:
+	clrc
+	rrf	(??_lcddata+0)+0,f
+	addlw	-1
+	skipz
+	goto	u3655
+	movf	0+(??_lcddata+0)+0,w
+	andlw	0Fh
+	movwf	(??_lcddata+1)+0
+	movf	(??_lcddata+1)+0,w
 	movwf	(lcddata@z)
-	movlw	(0Fh)
-	andwf	(lcddata@z),f
 	line	54
 	
-l4270:	
+l4564:	
 ;lcd.c: 54: y=a&0x0F;
 	movf	(lcddata@a),w
+	andlw	0Fh
+	movwf	(??_lcddata+0)+0
+	movf	(??_lcddata+0)+0,w
 	movwf	(lcddata@y)
-	
-l4272:	
-	movlw	(0Fh)
-	andwf	(lcddata@y),f
 	line	55
 	
-l4274:	
+l4566:	
 ;lcd.c: 55: RD2=1;
 	bsf	(66/8),(66)&7
 	line	56
 	
-l4276:	
+l4568:	
 ;lcd.c: 56: lcdport(z);
 	movf	(lcddata@z),w
 	fcall	_lcdport
 	line	57
 	
-l4278:	
+l4570:	
 ;lcd.c: 57: enable();
 	fcall	_enable
 	line	58
 	
-l4280:	
+l4572:	
 ;lcd.c: 58: lcdport(y);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(lcddata@y),w
 	fcall	_lcdport
 	line	59
 	
-l4282:	
+l4574:	
 ;lcd.c: 59: enable();
 	fcall	_enable
 	line	60
 	
-l4284:	
+l4576:	
 ;lcd.c: 60: RD2 = 0;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	bcf	(66/8),(66)&7
 	line	61
 	
@@ -4869,9 +6527,9 @@ GLOBAL	__end_of_lcddata
 
 	signat	_lcddata,4216
 	global	_lcdcmd
-psect	text976,local,class=CODE,delta=2
-global __ptext976
-__ptext976:
+psect	text908,local,class=CODE,delta=2
+global __ptext908
+__ptext908:
 
 ;; *************** function _lcdcmd *****************
 ;; Defined at:
@@ -4879,23 +6537,23 @@ __ptext976:
 ;; Parameters:    Size  Location     Type
 ;;  a               1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  a               1    4[BANK0 ] unsigned char 
-;;  z               1    3[BANK0 ] unsigned char 
-;;  y               1    2[BANK0 ] unsigned char 
+;;  a               1    6[BANK0 ] unsigned char 
+;;  z               1    5[BANK0 ] unsigned char 
+;;  y               1    4[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
 ;;		On entry : 0/0
-;;		On exit  : 60/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       3       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       3       0       0       0
-;;Total ram usage:        3 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       5       0       0       0
+;;Total ram usage:        5 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -4903,6 +6561,7 @@ __ptext976:
 ;;		_enable
 ;; This function is called by:
 ;;		_lcd_init
+;;		_gsm_init
 ;;		_DisplayAmnt
 ;;		_DisplayStock
 ;;		_DisplaySugar
@@ -4910,9 +6569,12 @@ __ptext976:
 ;;		_DisplayKerosene
 ;;		_startup
 ;;		_main
+;;		_lcdclear
+;;		_Lcd_Shift_Right
+;;		_Lcd_Shift_Left
 ;; This function uses a non-reentrant model
 ;;
-psect	text976
+psect	text908
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	39
 	global	__size_of_lcdcmd
@@ -4927,44 +6589,54 @@ _lcdcmd:
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(lcdcmd@a)
 	
-l4254:	
+l4550:	
 ;lcd.c: 40: unsigned char y,z;
 ;lcd.c: 41: z=a>>4&0x0F;
-	swapf	(lcdcmd@a),w
-	andlw	(0ffh shr 4) & 0ffh
+	movf	(lcdcmd@a),w
+	movwf	(??_lcdcmd+0)+0
+	movlw	04h
+u3645:
+	clrc
+	rrf	(??_lcdcmd+0)+0,f
+	addlw	-1
+	skipz
+	goto	u3645
+	movf	0+(??_lcdcmd+0)+0,w
+	andlw	0Fh
+	movwf	(??_lcdcmd+1)+0
+	movf	(??_lcdcmd+1)+0,w
 	movwf	(lcdcmd@z)
-	movlw	(0Fh)
-	andwf	(lcdcmd@z),f
 	line	42
 	
-l4256:	
+l4552:	
 ;lcd.c: 42: y=a&0x0F;
 	movf	(lcdcmd@a),w
+	andlw	0Fh
+	movwf	(??_lcdcmd+0)+0
+	movf	(??_lcdcmd+0)+0,w
 	movwf	(lcdcmd@y)
-	
-l4258:	
-	movlw	(0Fh)
-	andwf	(lcdcmd@y),f
 	line	44
 	
-l4260:	
+l4554:	
 ;lcd.c: 44: lcdport(z);
 	movf	(lcdcmd@z),w
 	fcall	_lcdport
 	line	45
 	
-l4262:	
+l4556:	
 ;lcd.c: 45: enable();
 	fcall	_enable
 	line	46
 	
-l4264:	
+l4558:	
 ;lcd.c: 46: lcdport(y);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(lcdcmd@y),w
 	fcall	_lcdport
 	line	47
 	
-l4266:	
+l4560:	
 ;lcd.c: 47: enable();
 	fcall	_enable
 	line	48
@@ -4978,9 +6650,9 @@ GLOBAL	__end_of_lcdcmd
 
 	signat	_lcdcmd,4216
 	global	_LoadStockToArray
-psect	text977,local,class=CODE,delta=2
-global __ptext977
-__ptext977:
+psect	text909,local,class=CODE,delta=2
+global __ptext909
+__ptext909:
 
 ;; *************** function _LoadStockToArray *****************
 ;; Defined at:
@@ -4994,15 +6666,15 @@ __ptext977:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFE9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       2       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -5012,7 +6684,7 @@ __ptext977:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text977
+psect	text909
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	177
 	global	__size_of_LoadStockToArray
@@ -5023,17 +6695,24 @@ _LoadStockToArray:
 ; Regs used in _LoadStockToArray: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
 	line	178
 	
-l4236:	
+l4532:	
 ;Main.c: 178: RiseArray[0] = digit[RiseStock/1000];
 	movlw	low(03E8h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(?___lwdiv)
 	movlw	high(03E8h)
 	movwf	((?___lwdiv))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5042,26 +6721,39 @@ l4236:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	(_RiseArray)
 	line	179
 ;Main.c: 179: RiseArray[1] = digit[RiseStock%1000/100];
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(064h)
+	movwf	((?___lwdiv))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwmod)+02h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	movlw	low(03E8h)
 	movwf	(?___lwmod)
 	movlw	high(03E8h)
 	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(0+(?___lwmod)),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5070,34 +6762,53 @@ l4236:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_RiseArray)+01h
 	line	180
 ;Main.c: 180: RiseArray[2] = digit[RiseStock%1000%100/10];
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(0Ah)
+	movwf	((?___lwdiv))+1
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwmod)+02h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	movlw	low(03E8h)
 	movwf	(?___lwmod)
 	movlw	high(03E8h)
 	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(0+(?___lwmod)),w
-	movwf	0+(?___lwmod)+02h
-	movlw	064h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(0+(?___lwmod)),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5106,43 +6817,65 @@ l4236:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_RiseArray)+02h
 	line	181
 	
-l4238:	
+l4534:	
 ;Main.c: 181: RiseArray[3] = digit[RiseStock%1000%100%10];
 	movf	(_RiseStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_RiseStock),w
-	movwf	0+(?___lwmod)+02h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	movlw	low(03E8h)
 	movwf	(?___lwmod)
 	movlw	high(03E8h)
 	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(0+(?___lwmod)),w
-	movwf	0+(?___lwmod)+02h
-	movlw	064h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	(_LoadStockToArray$1137+1)
+	clrf	(_LoadStockToArray$1138+1)
+	addwf	(_LoadStockToArray$1138+1)
 	movf	(0+(?___lwmod)),w
-	movwf	(_LoadStockToArray$1137)
+	clrf	(_LoadStockToArray$1138)
+	addwf	(_LoadStockToArray$1138)
+
 	
-l4240:	
+l4536:	
 ;Main.c: 181: RiseArray[3] = digit[RiseStock%1000%100%10];
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
-	movf	(_LoadStockToArray$1137+1),w
-	movwf	1+(?___lwmod)+02h
-	movf	(_LoadStockToArray$1137),w
-	movwf	0+(?___lwmod)+02h
+	movlw	high(0Ah)
+	movwf	((?___lwmod))+1
+	movf	(_LoadStockToArray$1138+1),w
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
+	movf	(_LoadStockToArray$1138),w
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5151,19 +6884,27 @@ l4240:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_RiseArray)+03h
 	line	182
 	
-l4242:	
+l4538:	
 ;Main.c: 182: SugarArray[0] = digit[SugarStock/100];
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(064h)
+	movwf	((?___lwdiv))+1
 	movf	(_SugarStock+1),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(_SugarStock),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5172,27 +6913,41 @@ l4242:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	(_SugarArray)
 	line	183
 	
-l4244:	
+l4540:	
 ;Main.c: 183: SugarArray[1] = digit[SugarStock%100/10];
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(0Ah)
+	movwf	((?___lwdiv))+1
 	movf	(_SugarStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_SugarStock),w
-	movwf	0+(?___lwmod)+02h
-	movlw	064h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(0+(?___lwmod)),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5201,32 +6956,49 @@ l4244:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_SugarArray)+01h
 	line	184
 ;Main.c: 184: SugarArray[2] = digit[SugarStock%100%10];
 	movf	(_SugarStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_SugarStock),w
-	movwf	0+(?___lwmod)+02h
-	movlw	064h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	(_LoadStockToArray$1137+1)
+	clrf	(_LoadStockToArray$1138+1)
+	addwf	(_LoadStockToArray$1138+1)
 	movf	(0+(?___lwmod)),w
-	movwf	(_LoadStockToArray$1137)
+	clrf	(_LoadStockToArray$1138)
+	addwf	(_LoadStockToArray$1138)
+
 	
-l4246:	
+l4542:	
 ;Main.c: 184: SugarArray[2] = digit[SugarStock%100%10];
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
-	movf	(_LoadStockToArray$1137+1),w
-	movwf	1+(?___lwmod)+02h
-	movf	(_LoadStockToArray$1137),w
-	movwf	0+(?___lwmod)+02h
+	movlw	high(0Ah)
+	movwf	((?___lwmod))+1
+	movf	(_LoadStockToArray$1138+1),w
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
+	movf	(_LoadStockToArray$1138),w
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5235,19 +7007,27 @@ l4246:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_SugarArray)+02h
 	line	185
 	
-l4248:	
+l4544:	
 ;Main.c: 185: KeroseneArray[0] = digit[KeroseneStock/100];
-	movlw	064h
+	movlw	low(064h)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(064h)
+	movwf	((?___lwdiv))+1
 	movf	(_KeroseneStock+1),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(_KeroseneStock),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5256,27 +7036,41 @@ l4248:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	(_KeroseneArray)
 	line	186
 	
-l4250:	
+l4546:	
 ;Main.c: 186: KeroseneArray[1] = digit[KeroseneStock%100/10];
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___lwdiv)
-	clrf	(?___lwdiv+1)
+	movlw	high(0Ah)
+	movwf	((?___lwdiv))+1
 	movf	(_KeroseneStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_KeroseneStock),w
-	movwf	0+(?___lwmod)+02h
-	movlw	064h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	1+(?___lwdiv)+02h
+	clrf	1+(?___lwdiv)+02h
+	addwf	1+(?___lwdiv)+02h
 	movf	(0+(?___lwmod)),w
-	movwf	0+(?___lwdiv)+02h
+	clrf	0+(?___lwdiv)+02h
+	addwf	0+(?___lwdiv)+02h
+
 	fcall	___lwdiv
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwdiv)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5285,32 +7079,49 @@ l4250:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_KeroseneArray)+01h
 	line	187
 	
-l4252:	
+l4548:	
 ;Main.c: 187: KeroseneArray[2] = digit[KeroseneStock%100%10];
 	movf	(_KeroseneStock+1),w
-	movwf	1+(?___lwmod)+02h
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
 	movf	(_KeroseneStock),w
-	movwf	0+(?___lwmod)+02h
-	movlw	064h
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
+	movlw	low(064h)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
+	movlw	high(064h)
+	movwf	((?___lwmod))+1
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(1+(?___lwmod)),w
-	movwf	(_LoadStockToArray$1137+1)
+	clrf	(_LoadStockToArray$1138+1)
+	addwf	(_LoadStockToArray$1138+1)
 	movf	(0+(?___lwmod)),w
-	movwf	(_LoadStockToArray$1137)
+	clrf	(_LoadStockToArray$1138)
+	addwf	(_LoadStockToArray$1138)
+
 ;Main.c: 187: KeroseneArray[2] = digit[KeroseneStock%100%10];
-	movlw	0Ah
+	movlw	low(0Ah)
 	movwf	(?___lwmod)
-	clrf	(?___lwmod+1)
-	movf	(_LoadStockToArray$1137+1),w
-	movwf	1+(?___lwmod)+02h
-	movf	(_LoadStockToArray$1137),w
-	movwf	0+(?___lwmod)+02h
+	movlw	high(0Ah)
+	movwf	((?___lwmod))+1
+	movf	(_LoadStockToArray$1138+1),w
+	clrf	1+(?___lwmod)+02h
+	addwf	1+(?___lwmod)+02h
+	movf	(_LoadStockToArray$1138),w
+	clrf	0+(?___lwmod)+02h
+	addwf	0+(?___lwmod)+02h
+
 	fcall	___lwmod
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(0+(?___lwmod)),w
 	addlw	low(_digit|8000h)
 	movwf	fsr0
@@ -5319,6 +7130,8 @@ l4252:
 	addlw	1
 	movwf	btemp+1
 	fcall	stringtab
+	movwf	(??_LoadStockToArray+0)+0
+	movf	(??_LoadStockToArray+0)+0,w
 	movwf	0+(_KeroseneArray)+02h
 	line	188
 	
@@ -5331,9 +7144,9 @@ GLOBAL	__end_of_LoadStockToArray
 
 	signat	_LoadStockToArray,88
 	global	_paramter
-psect	text978,local,class=CODE,delta=2
-global __ptext978
-__ptext978:
+psect	text910,local,class=CODE,delta=2
+global __ptext910
+__ptext910:
 
 ;; *************** function _paramter *****************
 ;; Defined at:
@@ -5347,15 +7160,15 @@ __ptext978:
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/40
-;;		Unchanged: FFE00/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
+;;      Temps:          0       3       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -5365,7 +7178,7 @@ __ptext978:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text978
+psect	text910
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	156
 	global	__size_of_paramter
@@ -5376,32 +7189,70 @@ _paramter:
 ; Regs used in _paramter: [wreg+status,2+status,0+pclath+cstack]
 	line	157
 	
-l4234:	
+l4530:	
 ;Main.c: 157: c1=(eeprom_read(0)*100)+eeprom_read(1);
-	movlw	(0)
-	fcall	_eeprom_read
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(?___wmul)
-	clrf	(?___wmul+1)
-	movlw	064h
-	movwf	0+(?___wmul)+02h
-	clrf	1+(?___wmul)+02h
-	fcall	___wmul
 	movlw	(01h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_paramter+0)+0
+	movlw	(0)
+	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_paramter+1)+0
+	clrf	(??_paramter+1)+0+1
+	movf	0+(??_paramter+1)+0,w
+	movwf	(?___wmul)
+	movf	1+(??_paramter+1)+0,w
+	movwf	(?___wmul+1)
+	movlw	low(064h)
+	movwf	0+(?___wmul)+02h
+	movlw	high(064h)
+	movwf	(0+(?___wmul)+02h)+1
+	fcall	___wmul
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	0+(??_paramter+0)+0,w
+	addwf	(0+(?___wmul)),w
+	movwf	(_c1)
+	movlw	0
+	skipnc
+	movlw	1
+	addwf	(1+(?___wmul)),w
+	movwf	1+(_c1)
 	line	158
 ;Main.c: 158: c2=(eeprom_read(2)*100)+eeprom_read(3);
-	movlw	(02h)
-	fcall	_eeprom_read
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(?___wmul)
-	clrf	(?___wmul+1)
-	movlw	064h
-	movwf	0+(?___wmul)+02h
-	clrf	1+(?___wmul)+02h
-	fcall	___wmul
 	movlw	(03h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_paramter+0)+0
+	movlw	(02h)
+	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_paramter+1)+0
+	clrf	(??_paramter+1)+0+1
+	movf	0+(??_paramter+1)+0,w
+	movwf	(?___wmul)
+	movf	1+(??_paramter+1)+0,w
+	movwf	(?___wmul+1)
+	movlw	low(064h)
+	movwf	0+(?___wmul)+02h
+	movlw	high(064h)
+	movwf	(0+(?___wmul)+02h)+1
+	fcall	___wmul
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	0+(??_paramter+0)+0,w
+	addwf	(0+(?___wmul)),w
+	movwf	(_c2)
+	movlw	0
+	skipnc
+	movlw	1
+	addwf	(1+(?___wmul)),w
+	movwf	1+(_c2)
 	line	159
 	
 l1140:	
@@ -5413,9 +7264,9 @@ GLOBAL	__end_of_paramter
 
 	signat	_paramter,88
 	global	_ReadStock
-psect	text979,local,class=CODE,delta=2
-global __ptext979
-__ptext979:
+psect	text911,local,class=CODE,delta=2
+global __ptext911
+__ptext911:
 
 ;; *************** function _ReadStock *****************
 ;; Defined at:
@@ -5429,15 +7280,15 @@ __ptext979:
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 0/20
-;;		On exit  : 60/0
-;;		Unchanged: FFE00/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
+;;      Temps:          0       3       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -5447,7 +7298,7 @@ __ptext979:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text979
+psect	text911
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	107
 	global	__size_of_ReadStock
@@ -5458,41 +7309,62 @@ _ReadStock:
 ; Regs used in _ReadStock: [wreg+status,2+status,0+pclath+cstack]
 	line	108
 	
-l4232:	
+l4528:	
 ;Main.c: 108: RiseStock=(eeprom_read(24)*100)+eeprom_read(25);
-	movlw	(018h)
-	fcall	_eeprom_read
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(?___wmul)
-	clrf	(?___wmul+1)
-	movlw	064h
-	movwf	0+(?___wmul)+02h
-	clrf	1+(?___wmul)+02h
-	fcall	___wmul
-	movf	(1+(?___wmul)),w
-	movwf	(_RiseStock+1)
-	movf	(0+(?___wmul)),w
-	movwf	(_RiseStock)
 	movlw	(019h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_RiseStock),f
+	movwf	(??_ReadStock+0)+0
+	movlw	(018h)
+	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadStock+1)+0
+	clrf	(??_ReadStock+1)+0+1
+	movf	0+(??_ReadStock+1)+0,w
+	movwf	(?___wmul)
+	movf	1+(??_ReadStock+1)+0,w
+	movwf	(?___wmul+1)
+	movlw	low(064h)
+	movwf	0+(?___wmul)+02h
+	movlw	high(064h)
+	movwf	(0+(?___wmul)+02h)+1
+	fcall	___wmul
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	0+(??_ReadStock+0)+0,w
+	addwf	(0+(?___wmul)),w
+	movwf	(_RiseStock)
+	movlw	0
 	skipnc
-	incf	(_RiseStock+1),f
+	movlw	1
+	addwf	(1+(?___wmul)),w
+	movwf	1+(_RiseStock)
 	line	109
 ;Main.c: 109: SugarStock=eeprom_read(26);
 	movlw	(01Ah)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadStock+0)+0
+	clrf	(??_ReadStock+0)+0+1
+	movf	0+(??_ReadStock+0)+0,w
 	movwf	(_SugarStock)
-	clrf	(_SugarStock+1)
+	movf	1+(??_ReadStock+0)+0,w
+	movwf	(_SugarStock+1)
 	line	110
 ;Main.c: 110: KeroseneStock=eeprom_read(27);
 	movlw	(01Bh)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadStock+0)+0
+	clrf	(??_ReadStock+0)+0+1
+	movf	0+(??_ReadStock+0)+0,w
 	movwf	(_KeroseneStock)
-	clrf	(_KeroseneStock+1)
+	movf	1+(??_ReadStock+0)+0,w
+	movwf	(_KeroseneStock+1)
 	line	111
 	
 l1122:	
@@ -5504,9 +7376,9 @@ GLOBAL	__end_of_ReadStock
 
 	signat	_ReadStock,88
 	global	_ReadAmnt
-psect	text980,local,class=CODE,delta=2
-global __ptext980
-__ptext980:
+psect	text912,local,class=CODE,delta=2
+global __ptext912
+__ptext912:
 
 ;; *************** function _ReadAmnt *****************
 ;; Defined at:
@@ -5520,15 +7392,15 @@ __ptext980:
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 160/0
-;;		On exit  : 60/0
-;;		Unchanged: FFE00/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
+;;      Temps:          0       3       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    4
 ;; This function calls:
@@ -5538,7 +7410,7 @@ __ptext980:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text980
+psect	text912
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	91
 	global	__size_of_ReadAmnt
@@ -5549,122 +7421,182 @@ _ReadAmnt:
 ; Regs used in _ReadAmnt: [wreg+status,2+status,0+pclath+cstack]
 	line	92
 	
-l4230:	
+l4526:	
 ;Main.c: 92: User1amt=(eeprom_read(0)*100)+eeprom_read(1);
-	movlw	(0)
-	fcall	_eeprom_read
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(?___wmul)
-	clrf	(?___wmul+1)
-	movlw	064h
-	movwf	0+(?___wmul)+02h
-	clrf	1+(?___wmul)+02h
-	fcall	___wmul
-	movf	(1+(?___wmul)),w
-	movwf	(_User1amt+1)
-	movf	(0+(?___wmul)),w
-	movwf	(_User1amt)
 	movlw	(01h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_User1amt),f
+	movwf	(??_ReadAmnt+0)+0
+	movlw	(0)
+	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+1)+0
+	clrf	(??_ReadAmnt+1)+0+1
+	movf	0+(??_ReadAmnt+1)+0,w
+	movwf	(?___wmul)
+	movf	1+(??_ReadAmnt+1)+0,w
+	movwf	(?___wmul+1)
+	movlw	low(064h)
+	movwf	0+(?___wmul)+02h
+	movlw	high(064h)
+	movwf	(0+(?___wmul)+02h)+1
+	fcall	___wmul
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	0+(??_ReadAmnt+0)+0,w
+	addwf	(0+(?___wmul)),w
+	movwf	(_User1amt)
+	movlw	0
 	skipnc
-	incf	(_User1amt+1),f
+	movlw	1
+	addwf	(1+(?___wmul)),w
+	movwf	1+(_User1amt)
 	line	93
 ;Main.c: 93: User2amt=(eeprom_read(8)*100)+eeprom_read(9);
-	movlw	(08h)
-	fcall	_eeprom_read
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(?___wmul)
-	clrf	(?___wmul+1)
-	movlw	064h
-	movwf	0+(?___wmul)+02h
-	clrf	1+(?___wmul)+02h
-	fcall	___wmul
-	movf	(1+(?___wmul)),w
-	movwf	(_User2amt+1)
-	movf	(0+(?___wmul)),w
-	movwf	(_User2amt)
 	movlw	(09h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_User2amt),f
+	movwf	(??_ReadAmnt+0)+0
+	movlw	(08h)
+	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+1)+0
+	clrf	(??_ReadAmnt+1)+0+1
+	movf	0+(??_ReadAmnt+1)+0,w
+	movwf	(?___wmul)
+	movf	1+(??_ReadAmnt+1)+0,w
+	movwf	(?___wmul+1)
+	movlw	low(064h)
+	movwf	0+(?___wmul)+02h
+	movlw	high(064h)
+	movwf	(0+(?___wmul)+02h)+1
+	fcall	___wmul
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	0+(??_ReadAmnt+0)+0,w
+	addwf	(0+(?___wmul)),w
+	movwf	(_User2amt)
+	movlw	0
 	skipnc
-	incf	(_User2amt+1),f
+	movlw	1
+	addwf	(1+(?___wmul)),w
+	movwf	1+(_User2amt)
 	line	94
 ;Main.c: 94: User3amt=(eeprom_read(16)*100)+eeprom_read(17);
-	movlw	(010h)
-	fcall	_eeprom_read
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(?___wmul)
-	clrf	(?___wmul+1)
-	movlw	064h
-	movwf	0+(?___wmul)+02h
-	clrf	1+(?___wmul)+02h
-	fcall	___wmul
-	movf	(1+(?___wmul)),w
-	movwf	(_User3amt+1)
-	movf	(0+(?___wmul)),w
-	movwf	(_User3amt)
 	movlw	(011h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	addwf	(_User3amt),f
+	movwf	(??_ReadAmnt+0)+0
+	movlw	(010h)
+	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+1)+0
+	clrf	(??_ReadAmnt+1)+0+1
+	movf	0+(??_ReadAmnt+1)+0,w
+	movwf	(?___wmul)
+	movf	1+(??_ReadAmnt+1)+0,w
+	movwf	(?___wmul+1)
+	movlw	low(064h)
+	movwf	0+(?___wmul)+02h
+	movlw	high(064h)
+	movwf	(0+(?___wmul)+02h)+1
+	fcall	___wmul
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	0+(??_ReadAmnt+0)+0,w
+	addwf	(0+(?___wmul)),w
+	movwf	(_User3amt)
+	movlw	0
 	skipnc
-	incf	(_User3amt+1),f
+	movlw	1
+	addwf	(1+(?___wmul)),w
+	movwf	1+(_User3amt)
 	line	95
 ;Main.c: 95: User1Rise = eeprom_read(2);
 	movlw	(02h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User1Rise)
 	line	96
 ;Main.c: 96: User2Rise = eeprom_read(10);
 	movlw	(0Ah)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User2Rise)
 	line	97
 ;Main.c: 97: User3Rise = eeprom_read(18);
 	movlw	(012h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User3Rise)
 	line	98
 ;Main.c: 98: User1Kerosene = eeprom_read(4);
 	movlw	(04h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User1Kerosene)
 	line	99
 ;Main.c: 99: User2Kerosene = eeprom_read(12);
 	movlw	(0Ch)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User2Kerosene)
 	line	100
 ;Main.c: 100: User3Kerosene = eeprom_read(20);
 	movlw	(014h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User3Kerosene)
 	line	101
 ;Main.c: 101: User1Sugar = eeprom_read(3);
 	movlw	(03h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User1Sugar)
 	line	102
 ;Main.c: 102: User2Sugar = eeprom_read(11);
 	movlw	(0Bh)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User2Sugar)
 	line	103
 ;Main.c: 103: User3Sugar = eeprom_read(19);
 	movlw	(013h)
 	fcall	_eeprom_read
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_ReadAmnt+0)+0
+	movf	(??_ReadAmnt+0)+0,w
 	movwf	(_User3Sugar)
 	line	104
 	
@@ -5676,10 +7608,128 @@ GLOBAL	__end_of_ReadAmnt
 ;; =============== function _ReadAmnt ends ============
 
 	signat	_ReadAmnt,88
+	global	_usartstring
+psect	text913,local,class=CODE,delta=2
+global __ptext913
+__ptext913:
+
+;; *************** function _usartstring *****************
+;; Defined at:
+;;		line 22 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+;; Parameters:    Size  Location     Type
+;;  st              2    1[BANK0 ] PTR const unsigned char 
+;;		 -> STR_33(5), STR_32(16), STR_31(5), STR_30(13), 
+;;		 -> STR_29(5), STR_28(12), STR_27(24), KeroseneArray(4), 
+;;		 -> SugarArray(4), RiseArray(5), STR_18(20), STR_17(24), 
+;;		 -> STR_16(20), STR_15(24), STR_14(20), STR_13(24), 
+;;		 -> STR_12(29), STR_11(24), STR_10(27), STR_9(24), 
+;;		 -> STR_7(19), STR_6(11), STR_5(11), STR_4(10), 
+;;		 -> STR_3(4), 
+;; Auto vars:     Size  Location     Type
+;;		None
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath, cstack
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       2       0       0       0
+;;      Locals:         0       0       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       2       0       0       0
+;;Total ram usage:        2 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    4
+;; This function calls:
+;;		_transmit
+;; This function is called by:
+;;		_gsm_init
+;;		_SendStock
+;;		_send_moister_message2
+;;		_send_moister_message1
+;;		_send_stage1_message
+;;		_send_stage2_message
+;;		_send_stage3_message
+;; This function uses a non-reentrant model
+;;
+psect	text913
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+	line	22
+	global	__size_of_usartstring
+	__size_of_usartstring	equ	__end_of_usartstring-_usartstring
+	
+_usartstring:	
+	opt	stack 2
+; Regs used in _usartstring: [wreg-fsr0h+status,2+status,0+btemp+1+pclath+cstack]
+	line	23
+	
+l4518:	
+;UART.C: 23: while(*st)
+	goto	l4524
+	
+l1031:	
+	line	24
+	
+l4520:	
+;UART.C: 24: transmit(*st++);
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(usartstring@st+1),w
+	movwf	btemp+1
+	movf	(usartstring@st),w
+	movwf	fsr0
+	fcall	stringtab
+	fcall	_transmit
+	
+l4522:	
+	movlw	low(01h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	addwf	(usartstring@st),f
+	skipnc
+	incf	(usartstring@st+1),f
+	movlw	high(01h)
+	addwf	(usartstring@st+1),f
+	goto	l4524
+	
+l1030:	
+	line	23
+	
+l4524:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(usartstring@st+1),w
+	movwf	btemp+1
+	movf	(usartstring@st),w
+	movwf	fsr0
+	fcall	stringtab
+	iorlw	0
+	skipz
+	goto	u3631
+	goto	u3630
+u3631:
+	goto	l4520
+u3630:
+	goto	l1033
+	
+l1032:	
+	line	25
+	
+l1033:	
+	return
+	opt stack 0
+GLOBAL	__end_of_usartstring
+	__end_of_usartstring:
+;; =============== function _usartstring ends ============
+
+	signat	_usartstring,4216
 	global	_softreceive
-psect	text981,local,class=CODE,delta=2
-global __ptext981
-__ptext981:
+psect	text914,local,class=CODE,delta=2
+global __ptext914
+__ptext914:
 
 ;; *************** function _softreceive *****************
 ;; Defined at:
@@ -5687,22 +7737,22 @@ __ptext981:
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
-;;  mask            1    2[BANK0 ] unsigned char 
-;;  Data            1    1[BANK0 ] unsigned char 
+;;  mask            1    3[BANK0 ] unsigned char 
+;;  Data            1    2[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;                  1    wreg      unsigned char 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       2       0       0       0
-;;      Temps:          0       1       0       0       0
-;;      Totals:         0       3       0       0       0
-;;Total ram usage:        3 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
@@ -5711,7 +7761,7 @@ __ptext981:
 ;;		_RFID_read
 ;; This function uses a non-reentrant model
 ;;
-psect	text981
+psect	text914
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c"
 	line	21
 	global	__size_of_softreceive
@@ -5722,97 +7772,136 @@ _softreceive:
 ; Regs used in _softreceive: [wreg+status,2+status,0]
 	line	24
 	
-l4206:	
+l4496:	
 ;softuart.c: 22: char mask;
 ;softuart.c: 23: char Data;
 ;softuart.c: 24: Data=0;
-	clrf	(softreceive@Data)
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(softreceive@Data)
 	line	25
 ;softuart.c: 25: while(RD0);
+	goto	l992
+	
+l993:	
 	
 l992:	
 	btfsc	(64/8),(64)&7
-	goto	u1561
-	goto	u1560
-u1561:
+	goto	u3591
+	goto	u3590
+u3591:
 	goto	l992
-u1560:
+u3590:
+	goto	l4498
+	
+l994:	
 	line	26
 	
-l4208:	
+l4498:	
 ;softuart.c: 26: _delay((unsigned long)(((((1000000/9600)-2)/2))*(20000000/4000000.0)));
 	opt asmopt_off
 movlw	84
 movwf	(??_softreceive+0)+0,f
-u1867:
+u4037:
 decfsz	(??_softreceive+0)+0,f
-	goto	u1867
+	goto	u4037
 	nop2	;nop
 opt asmopt_on
 
 	line	27
 	
-l4210:	
+l4500:	
 ;softuart.c: 27: for(mask=0x01;mask!=0;mask=mask<<1)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	clrf	(softreceive@mask)
-	incf	(softreceive@mask),f
+	bsf	status,0
+	rlf	(softreceive@mask),f
+	
+l4502:	
+	movf	(softreceive@mask),f
+	skipz
+	goto	u3601
+	goto	u3600
+u3601:
+	goto	l4506
+u3600:
+	goto	l4514
+	
+l4504:	
+	goto	l4514
+	line	28
+	
+l995:	
 	line	29
 	
-l4216:	
+l4506:	
 ;softuart.c: 28: {
 ;softuart.c: 29: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
 	opt asmopt_off
 movlw	169
 movwf	(??_softreceive+0)+0,f
-u1877:
+u4047:
 decfsz	(??_softreceive+0)+0,f
-	goto	u1877
+	goto	u4047
 	nop2	;nop
 opt asmopt_on
 
 	line	30
 	
-l4218:	
+l4508:	
 ;softuart.c: 30: if(RD0)Data=Data|mask;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	btfss	(64/8),(64)&7
-	goto	u1571
-	goto	u1570
-u1571:
-	goto	l4222
-u1570:
+	goto	u3611
+	goto	u3610
+u3611:
+	goto	l997
+u3610:
 	
-l4220:	
-	movf	(softreceive@mask),w
-	iorwf	(softreceive@Data),f
+l4510:	
+	movf	(softreceive@Data),w
+	iorwf	(softreceive@mask),w
+	movwf	(??_softreceive+0)+0
+	movf	(??_softreceive+0)+0,w
+	movwf	(softreceive@Data)
+	
+l997:	
 	line	27
+	movf	(softreceive@mask),w
+	movwf	(??_softreceive+0)+0
+	addwf	(??_softreceive+0)+0,w
+	movwf	(??_softreceive+1)+0
+	movf	(??_softreceive+1)+0,w
+	movwf	(softreceive@mask)
 	
-l4222:	
-	clrc
-	rlf	(softreceive@mask),f
-	
-l4224:	
+l4512:	
 	movf	(softreceive@mask),f
 	skipz
-	goto	u1581
-	goto	u1580
-u1581:
-	goto	l4216
-u1580:
+	goto	u3621
+	goto	u3620
+u3621:
+	goto	l4506
+u3620:
+	goto	l4514
+	
+l996:	
 	line	32
 	
-l4226:	
+l4514:	
 ;softuart.c: 31: }
 ;softuart.c: 32: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
 	opt asmopt_off
 movlw	169
 movwf	(??_softreceive+0)+0,f
-u1887:
+u4057:
 decfsz	(??_softreceive+0)+0,f
-	goto	u1887
+	goto	u4057
 	nop2	;nop
 opt asmopt_on
 
@@ -5821,6 +7910,9 @@ opt asmopt_on
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(softreceive@Data),w
+	goto	l998
+	
+l4516:	
 	line	34
 	
 l998:	
@@ -5832,9 +7924,9 @@ GLOBAL	__end_of_softreceive
 
 	signat	_softreceive,89
 	global	_SoftWareUart_Init
-psect	text982,local,class=CODE,delta=2
-global __ptext982
-__ptext982:
+psect	text915,local,class=CODE,delta=2
+global __ptext915
+__ptext915:
 
 ;; *************** function _SoftWareUart_Init *****************
 ;; Defined at:
@@ -5848,7 +7940,7 @@ __ptext982:
 ;; Registers used:
 ;;		wreg
 ;; Tracked objects:
-;;		On entry : 60/40
+;;		On entry : 0/0
 ;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
@@ -5865,7 +7957,7 @@ __ptext982:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text982
+psect	text915
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\softuart.c"
 	line	10
 	global	__size_of_SoftWareUart_Init
@@ -5876,8 +7968,9 @@ _SoftWareUart_Init:
 ; Regs used in _SoftWareUart_Init: [wreg]
 	line	11
 	
-l4202:	
+l4492:	
 ;softuart.c: 11: RD1=1;
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bsf	(65/8),(65)&7
 	line	12
@@ -5886,6 +7979,7 @@ l4202:
 	line	13
 ;softuart.c: 13: TRISD1=0;
 	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
 	bcf	(1089/8)^080h,(1089)&7
 	line	14
 ;softuart.c: 14: TRISD0=1;
@@ -5893,17 +7987,18 @@ l4202:
 	line	15
 ;softuart.c: 15: RD1=1;
 	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	bsf	(65/8),(65)&7
 	line	16
 	
-l4204:	
+l4494:	
 ;softuart.c: 16: _delay((unsigned long)((((1000000/9600)-2))*(20000000/4000000.0)));
 	opt asmopt_off
 movlw	169
 movwf	(??_SoftWareUart_Init+0)+0,f
-u1897:
+u4067:
 decfsz	(??_SoftWareUart_Init+0)+0,f
-	goto	u1897
+	goto	u4067
 	nop2	;nop
 opt asmopt_on
 
@@ -5918,9 +8013,9 @@ GLOBAL	__end_of_SoftWareUart_Init
 
 	signat	_SoftWareUart_Init,88
 	global	_enable
-psect	text983,local,class=CODE,delta=2
-global __ptext983
-__ptext983:
+psect	text916,local,class=CODE,delta=2
+global __ptext916
+__ptext916:
 
 ;; *************** function _enable *****************
 ;; Defined at:
@@ -5930,12 +8025,12 @@ __ptext983:
 ;; Auto vars:     Size  Location     Type
 ;;		None
 ;; Return value:  Size  Location     Type
-;;		None               void
+;;                  2  950[COMMON] int 
 ;; Registers used:
 ;;		wreg
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
@@ -5952,7 +8047,7 @@ __ptext983:
 ;;		_lcddata
 ;; This function uses a non-reentrant model
 ;;
-psect	text983
+psect	text916
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	9
 	global	__size_of_enable
@@ -5963,29 +8058,31 @@ _enable:
 ; Regs used in _enable: [wreg]
 	line	10
 	
-l4196:	
+l4486:	
 ;lcd.c: 10: RD3 = 1;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	bsf	(67/8),(67)&7
 	line	11
 	
-l4198:	
+l4488:	
 ;lcd.c: 11: _delay((unsigned long)((4)*(20000000/4000.0)));
 	opt asmopt_off
 movlw	26
 movwf	((??_enable+0)+0+1),f
 	movlw	248
 movwf	((??_enable+0)+0),f
-u1907:
+u4077:
 	decfsz	((??_enable+0)+0),f
-	goto	u1907
+	goto	u4077
 	decfsz	((??_enable+0)+0+1),f
-	goto	u1907
+	goto	u4077
 	clrwdt
 opt asmopt_on
 
 	line	12
 	
-l4200:	
+l4490:	
 ;lcd.c: 12: RD3 = 0;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
@@ -5999,11 +8096,131 @@ GLOBAL	__end_of_enable
 	__end_of_enable:
 ;; =============== function _enable ends ============
 
-	signat	_enable,88
+	signat	_enable,90
+	global	_DelayS
+psect	text917,local,class=CODE,delta=2
+global __ptext917
+__ptext917:
+
+;; *************** function _DelayS *****************
+;; Defined at:
+;;		line 75 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+;; Parameters:    Size  Location     Type
+;;  cnt             1    wreg     unsigned char 
+;; Auto vars:     Size  Location     Type
+;;  cnt             1    4[BANK0 ] unsigned char 
+;;  i               1    5[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg, status,2, status,0, pclath, cstack
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       2       0       0       0
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    4
+;; This function calls:
+;;		_DelayMs
+;; This function is called by:
+;;		_gsm_init
+;; This function uses a non-reentrant model
+;;
+psect	text917
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+	line	75
+	global	__size_of_DelayS
+	__size_of_DelayS	equ	__end_of_DelayS-_DelayS
+	
+_DelayS:	
+	opt	stack 2
+; Regs used in _DelayS: [wreg+status,2+status,0+pclath+cstack]
+;DelayS@cnt stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(DelayS@cnt)
+	line	77
+;Delay.c: 76: unsigned char i;
+;Delay.c: 77: do {
+	
+l944:	
+	line	78
+	
+l4476:	
+;Delay.c: 78: i = 4;
+	movlw	(04h)
+	movwf	(??_DelayS+0)+0
+	movf	(??_DelayS+0)+0,w
+	movwf	(DelayS@i)
+	goto	l4478
+	line	79
+;Delay.c: 79: do {
+	
+l945:	
+	line	80
+	
+l4478:	
+;Delay.c: 80: DelayMs(250);
+	movlw	(0FAh)
+	fcall	_DelayMs
+	line	81
+	
+l4480:	
+# 81 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+clrwdt ;#
+psect	text917
+	line	82
+	
+l4482:	
+;Delay.c: 82: } while(--i);
+	movlw	low(01h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	subwf	(DelayS@i),f
+	btfss	status,2
+	goto	u3571
+	goto	u3570
+u3571:
+	goto	l4478
+u3570:
+	goto	l4484
+	
+l946:	
+	line	83
+	
+l4484:	
+;Delay.c: 83: } while(--cnt);
+	movlw	low(01h)
+	subwf	(DelayS@cnt),f
+	btfss	status,2
+	goto	u3581
+	goto	u3580
+u3581:
+	goto	l944
+u3580:
+	goto	l948
+	
+l947:	
+	line	84
+	
+l948:	
+	return
+	opt stack 0
+GLOBAL	__end_of_DelayS
+	__end_of_DelayS:
+;; =============== function _DelayS ends ============
+
+	signat	_DelayS,4216
 	global	___awmod
-psect	text984,local,class=CODE,delta=2
-global __ptext984
-__ptext984:
+psect	text918,local,class=CODE,delta=2
+global __ptext918
+__ptext918:
 
 ;; *************** function ___awmod *****************
 ;; Defined at:
@@ -6012,32 +8229,35 @@ __ptext984:
 ;;  divisor         2    0[BANK0 ] int 
 ;;  dividend        2    2[BANK0 ] int 
 ;; Auto vars:     Size  Location     Type
-;;  sign            1    5[BANK0 ] unsigned char 
-;;  counter         1    4[BANK0 ] unsigned char 
+;;  sign            1    6[BANK0 ] unsigned char 
+;;  counter         1    5[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;                  2    0[BANK0 ] int 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       4       0       0       0
 ;;      Locals:         0       2       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       6       0       0       0
-;;Total ram usage:        6 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       7       0       0       0
+;;Total ram usage:        7 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
 ;;		Nothing
 ;; This function is called by:
 ;;		_DisplayAmnt
+;;		_DisplaySugar
+;;		_DisplayRise
+;;		_DisplayKerosene
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text984
+psect	text918
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awmod.c"
 	line	5
 	global	__size_of___awmod
@@ -6048,145 +8268,209 @@ ___awmod:
 ; Regs used in ___awmod: [wreg+status,2+status,0]
 	line	8
 	
-l4160:	
-	clrf	(___awmod@sign)
+l4432:	
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(___awmod@sign)
 	line	9
 	
-l4162:	
+l4434:	
 	btfss	(___awmod@dividend+1),7
-	goto	u1491
-	goto	u1490
-u1491:
-	goto	l4168
-u1490:
+	goto	u3461
+	goto	u3460
+u3461:
+	goto	l4438
+u3460:
 	line	10
 	
-l4164:	
+l4436:	
 	comf	(___awmod@dividend),f
 	comf	(___awmod@dividend+1),f
 	incf	(___awmod@dividend),f
 	skipnz
 	incf	(___awmod@dividend+1),f
 	line	11
-	
-l4166:	
 	clrf	(___awmod@sign)
-	incf	(___awmod@sign),f
+	bsf	status,0
+	rlf	(___awmod@sign),f
+	goto	l4438
+	line	12
+	
+l1452:	
 	line	13
 	
-l4168:	
+l4438:	
 	btfss	(___awmod@divisor+1),7
-	goto	u1501
-	goto	u1500
-u1501:
-	goto	l4172
-u1500:
+	goto	u3471
+	goto	u3470
+u3471:
+	goto	l4442
+u3470:
 	line	14
 	
-l4170:	
+l4440:	
 	comf	(___awmod@divisor),f
 	comf	(___awmod@divisor+1),f
 	incf	(___awmod@divisor),f
 	skipnz
 	incf	(___awmod@divisor+1),f
+	goto	l4442
+	
+l1453:	
 	line	15
 	
-l4172:	
+l4442:	
 	movf	(___awmod@divisor+1),w
 	iorwf	(___awmod@divisor),w
 	skipnz
-	goto	u1511
-	goto	u1510
-u1511:
-	goto	l4188
-u1510:
+	goto	u3481
+	goto	u3480
+u3481:
+	goto	l4460
+u3480:
 	line	16
 	
-l4174:	
+l4444:	
 	clrf	(___awmod@counter)
-	incf	(___awmod@counter),f
+	bsf	status,0
+	rlf	(___awmod@counter),f
 	line	17
-	goto	l4178
+	goto	l4450
+	
+l1456:	
 	line	18
 	
-l4176:	
+l4446:	
+	movlw	01h
+	
+u3495:
 	clrc
 	rlf	(___awmod@divisor),f
 	rlf	(___awmod@divisor+1),f
+	addlw	-1
+	skipz
+	goto	u3495
 	line	19
-	incf	(___awmod@counter),f
+	
+l4448:	
+	movlw	(01h)
+	movwf	(??___awmod+0)+0
+	movf	(??___awmod+0)+0,w
+	addwf	(___awmod@counter),f
+	goto	l4450
+	line	20
+	
+l1455:	
 	line	17
 	
-l4178:	
+l4450:	
 	btfss	(___awmod@divisor+1),(15)&7
-	goto	u1521
-	goto	u1520
-u1521:
-	goto	l4176
-u1520:
+	goto	u3501
+	goto	u3500
+u3501:
+	goto	l4446
+u3500:
+	goto	l4452
+	
+l1457:	
+	goto	l4452
+	line	21
+	
+l1458:	
 	line	22
 	
-l4180:	
+l4452:	
 	movf	(___awmod@divisor+1),w
 	subwf	(___awmod@dividend+1),w
 	skipz
-	goto	u1535
+	goto	u3515
 	movf	(___awmod@divisor),w
 	subwf	(___awmod@dividend),w
-u1535:
+u3515:
 	skipc
-	goto	u1531
-	goto	u1530
-u1531:
-	goto	l4184
-u1530:
+	goto	u3511
+	goto	u3510
+u3511:
+	goto	l4456
+u3510:
 	line	23
 	
-l4182:	
+l4454:	
 	movf	(___awmod@divisor),w
 	subwf	(___awmod@dividend),f
 	movf	(___awmod@divisor+1),w
 	skipc
 	decf	(___awmod@dividend+1),f
 	subwf	(___awmod@dividend+1),f
+	goto	l4456
+	
+l1459:	
 	line	24
 	
-l4184:	
+l4456:	
+	movlw	01h
+	
+u3525:
 	clrc
 	rrf	(___awmod@divisor+1),f
 	rrf	(___awmod@divisor),f
+	addlw	-1
+	skipz
+	goto	u3525
 	line	25
 	
-l4186:	
-	decfsz	(___awmod@counter),f
-	goto	u1541
-	goto	u1540
-u1541:
-	goto	l4180
-u1540:
+l4458:	
+	movlw	low(01h)
+	subwf	(___awmod@counter),f
+	btfss	status,2
+	goto	u3531
+	goto	u3530
+u3531:
+	goto	l4452
+u3530:
+	goto	l4460
+	
+l1460:	
+	goto	l4460
+	line	26
+	
+l1454:	
 	line	27
 	
-l4188:	
+l4460:	
 	movf	(___awmod@sign),w
 	skipz
-	goto	u1550
-	goto	l4192
-u1550:
+	goto	u3540
+	goto	l4464
+u3540:
 	line	28
 	
-l4190:	
+l4462:	
 	comf	(___awmod@dividend),f
 	comf	(___awmod@dividend+1),f
 	incf	(___awmod@dividend),f
 	skipnz
 	incf	(___awmod@dividend+1),f
+	goto	l4464
+	
+l1461:	
 	line	29
 	
-l4192:	
+l4464:	
 	movf	(___awmod@dividend+1),w
-	movwf	(?___awmod+1)
+	clrf	(?___awmod+1)
+	addwf	(?___awmod+1)
 	movf	(___awmod@dividend),w
-	movwf	(?___awmod)
+	clrf	(?___awmod)
+	addwf	(?___awmod)
+
+	goto	l1462
+	
+l4466:	
 	line	30
 	
 l1462:	
@@ -6198,44 +8482,48 @@ GLOBAL	__end_of___awmod
 
 	signat	___awmod,8314
 	global	___awdiv
-psect	text985,local,class=CODE,delta=2
-global __ptext985
-__ptext985:
+psect	text919,local,class=CODE,delta=2
+global __ptext919
+__ptext919:
 
 ;; *************** function ___awdiv *****************
 ;; Defined at:
 ;;		line 5 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awdiv.c"
 ;; Parameters:    Size  Location     Type
-;;  divisor         2    6[BANK0 ] int 
-;;  dividend        2    8[BANK0 ] int 
+;;  divisor         2    7[BANK0 ] int 
+;;  dividend        2    9[BANK0 ] int 
 ;; Auto vars:     Size  Location     Type
-;;  quotient        2   12[BANK0 ] int 
-;;  sign            1   11[BANK0 ] unsigned char 
-;;  counter         1   10[BANK0 ] unsigned char 
+;;  quotient        2   14[BANK0 ] int 
+;;  sign            1   13[BANK0 ] unsigned char 
+;;  counter         1   12[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
-;;                  2    6[BANK0 ] int 
+;;                  2    7[BANK0 ] int 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       4       0       0       0
 ;;      Locals:         0       4       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       8       0       0       0
-;;Total ram usage:        8 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       9       0       0       0
+;;Total ram usage:        9 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
 ;;		Nothing
 ;; This function is called by:
 ;;		_DisplayAmnt
+;;		_DisplaySugar
+;;		_DisplayRise
+;;		_DisplayKerosene
 ;;		_main
+;;		_DelayBigUs
 ;; This function uses a non-reentrant model
 ;;
-psect	text985
+psect	text919
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\awdiv.c"
 	line	5
 	global	__size_of___awdiv
@@ -6246,42 +8534,51 @@ ___awdiv:
 ; Regs used in ___awdiv: [wreg+status,2+status,0]
 	line	9
 	
-l3400:	
-	clrf	(___awdiv@sign)
+l4394:	
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(___awdiv@sign)
 	line	10
 	
-l3402:	
+l4396:	
 	btfss	(___awdiv@divisor+1),7
-	goto	u1001
-	goto	u1000
-u1001:
-	goto	l3408
-u1000:
+	goto	u3361
+	goto	u3360
+u3361:
+	goto	l4400
+u3360:
 	line	11
 	
-l3404:	
+l4398:	
 	comf	(___awdiv@divisor),f
 	comf	(___awdiv@divisor+1),f
 	incf	(___awdiv@divisor),f
 	skipnz
 	incf	(___awdiv@divisor+1),f
 	line	12
-	
-l3406:	
 	clrf	(___awdiv@sign)
-	incf	(___awdiv@sign),f
+	bsf	status,0
+	rlf	(___awdiv@sign),f
+	goto	l4400
+	line	13
+	
+l1384:	
 	line	14
 	
-l3408:	
+l4400:	
 	btfss	(___awdiv@dividend+1),7
-	goto	u1011
-	goto	u1010
-u1011:
-	goto	l3414
-u1010:
+	goto	u3371
+	goto	u3370
+u3371:
+	goto	l1385
+u3370:
 	line	15
 	
-l3410:	
+l4402:	
 	comf	(___awdiv@dividend),f
 	comf	(___awdiv@dividend+1),f
 	incf	(___awdiv@dividend),f
@@ -6289,74 +8586,106 @@ l3410:
 	incf	(___awdiv@dividend+1),f
 	line	16
 	
-l3412:	
+l4404:	
 	movlw	(01h)
+	movwf	(??___awdiv+0)+0
+	movf	(??___awdiv+0)+0,w
 	xorwf	(___awdiv@sign),f
+	line	17
+	
+l1385:	
 	line	18
-	
-l3414:	
-	clrf	(___awdiv@quotient)
-	clrf	(___awdiv@quotient+1)
+	movlw	low(0)
+	movwf	(___awdiv@quotient)
+	movlw	high(0)
+	movwf	((___awdiv@quotient))+1
 	line	19
-	
-l3416:	
 	movf	(___awdiv@divisor+1),w
 	iorwf	(___awdiv@divisor),w
 	skipnz
-	goto	u1021
-	goto	u1020
-u1021:
-	goto	l3436
-u1020:
+	goto	u3381
+	goto	u3380
+u3381:
+	goto	l4424
+u3380:
 	line	20
 	
-l3418:	
+l4406:	
 	clrf	(___awdiv@counter)
-	incf	(___awdiv@counter),f
+	bsf	status,0
+	rlf	(___awdiv@counter),f
 	line	21
-	goto	l3422
+	goto	l4412
+	
+l1388:	
 	line	22
 	
-l3420:	
+l4408:	
+	movlw	01h
+	
+u3395:
 	clrc
 	rlf	(___awdiv@divisor),f
 	rlf	(___awdiv@divisor+1),f
+	addlw	-1
+	skipz
+	goto	u3395
 	line	23
-	incf	(___awdiv@counter),f
+	
+l4410:	
+	movlw	(01h)
+	movwf	(??___awdiv+0)+0
+	movf	(??___awdiv+0)+0,w
+	addwf	(___awdiv@counter),f
+	goto	l4412
+	line	24
+	
+l1387:	
 	line	21
 	
-l3422:	
+l4412:	
 	btfss	(___awdiv@divisor+1),(15)&7
-	goto	u1031
-	goto	u1030
-u1031:
-	goto	l3420
-u1030:
+	goto	u3401
+	goto	u3400
+u3401:
+	goto	l4408
+u3400:
+	goto	l4414
+	
+l1389:	
+	goto	l4414
+	line	25
+	
+l1390:	
 	line	26
 	
-l3424:	
+l4414:	
+	movlw	01h
+	
+u3415:
 	clrc
 	rlf	(___awdiv@quotient),f
 	rlf	(___awdiv@quotient+1),f
+	addlw	-1
+	skipz
+	goto	u3415
 	line	27
-	
-l3426:	
 	movf	(___awdiv@divisor+1),w
 	subwf	(___awdiv@dividend+1),w
 	skipz
-	goto	u1045
+	goto	u3425
 	movf	(___awdiv@divisor),w
 	subwf	(___awdiv@dividend),w
-u1045:
+u3425:
 	skipc
-	goto	u1041
-	goto	u1040
-u1041:
-	goto	l3432
-u1040:
+	goto	u3421
+	goto	u3420
+u3421:
+	goto	l4420
+u3420:
 	line	28
 	
-l3428:	
+l4416:	
 	movf	(___awdiv@divisor),w
 	subwf	(___awdiv@dividend),f
 	movf	(___awdiv@divisor+1),w
@@ -6365,46 +8694,74 @@ l3428:
 	subwf	(___awdiv@dividend+1),f
 	line	29
 	
-l3430:	
+l4418:	
 	bsf	(___awdiv@quotient)+(0/8),(0)&7
+	goto	l4420
+	line	30
+	
+l1391:	
 	line	31
 	
-l3432:	
+l4420:	
+	movlw	01h
+	
+u3435:
 	clrc
 	rrf	(___awdiv@divisor+1),f
 	rrf	(___awdiv@divisor),f
+	addlw	-1
+	skipz
+	goto	u3435
 	line	32
 	
-l3434:	
-	decfsz	(___awdiv@counter),f
-	goto	u1051
-	goto	u1050
-u1051:
-	goto	l3424
-u1050:
+l4422:	
+	movlw	low(01h)
+	subwf	(___awdiv@counter),f
+	btfss	status,2
+	goto	u3441
+	goto	u3440
+u3441:
+	goto	l4414
+u3440:
+	goto	l4424
+	
+l1392:	
+	goto	l4424
+	line	33
+	
+l1386:	
 	line	34
 	
-l3436:	
+l4424:	
 	movf	(___awdiv@sign),w
 	skipz
-	goto	u1060
-	goto	l3440
-u1060:
+	goto	u3450
+	goto	l4428
+u3450:
 	line	35
 	
-l3438:	
+l4426:	
 	comf	(___awdiv@quotient),f
 	comf	(___awdiv@quotient+1),f
 	incf	(___awdiv@quotient),f
 	skipnz
 	incf	(___awdiv@quotient+1),f
+	goto	l4428
+	
+l1393:	
 	line	36
 	
-l3440:	
+l4428:	
 	movf	(___awdiv@quotient+1),w
-	movwf	(?___awdiv+1)
+	clrf	(?___awdiv+1)
+	addwf	(?___awdiv+1)
 	movf	(___awdiv@quotient),w
-	movwf	(?___awdiv)
+	clrf	(?___awdiv)
+	addwf	(?___awdiv)
+
+	goto	l1394
+	
+l4430:	
 	line	37
 	
 l1394:	
@@ -6415,270 +8772,10 @@ GLOBAL	__end_of___awdiv
 ;; =============== function ___awdiv ends ============
 
 	signat	___awdiv,8314
-	global	___lbmod
-psect	text986,local,class=CODE,delta=2
-global __ptext986
-__ptext986:
-
-;; *************** function ___lbmod *****************
-;; Defined at:
-;;		line 5 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbmod.c"
-;; Parameters:    Size  Location     Type
-;;  dividend        1    wreg     unsigned char 
-;;  divisor         1    0[BANK0 ] unsigned char 
-;; Auto vars:     Size  Location     Type
-;;  dividend        1    2[BANK0 ] unsigned char 
-;;  rem             1    4[BANK0 ] unsigned char 
-;;  counter         1    3[BANK0 ] unsigned char 
-;; Return value:  Size  Location     Type
-;;                  1    wreg      unsigned char 
-;; Registers used:
-;;		wreg, status,2, status,0
-;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
-;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       1       0       0       0
-;;      Locals:         0       3       0       0       0
-;;      Temps:          0       1       0       0       0
-;;      Totals:         0       5       0       0       0
-;;Total ram usage:        5 bytes
-;; Hardware stack levels used:    1
-;; Hardware stack levels required when called:    3
-;; This function calls:
-;;		Nothing
-;; This function is called by:
-;;		_DisplaySugar
-;;		_DisplayRise
-;;		_DisplayKerosene
-;; This function uses a non-reentrant model
-;;
-psect	text986
-	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbmod.c"
-	line	5
-	global	__size_of___lbmod
-	__size_of___lbmod	equ	__end_of___lbmod-___lbmod
-	
-___lbmod:	
-	opt	stack 3
-; Regs used in ___lbmod: [wreg+status,2+status,0]
-;___lbmod@dividend stored from wreg
-	line	9
-	movwf	(___lbmod@dividend)
-	
-l4142:	
-	movlw	(08h)
-	movwf	(___lbmod@counter)
-	line	10
-	
-l4144:	
-	clrf	(___lbmod@rem)
-	line	12
-	
-l4146:	
-	movf	(___lbmod@dividend),w
-	movwf	(??___lbmod+0)+0
-	movlw	07h
-u1465:
-	clrc
-	rrf	(??___lbmod+0)+0,f
-	addlw	-1
-	skipz
-	goto	u1465
-	clrc
-	rlf	(___lbmod@rem),w
-	iorwf	0+(??___lbmod+0)+0,w
-	movwf	(___lbmod@rem)
-	line	13
-	
-l4148:	
-	clrc
-	rlf	(___lbmod@dividend),f
-	line	14
-	
-l4150:	
-	movf	(___lbmod@divisor),w
-	subwf	(___lbmod@rem),w
-	skipc
-	goto	u1471
-	goto	u1470
-u1471:
-	goto	l4154
-u1470:
-	line	15
-	
-l4152:	
-	movf	(___lbmod@divisor),w
-	subwf	(___lbmod@rem),f
-	line	16
-	
-l4154:	
-	decfsz	(___lbmod@counter),f
-	goto	u1481
-	goto	u1480
-u1481:
-	goto	l4146
-u1480:
-	line	17
-	
-l4156:	
-	movf	(___lbmod@rem),w
-	line	18
-	
-l1283:	
-	return
-	opt stack 0
-GLOBAL	__end_of___lbmod
-	__end_of___lbmod:
-;; =============== function ___lbmod ends ============
-
-	signat	___lbmod,8313
-	global	___lbdiv
-psect	text987,local,class=CODE,delta=2
-global __ptext987
-__ptext987:
-
-;; *************** function ___lbdiv *****************
-;; Defined at:
-;;		line 5 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbdiv.c"
-;; Parameters:    Size  Location     Type
-;;  dividend        1    wreg     unsigned char 
-;;  divisor         1    0[BANK0 ] unsigned char 
-;; Auto vars:     Size  Location     Type
-;;  dividend        1    1[BANK0 ] unsigned char 
-;;  quotient        1    3[BANK0 ] unsigned char 
-;;  counter         1    2[BANK0 ] unsigned char 
-;; Return value:  Size  Location     Type
-;;                  1    wreg      unsigned char 
-;; Registers used:
-;;		wreg, status,2, status,0
-;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
-;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       1       0       0       0
-;;      Locals:         0       3       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       4       0       0       0
-;;Total ram usage:        4 bytes
-;; Hardware stack levels used:    1
-;; Hardware stack levels required when called:    3
-;; This function calls:
-;;		Nothing
-;; This function is called by:
-;;		_DisplaySugar
-;;		_DisplayRise
-;;		_DisplayKerosene
-;; This function uses a non-reentrant model
-;;
-psect	text987
-	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lbdiv.c"
-	line	5
-	global	__size_of___lbdiv
-	__size_of___lbdiv	equ	__end_of___lbdiv-___lbdiv
-	
-___lbdiv:	
-	opt	stack 3
-; Regs used in ___lbdiv: [wreg+status,2+status,0]
-;___lbdiv@dividend stored from wreg
-	line	9
-	movwf	(___lbdiv@dividend)
-	
-l4118:	
-	clrf	(___lbdiv@quotient)
-	line	10
-	
-l4120:	
-	movf	(___lbdiv@divisor),w
-	skipz
-	goto	u1420
-	goto	l4138
-u1420:
-	line	11
-	
-l4122:	
-	clrf	(___lbdiv@counter)
-	incf	(___lbdiv@counter),f
-	line	12
-	goto	l4126
-	
-l1272:	
-	line	13
-	clrc
-	rlf	(___lbdiv@divisor),f
-	line	14
-	
-l4124:	
-	incf	(___lbdiv@counter),f
-	line	12
-	
-l4126:	
-	btfss	(___lbdiv@divisor),(7)&7
-	goto	u1431
-	goto	u1430
-u1431:
-	goto	l1272
-u1430:
-	line	16
-	
-l1274:	
-	line	17
-	clrc
-	rlf	(___lbdiv@quotient),f
-	line	18
-	
-l4128:	
-	movf	(___lbdiv@divisor),w
-	subwf	(___lbdiv@dividend),w
-	skipc
-	goto	u1441
-	goto	u1440
-u1441:
-	goto	l4134
-u1440:
-	line	19
-	
-l4130:	
-	movf	(___lbdiv@divisor),w
-	subwf	(___lbdiv@dividend),f
-	line	20
-	
-l4132:	
-	bsf	(___lbdiv@quotient)+(0/8),(0)&7
-	line	22
-	
-l4134:	
-	clrc
-	rrf	(___lbdiv@divisor),f
-	line	23
-	
-l4136:	
-	decfsz	(___lbdiv@counter),f
-	goto	u1451
-	goto	u1450
-u1451:
-	goto	l1274
-u1450:
-	line	25
-	
-l4138:	
-	movf	(___lbdiv@quotient),w
-	line	26
-	
-l1277:	
-	return
-	opt stack 0
-GLOBAL	__end_of___lbdiv
-	__end_of___lbdiv:
-;; =============== function ___lbdiv ends ============
-
-	signat	___lbdiv,8313
 	global	___lwmod
-psect	text988,local,class=CODE,delta=2
-global __ptext988
-__ptext988:
+psect	text920,local,class=CODE,delta=2
+global __ptext920
+__ptext920:
 
 ;; *************** function ___lwmod *****************
 ;; Defined at:
@@ -6687,21 +8784,21 @@ __ptext988:
 ;;  divisor         2    0[BANK0 ] unsigned int 
 ;;  dividend        2    2[BANK0 ] unsigned int 
 ;; Auto vars:     Size  Location     Type
-;;  counter         1    4[BANK0 ] unsigned char 
+;;  counter         1    5[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;                  2    0[BANK0 ] unsigned int 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       4       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       5       0       0       0
-;;Total ram usage:        5 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       6       0       0       0
+;;Total ram usage:        6 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
@@ -6711,7 +8808,7 @@ __ptext988:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text988
+psect	text920
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lwmod.c"
 	line	5
 	global	__size_of___lwmod
@@ -6722,86 +8819,137 @@ ___lwmod:
 ; Regs used in ___lwmod: [wreg+status,2+status,0]
 	line	8
 	
-l4098:	
+l4372:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(___lwmod@divisor+1),w
 	iorwf	(___lwmod@divisor),w
 	skipnz
-	goto	u1381
-	goto	u1380
-u1381:
-	goto	l4114
-u1380:
+	goto	u3301
+	goto	u3300
+u3301:
+	goto	l4390
+u3300:
 	line	9
 	
-l4100:	
+l4374:	
 	clrf	(___lwmod@counter)
-	incf	(___lwmod@counter),f
+	bsf	status,0
+	rlf	(___lwmod@counter),f
 	line	10
-	goto	l4104
+	goto	l4380
+	
+l1262:	
 	line	11
 	
-l4102:	
+l4376:	
+	movlw	01h
+	
+u3315:
 	clrc
 	rlf	(___lwmod@divisor),f
 	rlf	(___lwmod@divisor+1),f
+	addlw	-1
+	skipz
+	goto	u3315
 	line	12
-	incf	(___lwmod@counter),f
+	
+l4378:	
+	movlw	(01h)
+	movwf	(??___lwmod+0)+0
+	movf	(??___lwmod+0)+0,w
+	addwf	(___lwmod@counter),f
+	goto	l4380
+	line	13
+	
+l1261:	
 	line	10
 	
-l4104:	
+l4380:	
 	btfss	(___lwmod@divisor+1),(15)&7
-	goto	u1391
-	goto	u1390
-u1391:
-	goto	l4102
-u1390:
+	goto	u3321
+	goto	u3320
+u3321:
+	goto	l4376
+u3320:
+	goto	l4382
+	
+l1263:	
+	goto	l4382
+	line	14
+	
+l1264:	
 	line	15
 	
-l4106:	
+l4382:	
 	movf	(___lwmod@divisor+1),w
 	subwf	(___lwmod@dividend+1),w
 	skipz
-	goto	u1405
+	goto	u3335
 	movf	(___lwmod@divisor),w
 	subwf	(___lwmod@dividend),w
-u1405:
+u3335:
 	skipc
-	goto	u1401
-	goto	u1400
-u1401:
-	goto	l4110
-u1400:
+	goto	u3331
+	goto	u3330
+u3331:
+	goto	l4386
+u3330:
 	line	16
 	
-l4108:	
+l4384:	
 	movf	(___lwmod@divisor),w
 	subwf	(___lwmod@dividend),f
 	movf	(___lwmod@divisor+1),w
 	skipc
 	decf	(___lwmod@dividend+1),f
 	subwf	(___lwmod@dividend+1),f
+	goto	l4386
+	
+l1265:	
 	line	17
 	
-l4110:	
+l4386:	
+	movlw	01h
+	
+u3345:
 	clrc
 	rrf	(___lwmod@divisor+1),f
 	rrf	(___lwmod@divisor),f
+	addlw	-1
+	skipz
+	goto	u3345
 	line	18
 	
-l4112:	
-	decfsz	(___lwmod@counter),f
-	goto	u1411
-	goto	u1410
-u1411:
-	goto	l4106
-u1410:
+l4388:	
+	movlw	low(01h)
+	subwf	(___lwmod@counter),f
+	btfss	status,2
+	goto	u3351
+	goto	u3350
+u3351:
+	goto	l4382
+u3350:
+	goto	l4390
+	
+l1266:	
+	goto	l4390
+	line	19
+	
+l1260:	
 	line	20
 	
-l4114:	
+l4390:	
 	movf	(___lwmod@dividend+1),w
-	movwf	(?___lwmod+1)
+	clrf	(?___lwmod+1)
+	addwf	(?___lwmod+1)
 	movf	(___lwmod@dividend),w
-	movwf	(?___lwmod)
+	clrf	(?___lwmod)
+	addwf	(?___lwmod)
+
+	goto	l1267
+	
+l4392:	
 	line	21
 	
 l1267:	
@@ -6813,33 +8961,33 @@ GLOBAL	__end_of___lwmod
 
 	signat	___lwmod,8314
 	global	___lwdiv
-psect	text989,local,class=CODE,delta=2
-global __ptext989
-__ptext989:
+psect	text921,local,class=CODE,delta=2
+global __ptext921
+__ptext921:
 
 ;; *************** function ___lwdiv *****************
 ;; Defined at:
 ;;		line 5 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lwdiv.c"
 ;; Parameters:    Size  Location     Type
-;;  divisor         2    5[BANK0 ] unsigned int 
-;;  dividend        2    7[BANK0 ] unsigned int 
+;;  divisor         2    6[BANK0 ] unsigned int 
+;;  dividend        2    8[BANK0 ] unsigned int 
 ;; Auto vars:     Size  Location     Type
-;;  quotient        2    9[BANK0 ] unsigned int 
-;;  counter         1   11[BANK0 ] unsigned char 
+;;  quotient        2   11[BANK0 ] unsigned int 
+;;  counter         1   13[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
-;;                  2    5[BANK0 ] unsigned int 
+;;                  2    6[BANK0 ] unsigned int 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       4       0       0       0
 ;;      Locals:         0       3       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       7       0       0       0
-;;Total ram usage:        7 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       8       0       0       0
+;;Total ram usage:        8 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
@@ -6849,7 +8997,7 @@ __ptext989:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text989
+psect	text921
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\lwdiv.c"
 	line	5
 	global	__size_of___lwdiv
@@ -6860,69 +9008,100 @@ ___lwdiv:
 ; Regs used in ___lwdiv: [wreg+status,2+status,0]
 	line	9
 	
-l3312:	
-	clrf	(___lwdiv@quotient)
-	clrf	(___lwdiv@quotient+1)
+l4348:	
+	movlw	low(0)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(___lwdiv@quotient)
+	movlw	high(0)
+	movwf	((___lwdiv@quotient))+1
 	line	10
-	
-l3314:	
 	movf	(___lwdiv@divisor+1),w
 	iorwf	(___lwdiv@divisor),w
 	skipnz
-	goto	u851
-	goto	u850
-u851:
-	goto	l3334
-u850:
+	goto	u3231
+	goto	u3230
+u3231:
+	goto	l4368
+u3230:
 	line	11
 	
-l3316:	
+l4350:	
 	clrf	(___lwdiv@counter)
-	incf	(___lwdiv@counter),f
+	bsf	status,0
+	rlf	(___lwdiv@counter),f
 	line	12
-	goto	l3320
+	goto	l4356
+	
+l1252:	
 	line	13
 	
-l3318:	
+l4352:	
+	movlw	01h
+	
+u3245:
 	clrc
 	rlf	(___lwdiv@divisor),f
 	rlf	(___lwdiv@divisor+1),f
+	addlw	-1
+	skipz
+	goto	u3245
 	line	14
-	incf	(___lwdiv@counter),f
+	
+l4354:	
+	movlw	(01h)
+	movwf	(??___lwdiv+0)+0
+	movf	(??___lwdiv+0)+0,w
+	addwf	(___lwdiv@counter),f
+	goto	l4356
+	line	15
+	
+l1251:	
 	line	12
 	
-l3320:	
+l4356:	
 	btfss	(___lwdiv@divisor+1),(15)&7
-	goto	u861
-	goto	u860
-u861:
-	goto	l3318
-u860:
+	goto	u3251
+	goto	u3250
+u3251:
+	goto	l4352
+u3250:
+	goto	l4358
+	
+l1253:	
+	goto	l4358
+	line	16
+	
+l1254:	
 	line	17
 	
-l3322:	
+l4358:	
+	movlw	01h
+	
+u3265:
 	clrc
 	rlf	(___lwdiv@quotient),f
 	rlf	(___lwdiv@quotient+1),f
+	addlw	-1
+	skipz
+	goto	u3265
 	line	18
-	
-l3324:	
 	movf	(___lwdiv@divisor+1),w
 	subwf	(___lwdiv@dividend+1),w
 	skipz
-	goto	u875
+	goto	u3275
 	movf	(___lwdiv@divisor),w
 	subwf	(___lwdiv@dividend),w
-u875:
+u3275:
 	skipc
-	goto	u871
-	goto	u870
-u871:
-	goto	l3330
-u870:
+	goto	u3271
+	goto	u3270
+u3271:
+	goto	l4364
+u3270:
 	line	19
 	
-l3326:	
+l4360:	
 	movf	(___lwdiv@divisor),w
 	subwf	(___lwdiv@dividend),f
 	movf	(___lwdiv@divisor+1),w
@@ -6931,30 +9110,55 @@ l3326:
 	subwf	(___lwdiv@dividend+1),f
 	line	20
 	
-l3328:	
+l4362:	
 	bsf	(___lwdiv@quotient)+(0/8),(0)&7
+	goto	l4364
+	line	21
+	
+l1255:	
 	line	22
 	
-l3330:	
+l4364:	
+	movlw	01h
+	
+u3285:
 	clrc
 	rrf	(___lwdiv@divisor+1),f
 	rrf	(___lwdiv@divisor),f
+	addlw	-1
+	skipz
+	goto	u3285
 	line	23
 	
-l3332:	
-	decfsz	(___lwdiv@counter),f
-	goto	u881
-	goto	u880
-u881:
-	goto	l3322
-u880:
+l4366:	
+	movlw	low(01h)
+	subwf	(___lwdiv@counter),f
+	btfss	status,2
+	goto	u3291
+	goto	u3290
+u3291:
+	goto	l4358
+u3290:
+	goto	l4368
+	
+l1256:	
+	goto	l4368
+	line	24
+	
+l1250:	
 	line	25
 	
-l3334:	
+l4368:	
 	movf	(___lwdiv@quotient+1),w
-	movwf	(?___lwdiv+1)
+	clrf	(?___lwdiv+1)
+	addwf	(?___lwdiv+1)
 	movf	(___lwdiv@quotient),w
-	movwf	(?___lwdiv)
+	clrf	(?___lwdiv)
+	addwf	(?___lwdiv)
+
+	goto	l1257
+	
+l4370:	
 	line	26
 	
 l1257:	
@@ -6966,26 +9170,26 @@ GLOBAL	__end_of___lwdiv
 
 	signat	___lwdiv,8314
 	global	___wmul
-psect	text990,local,class=CODE,delta=2
-global __ptext990
-__ptext990:
+psect	text922,local,class=CODE,delta=2
+global __ptext922
+__ptext922:
 
 ;; *************** function ___wmul *****************
 ;; Defined at:
 ;;		line 3 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\wmul.c"
 ;; Parameters:    Size  Location     Type
-;;  multiplier      2    3[BANK0 ] unsigned int 
-;;  multiplicand    2    5[BANK0 ] unsigned int 
+;;  multiplier      2    4[BANK0 ] unsigned int 
+;;  multiplicand    2    6[BANK0 ] unsigned int 
 ;; Auto vars:     Size  Location     Type
-;;  product         2    7[BANK0 ] unsigned int 
+;;  product         2    8[BANK0 ] unsigned int 
 ;; Return value:  Size  Location     Type
-;;                  2    3[BANK0 ] unsigned int 
+;;                  2    4[BANK0 ] unsigned int 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       4       0       0       0
 ;;      Locals:         0       2       0       0       0
@@ -7002,7 +9206,7 @@ __ptext990:
 ;;		_paramter
 ;; This function uses a non-reentrant model
 ;;
-psect	text990
+psect	text922
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\wmul.c"
 	line	3
 	global	__size_of___wmul
@@ -7013,57 +9217,84 @@ ___wmul:
 ; Regs used in ___wmul: [wreg+status,2+status,0]
 	line	4
 	
-l3296:	
-	clrf	(___wmul@product)
-	clrf	(___wmul@product+1)
+l4336:	
+	movlw	low(0)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(___wmul@product)
+	movlw	high(0)
+	movwf	((___wmul@product))+1
+	goto	l4338
+	line	6
+	
+l1244:	
 	line	7
 	
-l3298:	
+l4338:	
 	btfss	(___wmul@multiplier),(0)&7
-	goto	u831
-	goto	u830
-u831:
-	goto	l3302
-u830:
+	goto	u3191
+	goto	u3190
+u3191:
+	goto	l1245
+u3190:
 	line	8
 	
-l3300:	
+l4340:	
 	movf	(___wmul@multiplicand),w
 	addwf	(___wmul@product),f
 	skipnc
 	incf	(___wmul@product+1),f
 	movf	(___wmul@multiplicand+1),w
 	addwf	(___wmul@product+1),f
-	line	9
 	
-l3302:	
+l1245:	
+	line	9
+	movlw	01h
+	
+u3205:
 	clrc
 	rlf	(___wmul@multiplicand),f
 	rlf	(___wmul@multiplicand+1),f
+	addlw	-1
+	skipz
+	goto	u3205
 	line	10
 	
-l3304:	
+l4342:	
+	movlw	01h
+	
+u3215:
 	clrc
 	rrf	(___wmul@multiplier+1),f
 	rrf	(___wmul@multiplier),f
+	addlw	-1
+	skipz
+	goto	u3215
 	line	11
-	
-l3306:	
 	movf	((___wmul@multiplier+1)),w
 	iorwf	((___wmul@multiplier)),w
 	skipz
-	goto	u841
-	goto	u840
-u841:
-	goto	l3298
-u840:
+	goto	u3221
+	goto	u3220
+u3221:
+	goto	l4338
+u3220:
+	goto	l4344
+	
+l1246:	
 	line	12
 	
-l3308:	
+l4344:	
 	movf	(___wmul@product+1),w
-	movwf	(?___wmul+1)
+	clrf	(?___wmul+1)
+	addwf	(?___wmul+1)
 	movf	(___wmul@product),w
-	movwf	(?___wmul)
+	clrf	(?___wmul)
+	addwf	(?___wmul)
+
+	goto	l1247
+	
+l4346:	
 	line	13
 	
 l1247:	
@@ -7075,9 +9306,9 @@ GLOBAL	__end_of___wmul
 
 	signat	___wmul,8314
 	global	_memcmp
-psect	text991,local,class=CODE,delta=2
-global __ptext991
-__ptext991:
+psect	text923,local,class=CODE,delta=2
+global __ptext923
+__ptext923:
 
 ;; *************** function _memcmp *****************
 ;; Defined at:
@@ -7095,15 +9326,15 @@ __ptext991:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, btemp+1, pclath
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFE9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       5       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          0       1       0       0       0
-;;      Totals:         0       6       0       0       0
-;;Total ram usage:        6 bytes
+;;      Temps:          0       2       0       0       0
+;;      Totals:         0       7       0       0       0
+;;Total ram usage:        7 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
@@ -7112,7 +9343,7 @@ __ptext991:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text991
+psect	text923
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\memcmp.c"
 	line	4
 	global	__size_of_memcmp
@@ -7123,11 +9354,15 @@ _memcmp:
 ; Regs used in _memcmp: [wreg-fsr0h+status,2+status,0+btemp+1+pclath]
 	line	5
 	
-l4082:	
-	goto	l4092
+l4318:	
+	goto	l4330
+	
+l1224:	
 	line	6
 	
-l4084:	
+l4320:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movf	(memcmp@s2),w
 	movwf	fsr
 	bcf	status, 7	;select IRP bank0
@@ -7140,63 +9375,100 @@ l4084:
 	fcall	stringtab
 	xorwf	(??_memcmp+0)+0,w
 	skipnz
-	goto	u1361
-	goto	u1360
-u1361:
-	goto	l4090
-u1360:
+	goto	u3171
+	goto	u3170
+u3171:
+	goto	l4326
+u3170:
 	line	7
 	
-l4086:	
+l4322:	
+	movf	(memcmp@s2),w
+	movwf	fsr0
+	bcf	status, 7	;select IRP bank0
+	movf	indf,w
+	movwf	(??_memcmp+0)+0
+	clrf	(??_memcmp+0)+0+1
+	comf	(??_memcmp+0)+0,f
+	comf	(??_memcmp+0)+1,f
+	incf	(??_memcmp+0)+0,f
+	skipnz
+	incf	(??_memcmp+0)+1,f
 	movf	(memcmp@s1+1),w
 	movwf	btemp+1
 	movf	(memcmp@s1),w
 	movwf	fsr0
 	fcall	stringtab
-	movwf	(??_memcmp+0)+0
-	movf	(memcmp@s2),w
-	movwf	fsr0
-	bcf	status, 7	;select IRP bank0
-	movf	indf,w
-	subwf	(??_memcmp+0)+0,w
+	addwf	0+(??_memcmp+0)+0,w
 	movwf	(?_memcmp)
-	clrf	(?_memcmp)+1
-	skipc
-	decf	1+(?_memcmp),f
-	
+	movf	1+(??_memcmp+0)+0,w
+	skipnc
+	incf	1+(??_memcmp+0)+0,w
+	movwf	((?_memcmp))+1
 	goto	l1226
+	
+l4324:	
+	goto	l1226
+	
+l1225:	
 	line	8
 	
-l4090:	
-	incf	(memcmp@s1),f
-	skipnz
+l4326:	
+	movlw	low(01h)
+	addwf	(memcmp@s1),f
+	skipnc
 	incf	(memcmp@s1+1),f
+	movlw	high(01h)
+	addwf	(memcmp@s1+1),f
 	line	9
-	incf	(memcmp@s2),f
+	
+l4328:	
+	movlw	(01h)
+	movwf	(??_memcmp+0)+0
+	movf	(??_memcmp+0)+0,w
+	addwf	(memcmp@s2),f
+	goto	l4330
+	line	10
+	
+l1223:	
 	line	5
 	
-l4092:	
+l4330:	
 	movlw	low(01h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	subwf	(memcmp@n),f
 	movlw	high(01h)
 	skipc
 	decf	(memcmp@n+1),f
 	subwf	(memcmp@n+1),f
-	incf	((memcmp@n)),w
-	skipnz
-	incf	((memcmp@n+1)),w
+	movlw	high(0FFFFh)
+	xorwf	((memcmp@n+1)),w
+	skipz
+	goto	u3185
+	movlw	low(0FFFFh)
+	xorwf	((memcmp@n)),w
+u3185:
 
 	skipz
-	goto	u1371
-	goto	u1370
-u1371:
-	goto	l4084
-u1370:
+	goto	u3181
+	goto	u3180
+u3181:
+	goto	l4320
+u3180:
+	goto	l4332
+	
+l1227:	
 	line	11
 	
-l4094:	
-	clrf	(?_memcmp)
-	clrf	(?_memcmp+1)
+l4332:	
+	movlw	low(0)
+	movwf	(?_memcmp)
+	movlw	high(0)
+	movwf	((?_memcmp))+1
+	goto	l1226
+	
+l4334:	
 	line	12
 	
 l1226:	
@@ -7208,32 +9480,32 @@ GLOBAL	__end_of_memcmp
 
 	signat	_memcmp,12410
 	global	_eeprom_write
-psect	text992,local,class=CODE,delta=2
-global __ptext992
-__ptext992:
+psect	text924,local,class=CODE,delta=2
+global __ptext924
+__ptext924:
 
 ;; *************** function _eeprom_write *****************
 ;; Defined at:
 ;;		line 8 in file "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eewrite.c"
 ;; Parameters:    Size  Location     Type
 ;;  addr            1    wreg     unsigned char 
-;;  value           1   14[BANK0 ] unsigned char 
+;;  value           1   16[BANK0 ] unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  addr            1   15[BANK0 ] unsigned char 
+;;  addr            1   18[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/60
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       1       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
@@ -7242,7 +9514,7 @@ __ptext992:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text992
+psect	text924
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eewrite.c"
 	line	8
 	global	__size_of_eeprom_write
@@ -7252,77 +9524,105 @@ _eeprom_write:
 	opt	stack 4
 ; Regs used in _eeprom_write: [wreg+status,2+status,0]
 ;eeprom_write@addr stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(eeprom_write@addr)
 	line	9
 	
 l1213:	
+	goto	l1214
+	
+l1215:	
 	
 l1214:	
 	bsf	status, 5	;RP0=1, select bank3
 	bsf	status, 6	;RP1=1, select bank3
 	btfsc	(3169/8)^0180h,(3169)&7
-	goto	u781
-	goto	u780
-u781:
+	goto	u3141
+	goto	u3140
+u3141:
 	goto	l1214
-u780:
+u3140:
+	goto	l4298
 	
-l3260:	
+l1216:	
+	
+l4298:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(eeprom_write@addr),w
+	bcf	status, 5	;RP0=0, select bank2
 	bsf	status, 6	;RP1=1, select bank2
 	movwf	(269)^0100h	;volatile
+	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(eeprom_write@value),w
+	bcf	status, 5	;RP0=0, select bank2
 	bsf	status, 6	;RP1=1, select bank2
 	movwf	(268)^0100h	;volatile
 	
-l3262:	
+l4300:	
 	movlw	(03Fh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_eeprom_write+0)+0
+	movf	(??_eeprom_write+0)+0,w
 	bsf	status, 5	;RP0=1, select bank3
+	bsf	status, 6	;RP1=1, select bank3
 	andwf	(396)^0180h,f	;volatile
 	
-l3264:	
+l4302:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	bcf	(24/8),(24)&7
 	
-l3266:	
+l4304:	
 	btfss	(95/8),(95)&7
-	goto	u791
-	goto	u790
-u791:
+	goto	u3151
+	goto	u3150
+u3151:
 	goto	l1217
-u790:
+u3150:
 	
-l3268:	
+l4306:	
 	bsf	(24/8),(24)&7
 	
 l1217:	
 	bcf	(95/8),(95)&7
+	bsf	status, 5	;RP0=1, select bank3
+	bsf	status, 6	;RP1=1, select bank3
 	bsf	(3170/8)^0180h,(3170)&7
 	
-l3270:	
+l4308:	
 	movlw	(055h)
 	movwf	(397)^0180h	;volatile
 	movlw	(0AAh)
 	movwf	(397)^0180h	;volatile
 	
-l3272:	
+l4310:	
 	bsf	(3169/8)^0180h,(3169)&7
 	
-l3274:	
+l4312:	
 	bcf	(3170/8)^0180h,(3170)&7
 	
-l3276:	
+l4314:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	btfss	(24/8),(24)&7
-	goto	u801
-	goto	u800
-u801:
+	goto	u3161
+	goto	u3160
+u3161:
 	goto	l1220
-u800:
+u3160:
 	
-l3278:	
+l4316:	
 	bsf	(95/8),(95)&7
+	goto	l1220
+	
+l1218:	
+	goto	l1220
+	
+l1219:	
 	line	10
 	
 l1220:	
@@ -7334,9 +9634,9 @@ GLOBAL	__end_of_eeprom_write
 
 	signat	_eeprom_write,8312
 	global	_strcmp
-psect	text993,local,class=CODE,delta=2
-global __ptext993
-__ptext993:
+psect	text925,local,class=CODE,delta=2
+global __ptext925
+__ptext925:
 
 ;; *************** function _strcmp *****************
 ;; Defined at:
@@ -7355,9 +9655,9 @@ __ptext993:
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 160/0
-;;		Unchanged: FFE9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       2       0       0       0
 ;;      Locals:         0       2       0       0       0
@@ -7372,7 +9672,7 @@ __ptext993:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text993
+psect	text925
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\strcmp.c"
 	line	34
 	global	__size_of_strcmp
@@ -7382,52 +9682,74 @@ _strcmp:
 	opt	stack 4
 ; Regs used in _strcmp: [wreg-fsr0h+status,2+status,0]
 ;strcmp@s1 stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(strcmp@s1)
 	line	37
 	
-l4072:	
+l4288:	
+	goto	l4290
 	
-l4074:	
-	movf	(strcmp@s2),w
-	incf	(strcmp@s2),f
-	movwf	fsr0
+l1231:	
+	line	38
+	goto	l4290
+	
+l1230:	
+	line	37
+	
+l4290:	
+	movf	(strcmp@s1),w
+	movwf	fsr
 	bcf	status, 7	;select IRP bank0
 	movf	indf,w
 	movwf	(??_strcmp+0)+0
-	movf	(strcmp@s1),w
+	movf	(strcmp@s2),w
 	movwf	fsr0
-	movf	indf,w
+	movlw	01h
+	addwf	(strcmp@s2),f
+	decf	indf,w
+	xorlw	0ffh
+	addwf	(??_strcmp+0)+0,w
 	movwf	(??_strcmp+1)+0
-	movf	(??_strcmp+0)+0,w
-	subwf	(??_strcmp+1)+0,w
+	movf	(??_strcmp+1)+0,w
 	movwf	(strcmp@r)
 	movf	((strcmp@r)),f
 	skipz
-	goto	u1341
-	goto	u1340
-u1341:
-	goto	l4078
-u1340:
+	goto	u3121
+	goto	u3120
+u3121:
+	goto	l4294
+u3120:
 	
-l4076:	
+l4292:	
 	movf	(strcmp@s1),w
-	incf	(strcmp@s1),f
 	movwf	fsr0
+	movlw	01h
+	addwf	(strcmp@s1),f
 	movf	indf,f
 	skipz
-	goto	u1351
-	goto	u1350
-u1351:
-	goto	l4074
-u1350:
+	goto	u3131
+	goto	u3130
+u3131:
+	goto	l4290
+u3130:
+	goto	l4294
+	
+l1233:	
+	goto	l4294
+	
+l1234:	
 	line	39
 	
-l4078:	
+l4294:	
 	movf	(strcmp@r),w
 	movwf	(?_strcmp)
 	clrf	(?_strcmp+1)
 	btfsc	(?_strcmp),7
 	decf	(?_strcmp+1),f
+	goto	l1235
+	
+l4296:	
 	line	40
 	
 l1235:	
@@ -7439,9 +9761,9 @@ GLOBAL	__end_of_strcmp
 
 	signat	_strcmp,8314
 	global	_uart_init
-psect	text994,local,class=CODE,delta=2
-global __ptext994
-__ptext994:
+psect	text926,local,class=CODE,delta=2
+global __ptext926
+__ptext926:
 
 ;; *************** function _uart_init *****************
 ;; Defined at:
@@ -7455,9 +9777,9 @@ __ptext994:
 ;; Registers used:
 ;;		wreg, status,2
 ;; Tracked objects:
-;;		On entry : 17F/0
-;;		On exit  : 17F/0
-;;		Unchanged: FFE80/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
@@ -7472,7 +9794,7 @@ __ptext994:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text994
+psect	text926
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	147
 	global	__size_of_uart_init
@@ -7483,14 +9805,17 @@ _uart_init:
 ; Regs used in _uart_init: [wreg+status,2]
 	line	148
 	
-l3246:	
+l4284:	
 ;Main.c: 148: PORTC=0xFF;
 	movlw	(0FFh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(7)	;volatile
 	line	149
 ;Main.c: 149: TRISC=0x80;
 	movlw	(080h)
 	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
 	movwf	(135)^080h	;volatile
 	line	150
 ;Main.c: 150: TXSTA=0X24;
@@ -7500,17 +9825,20 @@ l3246:
 ;Main.c: 151: RCSTA=0X90;
 	movlw	(090h)
 	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(24)	;volatile
 	line	152
 ;Main.c: 152: SPBRG=129;
 	movlw	(081h)
 	bsf	status, 5	;RP0=1, select bank1
+	bcf	status, 6	;RP1=0, select bank1
 	movwf	(153)^080h	;volatile
 	line	153
 	
-l3248:	
+l4286:	
 ;Main.c: 153: RCREG=0;
 	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	clrf	(26)	;volatile
 	line	154
 	
@@ -7523,9 +9851,9 @@ GLOBAL	__end_of_uart_init
 
 	signat	_uart_init,88
 	global	_eeprom_read
-psect	text995,local,class=CODE,delta=2
-global __ptext995
-__ptext995:
+psect	text927,local,class=CODE,delta=2
+global __ptext927
+__ptext927:
 
 ;; *************** function _eeprom_read *****************
 ;; Defined at:
@@ -7533,21 +9861,21 @@ __ptext995:
 ;; Parameters:    Size  Location     Type
 ;;  addr            1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  addr            1    2[BANK0 ] unsigned char 
+;;  addr            1    3[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;                  1    wreg      unsigned char 
 ;; Registers used:
 ;;		wreg, status,2, status,0
 ;; Tracked objects:
 ;;		On entry : 0/0
-;;		On exit  : 60/40
-;;		Unchanged: FFE00/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       2       0       0       0
-;;      Totals:         0       3       0       0       0
-;;Total ram usage:        3 bytes
+;;      Temps:          0       3       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
@@ -7558,7 +9886,7 @@ __ptext995:
 ;;		_paramter
 ;; This function uses a non-reentrant model
 ;;
-psect	text995
+psect	text927
 	file	"C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eeread.c"
 	line	8
 	global	__size_of_eeprom_read
@@ -7578,26 +9906,35 @@ l1192:
 	line	10
 # 10 "C:\Program Files (x86)\HI-TECH Software\PICC\9.80\sources\eeread.c"
 clrwdt ;#
-psect	text995
+psect	text927
 	line	11
 	bsf	status, 5	;RP0=1, select bank3
 	bsf	status, 6	;RP1=1, select bank3
 	btfsc	(3169/8)^0180h,(3169)&7
-	goto	u1331
-	goto	u1330
-u1331:
+	goto	u3111
+	goto	u3110
+u3111:
 	goto	l1192
-u1330:
+u3110:
+	goto	l4280
+	
+l1193:	
 	line	12
 	
-l4068:	
+l4280:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(eeprom_read@addr),w
+	bcf	status, 5	;RP0=0, select bank2
 	bsf	status, 6	;RP1=1, select bank2
 	movwf	(269)^0100h	;volatile
 	movlw	(03Fh)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_eeprom_read+0)+0
+	movf	(??_eeprom_read+0)+0,w
 	bsf	status, 5	;RP0=1, select bank3
+	bsf	status, 6	;RP1=1, select bank3
 	andwf	(396)^0180h,f	;volatile
 	bsf	(3168/8)^0180h,(3168)&7
 	clrc
@@ -7609,10 +9946,14 @@ l4068:
 
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	movwf	(??_eeprom_read+0)+0
-	clrf	(??_eeprom_read+0)+0+1
+	movwf	(??_eeprom_read+1)+0
+	clrf	(??_eeprom_read+1)+0+1
+	bcf	status, 5	;RP0=0, select bank2
 	bsf	status, 6	;RP1=1, select bank2
 	movf	(268)^0100h,w	;volatile
+	goto	l1194
+	
+l4282:	
 	line	13
 	
 l1194:	
@@ -7623,10 +9964,200 @@ GLOBAL	__end_of_eeprom_read
 ;; =============== function _eeprom_read ends ============
 
 	signat	_eeprom_read,4217
+	global	_transmit
+psect	text928,local,class=CODE,delta=2
+global __ptext928
+__ptext928:
+
+;; *************** function _transmit *****************
+;; Defined at:
+;;		line 8 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+;; Parameters:    Size  Location     Type
+;;  data            1    wreg     unsigned char 
+;; Auto vars:     Size  Location     Type
+;;  data            1    0[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       1       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       1       0       0       0
+;;Total ram usage:        1 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    3
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_usartstring
+;;		_gsm_init
+;;		_SendStock
+;;		_send_moister_message2
+;;		_send_moister_message1
+;;		_send_stage1_message
+;;		_send_stage2_message
+;;		_send_stage3_message
+;; This function uses a non-reentrant model
+;;
+psect	text928
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+	line	8
+	global	__size_of_transmit
+	__size_of_transmit	equ	__end_of_transmit-_transmit
+	
+_transmit:	
+	opt	stack 3
+; Regs used in _transmit: [wreg]
+;transmit@data stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(transmit@data)
+	line	9
+	
+l4190:	
+;UART.C: 9: while(!TXIF);
+	goto	l1021
+	
+l1022:	
+	
+l1021:	
+	btfss	(100/8),(100)&7
+	goto	u2961
+	goto	u2960
+u2961:
+	goto	l1021
+u2960:
+	goto	l4192
+	
+l1023:	
+	line	10
+	
+l4192:	
+;UART.C: 10: TXREG =data;
+	movf	(transmit@data),w
+	movwf	(25)	;volatile
+	line	11
+	
+l1024:	
+	return
+	opt stack 0
+GLOBAL	__end_of_transmit
+	__end_of_transmit:
+;; =============== function _transmit ends ============
+
+	signat	_transmit,4216
+	global	_receive
+psect	text929,local,class=CODE,delta=2
+global __ptext929
+__ptext929:
+
+;; *************** function _receive *****************
+;; Defined at:
+;;		line 2 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;		None
+;; Return value:  Size  Location     Type
+;;                  1    wreg      unsigned char 
+;; Registers used:
+;;		wreg
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       0       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       0       0       0       0
+;;Total ram usage:        0 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    3
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_gsm_init
+;;		_SendStock
+;;		_send_moister_message2
+;;		_send_moister_message1
+;;		_send_stage1_message
+;;		_send_stage2_message
+;;		_send_stage3_message
+;; This function uses a non-reentrant model
+;;
+psect	text929
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
+	line	2
+	global	__size_of_receive
+	__size_of_receive	equ	__end_of_receive-_receive
+	
+_receive:	
+	opt	stack 3
+; Regs used in _receive: [wreg]
+	line	3
+	
+l4182:	
+;UART.C: 3: if(OERR){CREN=0;CREN=1;}
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	btfss	(193/8),(193)&7
+	goto	u2941
+	goto	u2940
+u2941:
+	goto	l1015
+u2940:
+	
+l4184:	
+	bcf	(196/8),(196)&7
+	bsf	(196/8),(196)&7
+	goto	l1015
+	
+l1014:	
+	line	4
+;UART.C: 4: while(!RCIF);
+	goto	l1015
+	
+l1016:	
+	
+l1015:	
+	btfss	(101/8),(101)&7
+	goto	u2951
+	goto	u2950
+u2951:
+	goto	l1015
+u2950:
+	goto	l4186
+	
+l1017:	
+	line	5
+	
+l4186:	
+;UART.C: 5: return(RCREG);
+	movf	(26),w	;volatile
+	goto	l1018
+	
+l4188:	
+	line	6
+	
+l1018:	
+	return
+	opt stack 0
+GLOBAL	__end_of_receive
+	__end_of_receive:
+;; =============== function _receive ends ============
+
+	signat	_receive,89
 	global	_lcdport
-psect	text996,local,class=CODE,delta=2
-global __ptext996
-__ptext996:
+psect	text930,local,class=CODE,delta=2
+global __ptext930
+__ptext930:
 
 ;; *************** function _lcdport *****************
 ;; Defined at:
@@ -7640,9 +10171,9 @@ __ptext996:
 ;; Registers used:
 ;;		wreg
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       1       0       0       0
@@ -7659,7 +10190,7 @@ __ptext996:
 ;;		_lcd_init
 ;; This function uses a non-reentrant model
 ;;
-psect	text996
+psect	text930
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\lcd.c"
 	line	16
 	global	__size_of_lcdport
@@ -7669,20 +10200,22 @@ _lcdport:
 	opt	stack 1
 ; Regs used in _lcdport: [wreg]
 ;lcdport@a stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	movwf	(lcdport@a)
 	line	17
 	
-l4058:	
+l4166:	
 ;lcd.c: 17: if(a & 1)
 	btfss	(lcdport@a),(0)&7
-	goto	u1291
-	goto	u1290
-u1291:
+	goto	u2901
+	goto	u2900
+u2901:
 	goto	l954
-u1290:
+u2900:
 	line	18
 	
-l4060:	
+l4168:	
 ;lcd.c: 18: RD4 = 1;
 	bsf	(68/8),(68)&7
 	goto	l955
@@ -7698,14 +10231,14 @@ l955:
 	line	22
 ;lcd.c: 22: if(a & 2)
 	btfss	(lcdport@a),(1)&7
-	goto	u1301
-	goto	u1300
-u1301:
+	goto	u2911
+	goto	u2910
+u2911:
 	goto	l956
-u1300:
+u2910:
 	line	23
 	
-l4062:	
+l4170:	
 ;lcd.c: 23: RD5 = 1;
 	bsf	(69/8),(69)&7
 	goto	l957
@@ -7721,14 +10254,14 @@ l957:
 	line	27
 ;lcd.c: 27: if(a & 4)
 	btfss	(lcdport@a),(2)&7
-	goto	u1311
-	goto	u1310
-u1311:
+	goto	u2921
+	goto	u2920
+u2921:
 	goto	l958
-u1310:
+u2920:
 	line	28
 	
-l4064:	
+l4172:	
 ;lcd.c: 28: RD6 = 1;
 	bsf	(70/8),(70)&7
 	goto	l959
@@ -7744,14 +10277,14 @@ l959:
 	line	32
 ;lcd.c: 32: if(a & 8)
 	btfss	(lcdport@a),(3)&7
-	goto	u1321
-	goto	u1320
-u1321:
+	goto	u2931
+	goto	u2930
+u2931:
 	goto	l960
-u1320:
+u2930:
 	line	33
 	
-l4066:	
+l4174:	
 ;lcd.c: 33: RD7 = 1;
 	bsf	(71/8),(71)&7
 	goto	l962
@@ -7762,6 +10295,9 @@ l960:
 ;lcd.c: 34: else
 ;lcd.c: 35: RD7 = 0;
 	bcf	(71/8),(71)&7
+	goto	l962
+	
+l961:	
 	line	36
 	
 l962:	
@@ -7772,10 +10308,144 @@ GLOBAL	__end_of_lcdport
 ;; =============== function _lcdport ends ============
 
 	signat	_lcdport,4216
+	global	_DelayMs
+psect	text931,local,class=CODE,delta=2
+global __ptext931
+__ptext931:
+
+;; *************** function _DelayMs *****************
+;; Defined at:
+;;		line 39 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+;; Parameters:    Size  Location     Type
+;;  cnt             1    wreg     unsigned char 
+;; Auto vars:     Size  Location     Type
+;;  cnt             1    1[BANK0 ] unsigned char 
+;;  i               1    2[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;		None               void
+;; Registers used:
+;;		wreg, status,2, status,0
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       2       0       0       0
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    3
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_DelayS
+;; This function uses a non-reentrant model
+;;
+psect	text931
+	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+	line	39
+	global	__size_of_DelayMs
+	__size_of_DelayMs	equ	__end_of_DelayMs-_DelayMs
+	
+_DelayMs:	
+	opt	stack 2
+; Regs used in _DelayMs: [wreg+status,2+status,0]
+;DelayMs@cnt stored from wreg
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(DelayMs@cnt)
+	line	41
+;Delay.c: 40: unsigned char i;
+;Delay.c: 41: do {
+	
+l923:	
+	line	42
+	
+l4152:	
+;Delay.c: 42: i = 4;
+	movlw	(04h)
+	movwf	(??_DelayMs+0)+0
+	movf	(??_DelayMs+0)+0,w
+	movwf	(DelayMs@i)
+	line	43
+;Delay.c: 43: do {
+	
+l924:	
+	line	44
+;Delay.c: 44: { delayus_variable=(unsigned char)(250/4); asm("nop"); } asm("decfsz _delayus_variable,f"); asm("goto $ - 2");;
+	movlw	(03Eh)
+	movwf	(??_DelayMs+0)+0
+	movf	(??_DelayMs+0)+0,w
+	movwf	(_delayus_variable)
+	
+l4154:	
+# 44 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+nop ;#
+psect	text931
+	
+l4156:	
+# 44 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+decfsz _delayus_variable,f ;#
+psect	text931
+	
+l4158:	
+# 44 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+goto $ - 2 ;#
+psect	text931
+	line	45
+	
+l4160:	
+# 45 "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Delay.c"
+clrwdt ;#
+psect	text931
+	line	46
+	
+l4162:	
+;Delay.c: 46: } while(--i);
+	movlw	low(01h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	subwf	(DelayMs@i),f
+	btfss	status,2
+	goto	u2881
+	goto	u2880
+u2881:
+	goto	l924
+u2880:
+	goto	l4164
+	
+l925:	
+	line	47
+	
+l4164:	
+;Delay.c: 47: } while(--cnt);
+	movlw	low(01h)
+	subwf	(DelayMs@cnt),f
+	btfss	status,2
+	goto	u2891
+	goto	u2890
+u2891:
+	goto	l923
+u2890:
+	goto	l927
+	
+l926:	
+	line	48
+	
+l927:	
+	return
+	opt stack 0
+GLOBAL	__end_of_DelayMs
+	__end_of_DelayMs:
+;; =============== function _DelayMs ends ============
+
+	signat	_DelayMs,4216
 	global	_ISR
-psect	text997,local,class=CODE,delta=2
-global __ptext997
-__ptext997:
+psect	text932,local,class=CODE,delta=2
+global __ptext932
+__ptext932:
 
 ;; *************** function _ISR *****************
 ;; Defined at:
@@ -7790,14 +10460,14 @@ __ptext997:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
 ;; Tracked objects:
 ;;		On entry : 0/0
-;;		On exit  : 60/0
-;;		Unchanged: FFE9F/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          3       0       0       0       0
-;;      Totals:         3       0       0       0       0
-;;Total ram usage:        3 bytes
+;;      Temps:          4       0       0       0       0
+;;      Totals:         4       0       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    2
 ;; This function calls:
@@ -7806,7 +10476,7 @@ __ptext997:
 ;;		Interrupt level 1
 ;; This function uses a non-reentrant model
 ;;
-psect	text997
+psect	text932
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	65
 	global	__size_of_ISR
@@ -7829,34 +10499,44 @@ interrupt_function:
 	movwf	(??_ISR+1)
 	movf	pclath,w
 	movwf	(??_ISR+2)
-	ljmp	_ISR
-psect	text997
-	line	66
-	
-i1l3236:	
-;Main.c: 66: if (RCIF==1)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
+	movf	btemp+1,w
+	movwf	(??_ISR+3)
+	ljmp	_ISR
+psect	text932
+	line	66
+	
+i1l4274:	
+;Main.c: 66: if (RCIF==1)
 	btfss	(101/8),(101)&7
-	goto	u74_21
-	goto	u74_20
-u74_21:
+	goto	u310_21
+	goto	u310_20
+u310_21:
 	goto	i1l1107
-u74_20:
+u310_20:
 	line	67
 	
-i1l3238:	
+i1l4276:	
 ;Main.c: 67: { sms_indication=0;
 	bcf	(_sms_indication/8),(_sms_indication)&7
 	line	68
 	
-i1l3240:	
+i1l4278:	
 ;Main.c: 68: gsm_read_line2(sms);
 	movlw	(_sms)&0ffh
 	fcall	_gsm_read_line2
+	goto	i1l1107
+	line	69
+	
+i1l1106:	
 	line	70
 	
 i1l1107:	
+	movf	(??_ISR+3),w
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	btemp+1
 	movf	(??_ISR+2),w
 	movwf	pclath
 	movf	(??_ISR+1),w
@@ -7873,9 +10553,9 @@ GLOBAL	__end_of_ISR
 
 	signat	_ISR,88
 	global	_gsm_read_line2
-psect	text998,local,class=CODE,delta=2
-global __ptext998
-__ptext998:
+psect	text933,local,class=CODE,delta=2
+global __ptext933
+__ptext933:
 
 ;; *************** function _gsm_read_line2 *****************
 ;; Defined at:
@@ -7884,33 +10564,33 @@ __ptext998:
 ;;  buffer          1    wreg     PTR unsigned char 
 ;;		 -> sms(20), 
 ;; Auto vars:     Size  Location     Type
-;;  buffer          1    1[COMMON] PTR unsigned char 
+;;  buffer          1    2[COMMON] PTR unsigned char 
 ;;		 -> sms(20), 
-;;  rec_data        1    2[COMMON] unsigned char 
-;;  flag            1    0[COMMON] unsigned char 
+;;  rec_data        1    3[COMMON] unsigned char 
+;;  flag            1    1[COMMON] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 160/0
-;;		Unchanged: FFE9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         3       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         3       0       0       0       0
-;;Total ram usage:        3 bytes
+;;      Temps:          1       0       0       0       0
+;;      Totals:         4       0       0       0       0
+;;Total ram usage:        4 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    1
 ;; This function calls:
-;;		_receive
+;;		i1_receive
 ;; This function is called by:
 ;;		_ISR
 ;; This function uses a non-reentrant model
 ;;
-psect	text998
+psect	text933
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\Main.c"
 	line	48
 	global	__size_of_gsm_read_line2
@@ -7923,78 +10603,117 @@ _gsm_read_line2:
 	movwf	(gsm_read_line2@buffer)
 	line	49
 	
-i1l3216:	
-	clrf	(gsm_read_line2@flag)
+i1l4254:	
+;Main.c: 49: unsigned char rec_data=0,flag=0;
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	movwf	(gsm_read_line2@rec_data)
+	clrc
+	movlw	0
+	btfsc	status,0
+	movlw	1
+	movwf	(gsm_read_line2@flag)
+	goto	i1l4256
+	line	51
+;Main.c: 51: do
+	
+i1l1099:	
 	line	53
 	
-i1l3218:	
+i1l4256:	
 ;Main.c: 52: {
 ;Main.c: 53: rec_data = receive();
-	fcall	_receive
+	fcall	i1_receive
+	movwf	(??_gsm_read_line2+0)+0
+	movf	(??_gsm_read_line2+0)+0,w
 	movwf	(gsm_read_line2@rec_data)
 	line	54
 	
-i1l3220:	
+i1l4258:	
 ;Main.c: 54: if(rec_data=='#'){flag=1;rec_data = receive(); }
 	movf	(gsm_read_line2@rec_data),w
 	xorlw	023h
 	skipz
-	goto	u71_21
-	goto	u71_20
-u71_21:
-	goto	i1l3226
-u71_20:
+	goto	u307_21
+	goto	u307_20
+u307_21:
+	goto	i1l4264
+u307_20:
 	
-i1l3222:	
+i1l4260:	
 	clrf	(gsm_read_line2@flag)
-	incf	(gsm_read_line2@flag),f
+	bsf	status,0
+	rlf	(gsm_read_line2@flag),f
 	
-i1l3224:	
-	fcall	_receive
+i1l4262:	
+	fcall	i1_receive
+	movwf	(??_gsm_read_line2+0)+0
+	movf	(??_gsm_read_line2+0)+0,w
 	movwf	(gsm_read_line2@rec_data)
+	goto	i1l4264
+	
+i1l1100:	
 	line	55
 	
-i1l3226:	
+i1l4264:	
 ;Main.c: 55: if(flag)
 	movf	(gsm_read_line2@flag),w
 	skipz
-	goto	u72_20
-	goto	i1l3232
-u72_20:
+	goto	u308_20
+	goto	i1l4270
+u308_20:
 	line	57
 	
-i1l3228:	
+i1l4266:	
 ;Main.c: 56: {
 ;Main.c: 57: *buffer++ = rec_data;
+	movf	(gsm_read_line2@rec_data),w
+	movwf	(??_gsm_read_line2+0)+0
 	movf	(gsm_read_line2@buffer),w
 	movwf	fsr0
-	movf	(gsm_read_line2@rec_data),w
+	movf	(??_gsm_read_line2+0)+0,w
 	bcf	status, 7	;select IRP bank0
 	movwf	indf
 	
-i1l3230:	
-	incf	(gsm_read_line2@buffer),f
+i1l4268:	
+	movlw	(01h)
+	movwf	(??_gsm_read_line2+0)+0
+	movf	(??_gsm_read_line2+0)+0,w
+	addwf	(gsm_read_line2@buffer),f
+	goto	i1l4270
+	line	58
+	
+i1l1101:	
 	line	59
 	
-i1l3232:	
+i1l4270:	
 ;Main.c: 58: }
 ;Main.c: 59: }while (rec_data != '\n');
 	movf	(gsm_read_line2@rec_data),w
 	xorlw	0Ah
 	skipz
-	goto	u73_21
-	goto	u73_20
-u73_21:
-	goto	i1l3218
-u73_20:
+	goto	u309_21
+	goto	u309_20
+u309_21:
+	goto	i1l4256
+u309_20:
+	goto	i1l4272
+	
+i1l1102:	
 	line	60
 	
-i1l3234:	
+i1l4272:	
 ;Main.c: 60: *buffer='\0';
+	clrc
 	movf	(gsm_read_line2@buffer),w
 	movwf	fsr0
+	movlw	0
+	btfsc	status,0
+	movlw	1
 	bcf	status, 7	;select IRP bank0
-	clrf	indf
+	movwf	indf
 	line	61
 	
 i1l1103:	
@@ -8005,12 +10724,12 @@ GLOBAL	__end_of_gsm_read_line2
 ;; =============== function _gsm_read_line2 ends ============
 
 	signat	_gsm_read_line2,4216
-	global	_receive
-psect	text999,local,class=CODE,delta=2
-global __ptext999
-__ptext999:
+	global	i1_receive
+psect	text934,local,class=CODE,delta=2
+global __ptext934
+__ptext934:
 
-;; *************** function _receive *****************
+;; *************** function i1_receive *****************
 ;; Defined at:
 ;;		line 2 in file "F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
 ;; Parameters:    Size  Location     Type
@@ -8022,9 +10741,9 @@ __ptext999:
 ;; Registers used:
 ;;		wreg
 ;; Tracked objects:
-;;		On entry : 60/0
-;;		On exit  : 60/0
-;;		Unchanged: FFF9F/0
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       0       0       0       0
@@ -8038,56 +10757,71 @@ __ptext999:
 ;;		_gsm_read_line2
 ;; This function uses a non-reentrant model
 ;;
-psect	text999
+psect	text934
 	file	"F:\PiROOT_Tech\student_projects\AutomaticRationCardSystem\UART.C"
 	line	2
-	global	__size_of_receive
-	__size_of_receive	equ	__end_of_receive-_receive
+	global	__size_ofi1_receive
+	__size_ofi1_receive	equ	__end_ofi1_receive-i1_receive
 	
-_receive:	
+i1_receive:	
 	opt	stack 1
-; Regs used in _receive: [wreg]
+; Regs used in i1_receive: [wreg]
 	line	3
 	
-i1l3208:	
+i1l4468:	
 ;UART.C: 3: if(OERR){CREN=0;CREN=1;}
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
 	btfss	(193/8),(193)&7
-	goto	u69_21
-	goto	u69_20
-u69_21:
+	goto	u355_21
+	goto	u355_20
+u355_21:
 	goto	i1l1015
-u69_20:
+u355_20:
 	
-i1l3210:	
+i1l4470:	
 	bcf	(196/8),(196)&7
 	bsf	(196/8),(196)&7
+	goto	i1l1015
+	
+i1l1014:	
 	line	4
+;UART.C: 4: while(!RCIF);
+	goto	i1l1015
+	
+i1l1016:	
 	
 i1l1015:	
 	btfss	(101/8),(101)&7
-	goto	u70_21
-	goto	u70_20
-u70_21:
+	goto	u356_21
+	goto	u356_20
+u356_21:
 	goto	i1l1015
-u70_20:
+u356_20:
+	goto	i1l4472
+	
+i1l1017:	
 	line	5
 	
-i1l3212:	
+i1l4472:	
 ;UART.C: 5: return(RCREG);
 	movf	(26),w	;volatile
+	goto	i1l1018
+	
+i1l4474:	
 	line	6
 	
 i1l1018:	
 	return
 	opt stack 0
-GLOBAL	__end_of_receive
-	__end_of_receive:
-;; =============== function _receive ends ============
+GLOBAL	__end_ofi1_receive
+	__end_ofi1_receive:
+;; =============== function i1_receive ends ============
 
-	signat	_receive,89
-psect	text1000,local,class=CODE,delta=2
-global __ptext1000
-__ptext1000:
+	signat	i1_receive,89
+psect	text935,local,class=CODE,delta=2
+global __ptext935
+__ptext935:
 	global	btemp
 	btemp set 07Eh
 

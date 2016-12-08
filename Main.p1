@@ -1697,9 +1697,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 ]
 [; ;lcd.c: 1: const char a[]={"0123456789"};
 "9
-[v _enable `(v 1 ef ]
+[v _enable `(i 1 ef ]
 {
-[; ;lcd.c: 8: void enable()
+[; ;lcd.c: 8: enable()
 [; ;lcd.c: 9: {
 [e :U _enable ]
 [f ]
@@ -3231,7 +3231,7 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 193: PIE1=0X00;
 "193
 [e = _PIE1 -> -> 0 `i `uc ]
-[; ;Main.c: 194: usartstring("AT+CMGS=\"+919894748200\"");
+[; ;Main.c: 194: usartstring("AT+CMGS=\"+919003831304\"");
 "194
 [e ( _usartstring (1 :s 27C ]
 [; ;Main.c: 195: transmit(0x0D);
@@ -3337,6 +3337,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 226: startup();
 "226
 [e ( _startup ..  ]
+[; ;Main.c: 227: gsm_init();
+"227
+[e ( _gsm_init ..  ]
 [; ;Main.c: 228: PIE1=0x20;
 "228
 [e = _PIE1 -> -> 32 `i `uc ]
@@ -3486,9 +3489,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 278: DisplayKerosene(0XDD,User1Kerosene);
 "278
 [e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User1Kerosene ]
-[; ;Main.c: 279: _delay((unsigned long)((2000)*(20000000/4000.0)));
+[; ;Main.c: 279: _delay((unsigned long)((8000)*(20000000/4000.0)));
 "279
-[e ( __delay (1 -> * -> -> 2000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[e ( __delay (1 -> * -> -> 8000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
 [; ;Main.c: 280: RiseStock=RiseStock-User1Rise;
 "280
 [e = _RiseStock - _RiseStock -> _User1Rise `ui ]
@@ -3612,9 +3615,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 324: DisplayKerosene(0XDD,User2Kerosene);
 "324
 [e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User2Kerosene ]
-[; ;Main.c: 325: _delay((unsigned long)((2000)*(20000000/4000.0)));
+[; ;Main.c: 325: _delay((unsigned long)((8000)*(20000000/4000.0)));
 "325
-[e ( __delay (1 -> * -> -> 2000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[e ( __delay (1 -> * -> -> 8000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
 [; ;Main.c: 326: RiseStock=RiseStock-User2Rise;
 "326
 [e = _RiseStock - _RiseStock -> _User2Rise `ui ]
@@ -3738,9 +3741,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 370: DisplayKerosene(0XDD,User3Kerosene);
 "370
 [e ( _DisplayKerosene (2 , -> -> 221 `i `uc _User3Kerosene ]
-[; ;Main.c: 371: _delay((unsigned long)((2000)*(20000000/4000.0)));
+[; ;Main.c: 371: _delay((unsigned long)((8000)*(20000000/4000.0)));
 "371
-[e ( __delay (1 -> * -> -> 2000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
+[e ( __delay (1 -> * -> -> 8000 `i `d / -> -> 20000000 `l `d .4000.0 `ul ]
 [; ;Main.c: 372: RiseStock=RiseStock-User3Rise;
 "372
 [e = _RiseStock - _RiseStock -> _User3Rise `ui ]
@@ -3862,6 +3865,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;Main.c: 413: {
 "413
 {
+[; ;Main.c: 414: SendStock();
+"414
+[e ( _SendStock ..  ]
 [; ;Main.c: 415: sms_indication=1;
 "415
 [e = _sms_indication -> -> 1 `i `b ]
@@ -3935,12 +3941,12 @@ Version 3.2 HI-TECH Software Intermediate Code
 [a 16C 67 114 111 112 32 99 114 111 115 115 101 100 32 115 116 97 103 101 50 0 ]
 [a 14C 67 114 111 112 32 99 114 111 115 115 101 100 32 115 116 97 103 101 49 0 ]
 [a 2C 80 76 83 32 87 65 73 84 46 46 46 46 46 46 46 46 0 ]
+[a 27C 65 84 43 67 77 71 83 61 34 43 57 49 57 48 48 51 56 51 49 51 48 52 34 0 ]
 [a 9C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 11C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 13C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 15C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
 [a 17C 65 84 43 67 77 71 83 61 34 43 57 49 57 55 57 48 48 56 48 53 49 48 34 0 ]
-[a 27C 65 84 43 67 77 71 83 61 34 43 57 49 57 56 57 52 55 52 56 50 48 48 34 0 ]
 [a 23C 65 85 84 79 77 65 84 73 67 32 82 65 84 73 79 78 32 0 ]
 [a 41C 32 67 65 78 32 79 78 32 75 69 82 79 83 69 78 69 32 0 ]
 [a 48C 32 67 65 78 32 79 78 32 75 69 82 79 83 69 78 69 32 0 ]
